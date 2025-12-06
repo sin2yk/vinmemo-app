@@ -123,11 +123,15 @@
       // ログイン状態の監視
       onAuthStateChanged(auth, (user) => {
         if (user) {
-          setStatus(`ログイン中：${user.email}`);
-          logoutBtn.disabled = false;
-          loginBtn.disabled = true;
-          signupBtn.disabled = true;
+          // ログインしていたら、少しだけメッセージを出してから home.php へ
+          setStatus(`ログイン中：${user.email}（VinMemoへ移動します…）`);
+
+          // すぐ飛んでもいいけど、0.5秒くらい待つと安心感ある
+          setTimeout(() => {
+            window.location.href = "home.php";
+          }, 500);
         } else {
+          // ログアウト状態
           setStatus("ログアウト状態です。");
           logoutBtn.disabled = true;
           loginBtn.disabled = false;
