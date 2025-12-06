@@ -1,8 +1,13 @@
-CREATE TABLE events (
-  id INT AUTO_INCREMENT PRIMARY KEY,
-  title VARCHAR(255) NOT NULL,
-  event_date DATE NOT NULL,
-  place VARCHAR(255),
-  memo TEXT,
-  created_at DATETIME DEFAULT CURRENT_TIMESTAMP
-);
+<?php
+require_once 'db_connect.php'; // ここでエラーならDB接続失敗
+
+echo "DB接続OKっぽいよ<br>";
+
+// １件だけSELECTしてみる
+$sql = 'SELECT COUNT(*) AS cnt FROM events';
+$stmt = $pdo->prepare($sql);
+$stmt->execute();
+$row = $stmt->fetch(PDO::FETCH_ASSOC);
+
+echo "eventsテーブルの件数: " . $row['cnt'];
+?>
