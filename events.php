@@ -16,6 +16,12 @@ $events = $stmt->fetchAll(PDO::FETCH_ASSOC);
 <body>
   <h1>ワイン会一覧（テスト版）</h1>
   <p><a href="home.php">← Homeに戻る</a></p>
+  <!-- ▼ ここを追記 -->
+  <p>
+    <a href="events_new.php">＋ ワイン会を新規登録する</a>
+  </p>
+  <!-- ▲ ここまで追記 -->
+
   <hr>
 
   <?php if (empty($events)) : ?>
