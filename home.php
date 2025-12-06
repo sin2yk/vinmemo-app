@@ -31,8 +31,12 @@
 
   <hr>
 
-  <h2>ここから先が VinMemo 本体</h2>
-  <p>※まずはこのページにワイン会一覧やボトル登録へのリンクを置いていく。</p>
+<h2>ここから先が VinMemo 本体</h2>
+<ul>
+  <li><a href="events.php">ワイン会一覧（Events）</a></li>
+  <li><a href="entry.php">ボトル登録（Bottle Entry）</a></li>
+  <li><a href="mypage.php">マイページ（自分のボトル履歴）</a></li>
+</ul>
 
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-app.js";
