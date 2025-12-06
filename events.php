@@ -9,11 +9,13 @@ $events = $stmt->fetchAll(PDO::FETCH_ASSOC);
 ?>
 <!DOCTYPE html>
 <html lang="ja">
+
 <head>
   <meta charset="UTF-8">
   <title>VinMemo v1 – Events</title>
   <link rel="stylesheet" href="style.css">
 </head>
+
 <body>
   <div class="container">
     <header>
@@ -27,9 +29,9 @@ $events = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
     <hr>
 
-    <?php if (empty($events)) : ?>
+    <?php if (empty($events)): ?>
       <p>まだイベントは登録されていません。</p>
-    <?php else : ?>
+    <?php else: ?>
       <div class="card">
         <table>
           <thead>
@@ -43,10 +45,12 @@ $events = $stmt->fetchAll(PDO::FETCH_ASSOC);
             </tr>
           </thead>
           <tbody>
-            <?php foreach ($events as $event) : ?>
+            <?php foreach ($events as $event): ?>
               <tr>
                 <td><?= htmlspecialchars($event['id'], ENT_QUOTES, 'UTF-8') ?></td>
-                <td><?= htmlspecialchars($event['title'], ENT_QUOTES, 'UTF-8') ?></td>
+                <td><a
+                    href="event_show.php?id=<?= htmlspecialchars($event['id'], ENT_QUOTES, 'UTF-8') ?>"><?= htmlspecialchars($event['title'], ENT_QUOTES, 'UTF-8') ?></a>
+                </td>
                 <td><?= htmlspecialchars($event['event_date'], ENT_QUOTES, 'UTF-8') ?></td>
                 <td><?= htmlspecialchars($event['place'], ENT_QUOTES, 'UTF-8') ?></td>
                 <td><?= nl2br(htmlspecialchars($event['memo'], ENT_QUOTES, 'UTF-8')) ?></td>
@@ -60,4 +64,5 @@ $events = $stmt->fetchAll(PDO::FETCH_ASSOC);
   </div>
 
 </body>
+
 </html>
