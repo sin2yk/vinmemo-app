@@ -1,2 +1,3 @@
 # vinmemo-app
-G's Academyの卒業制作～ワインメモリー/VinuMemory
+ワインメモリー/VinuMemory プロジェクト用
+VinMemo v1 / Firebase Authログインフォームまで実装

@@ -1,0 +1,13 @@
+# OS / エディタ系
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+
+# そのうち使うかもしれないやつ
+node_modules/
+vendor/
+
+# 環境依存の設定ファイル（将来用）
+.env
+*.log
