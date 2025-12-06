@@ -1,34 +1,38 @@
 <!DOCTYPE html>
 <html lang="ja">
-  <head>
-    <meta charset="UTF-8" />
-    <title>VinMemo v1</title>
-    <!-- Google Analytics GA4 -->
-    <script
-      async
-      src="https://www.googletagmanager.com/gtag/js?id=G-6BXQJQF1K5"
-    ></script>
-    <script>
-      window.dataLayer = window.dataLayer || [];
-      function gtag() {
-        dataLayer.push(arguments);
-      }
-      gtag("js", new Date());
-      gtag("config", "G-6BXQJQF1K5");
-    </script>
-  </head>
-  <body>
-    <h1>VinMemo v1</h1>
+
+<head>
+  <meta charset="UTF-8" />
+  <title>VinMemo v1</title>
+  <!-- Google Analytics GA4 -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-6BXQJQF1K5"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag() {
+      dataLayer.push(arguments);
+    }
+    gtag("js", new Date());
+    gtag("config", "G-6BXQJQF1K5");
+  </script>
+  <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+  <div class="container text-center">
+    <header>
+      <h1>VinMemo v1</h1>
+    </header>
+
     <p>ここにFirebase Authログインフォームを置く予定。</p>
 
-    <section id="auth-section">
+    <div class="card" id="auth-section">
       <h2>ログイン / 新規登録</h2>
 
       <label>
         メールアドレス：
         <input type="email" id="email" autocomplete="email" />
       </label>
-      <br />
+
       <label>
         パスワード：
         <input type="password" id="password" autocomplete="current-password" />
@@ -40,104 +44,106 @@
       <button id="logout-btn" disabled>ログアウト</button>
 
       <p id="auth-status"></p>
-    </section>
+    </div>
+  </div>
 
-    <!-- ここにFirebaseのスクリプトを入れる -->
-    <script type="module">
-      import { initializeApp } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-app.js";
-      import {
-        getAuth,
-        onAuthStateChanged,
-        createUserWithEmailAndPassword,
-        signInWithEmailAndPassword,
-        signOut,
-      } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-auth.js";
+  <!-- ここにFirebaseのスクリプトを入れる -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-app.js";
+    import {
+      getAuth,
+      onAuthStateChanged,
+      createUserWithEmailAndPassword,
+      signInWithEmailAndPassword,
+      signOut,
+    } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-auth.js";
 
-      // ★ さっき作った新しいAPIキーを含む firebaseConfig をそのまま貼る
-      const firebaseConfig = {
-        apiKey: "AIzaSyAWy-qFkXZM3tMSwoMYeTo2SrJHyVkuZ9c", // 新キー
-        authDomain: "vinmemo-v1.firebaseapp.com",
-        projectId: "vinmemo-v1",
-        storageBucket: "vinmemo-v1.firebasestorage.app",
-        messagingSenderId: "559734690298",
-        appId: "1:559734690298:web:171793d9abbe724f77d443",
-        measurementId: "G-6BXQJQF1K5",
-      };
+    // ★ さっき作った新しいAPIキーを含む firebaseConfig をそのまま貼る
+    const firebaseConfig = {
+      apiKey: "AIzaSyAWy-qFkXZM3tMSwoMYeTo2SrJHyVkuZ9c", // 新キー
+      authDomain: "vinmemo-v1.firebaseapp.com",
+      projectId: "vinmemo-v1",
+      storageBucket: "vinmemo-v1.firebasestorage.app",
+      messagingSenderId: "559734690298",
+      appId: "1:559734690298:web:171793d9abbe724f77d443",
+      measurementId: "G-6BXQJQF1K5",
+    };
 
-      // Firebase 初期化
-      const app = initializeApp(firebaseConfig);
-      const auth = getAuth(app);
+    // Firebase 初期化
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
 
-      // DOM要素取得
-      const emailInput = document.getElementById("email");
-      const passwordInput = document.getElementById("password");
-      const signupBtn = document.getElementById("signup-btn");
-      const loginBtn = document.getElementById("login-btn");
-      const logoutBtn = document.getElementById("logout-btn");
-      const statusEl = document.getElementById("auth-status");
+    // DOM要素取得
+    const emailInput = document.getElementById("email");
+    const passwordInput = document.getElementById("password");
+    const signupBtn = document.getElementById("signup-btn");
+    const loginBtn = document.getElementById("login-btn");
+    const logoutBtn = document.getElementById("logout-btn");
+    const statusEl = document.getElementById("auth-status");
 
-      // 状態表示用ヘルパー
-      function setStatus(message) {
-        statusEl.textContent = message;
+    // 状態表示用ヘルパー
+    function setStatus(message) {
+      statusEl.textContent = message;
+    }
+
+    // 新規登録ボタン
+    signupBtn.addEventListener("click", async () => {
+      const email = emailInput.value;
+      const password = passwordInput.value;
+
+      try {
+        await createUserWithEmailAndPassword(auth, email, password);
+        setStatus("新規登録に成功しました。");
+      } catch (err) {
+        console.error(err);
+        setStatus("新規登録エラー：" + err.message);
       }
+    });
 
-      // 新規登録ボタン
-      signupBtn.addEventListener("click", async () => {
-        const email = emailInput.value;
-        const password = passwordInput.value;
+    // ログインボタン
+    loginBtn.addEventListener("click", async () => {
+      const email = emailInput.value;
+      const password = passwordInput.value;
 
-        try {
-          await createUserWithEmailAndPassword(auth, email, password);
-          setStatus("新規登録に成功しました。");
-        } catch (err) {
-          console.error(err);
-          setStatus("新規登録エラー：" + err.message);
-        }
-      });
+      try {
+        await signInWithEmailAndPassword(auth, email, password);
+        setStatus("ログイン成功。");
+      } catch (err) {
+        console.error(err);
+        setStatus("ログインエラー：" + err.message);
+      }
+    });
 
-      // ログインボタン
-      loginBtn.addEventListener("click", async () => {
-        const email = emailInput.value;
-        const password = passwordInput.value;
+    // ログアウトボタン
+    logoutBtn.addEventListener("click", async () => {
+      try {
+        await signOut(auth);
+        setStatus("ログアウトしました。");
+      } catch (err) {
+        console.error(err);
+        setStatus("ログアウトエラー：" + err.message);
+      }
+    });
 
-        try {
-          await signInWithEmailAndPassword(auth, email, password);
-          setStatus("ログイン成功。");
-        } catch (err) {
-          console.error(err);
-          setStatus("ログインエラー：" + err.message);
-        }
-      });
+    // ログイン状態の監視
+    onAuthStateChanged(auth, (user) => {
+      if (user) {
+        // ログインしていたら、少しだけメッセージを出してから home.php へ
+        setStatus(`ログイン中：${user.email}（VinMemoへ移動します…）`);
 
-      // ログアウトボタン
-      logoutBtn.addEventListener("click", async () => {
-        try {
-          await signOut(auth);
-          setStatus("ログアウトしました。");
-        } catch (err) {
-          console.error(err);
-          setStatus("ログアウトエラー：" + err.message);
-        }
-      });
+        // すぐ飛んでもいいけど、0.5秒くらい待つと安心感ある
+        setTimeout(() => {
+          window.location.href = "home.php";
+        }, 500);
+      } else {
+        // ログアウト状態
+        setStatus("ログアウト状態です。");
+        logoutBtn.disabled = true;
+        loginBtn.disabled = false;
+        signupBtn.disabled = false;
+      }
+    });
+  </script>
+</body>
 
-      // ログイン状態の監視
-      onAuthStateChanged(auth, (user) => {
-        if (user) {
-          // ログインしていたら、少しだけメッセージを出してから home.php へ
-          setStatus(`ログイン中：${user.email}（VinMemoへ移動します…）`);
-
-          // すぐ飛んでもいいけど、0.5秒くらい待つと安心感ある
-          setTimeout(() => {
-            window.location.href = "home.php";
-          }, 500);
-        } else {
-          // ログアウト状態
-          setStatus("ログアウト状態です。");
-          logoutBtn.disabled = true;
-          loginBtn.disabled = false;
-          signupBtn.disabled = false;
-        }
-      });
-    </script>
-  </body>
 </html>

@@ -4,39 +4,43 @@
 ?>
 <!DOCTYPE html>
 <html lang="ja">
+
 <head>
   <meta charset="UTF-8">
   <title>VinMemo v1 – Home</title>
 
-    <!-- Google Analytics GA4 -->
-    <script
-      async
-      src="https://www.googletagmanager.com/gtag/js?id=G-6BXQJQF1K5"
-    ></script>
-    <script>
-      window.dataLayer = window.dataLayer || [];
-      function gtag() {
-        dataLayer.push(arguments);
-      }
-      gtag("js", new Date());
-      gtag("config", "G-6BXQJQF1K5");
-    </script>
+  <link rel="stylesheet" href="style.css">
+
+  <!-- Google Analytics GA4 -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-6BXQJQF1K5"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag() {
+      dataLayer.push(arguments);
+    }
+    gtag("js", new Date());
+    gtag("config", "G-6BXQJQF1K5");
+  </script>
 
 </head>
+
 <body>
-  <h1>VinMemo Home</h1>
-  <p id="user-info">ログイン確認中...</p>
+  <div class="container">
+    <header>
+      <h1>VinMemo Home</h1>
+      <p id="user-info">ログイン確認中...</p>
+      <button id="logout-btn">ログアウト</button>
+    </header>
 
-  <button id="logout-btn">ログアウト</button>
-
-  <hr>
-
-<h2>ここから先が VinMemo 本体</h2>
-<ul>
-  <li><a href="events.php">ワイン会一覧（Events）</a></li>
-  <li><a href="entry.php">ボトル登録（Bottle Entry）</a></li>
-  <li><a href="mypage.php">マイページ（自分のボトル履歴）</a></li>
-</ul>
+    <div class="card">
+      <h2>ここから先が VinMemo 本体</h2>
+      <ul>
+        <li><a href="events.php">ワイン会一覧（Events）</a></li>
+        <li><a href="entry.php">ボトル登録（Bottle Entry）</a></li>
+        <li><a href="mypage.php">マイページ（自分のボトル履歴）</a></li>
+      </ul>
+    </div>
+  </div>
 
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-app.js";
@@ -57,11 +61,11 @@
       measurementId: "G-6BXQJQF1K5"
     };
 
-    const app  = initializeApp(firebaseConfig);
+    const app = initializeApp(firebaseConfig);
     const auth = getAuth(app);
 
     const userInfoEl = document.getElementById('user-info');
-    const logoutBtn  = document.getElementById('logout-btn');
+    const logoutBtn = document.getElementById('logout-btn');
 
     // ここでもログイン状態を監視
     onAuthStateChanged(auth, (user) => {
@@ -86,4 +90,5 @@
     });
   </script>
 </body>
+
 </html>

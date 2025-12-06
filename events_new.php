@@ -5,10 +5,10 @@ require_once 'db_connect.php';
 
 // フォーム送信後の処理
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $title      = $_POST['title'] ?? '';
+    $title = $_POST['title'] ?? '';
     $event_date = $_POST['event_date'] ?? '';
-    $place      = $_POST['place'] ?? '';
-    $memo       = $_POST['memo'] ?? '';
+    $place = $_POST['place'] ?? '';
+    $memo = $_POST['memo'] ?? '';
 
     // ざっくりバリデーション（最低限）
     if ($title === '' || $event_date === '') {
@@ -31,46 +31,48 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 ?>
 <!DOCTYPE html>
 <html lang="ja">
+
 <head>
-  <meta charset="UTF-8">
-  <title>VinMemo v1 – ワイン会新規登録</title>
+    <meta charset="UTF-8">
+    <title>VinMemo v1 – ワイン会新規登録</title>
+    <link rel="stylesheet" href="style.css">
 </head>
+
 <body>
-  <h1>ワイン会 新規登録</h1>
-  <p><a href="events.php">← ワイン会一覧に戻る</a></p>
-  <hr>
+    <div class="container">
+        <header>
+            <h1>ワイン会 新規登録</h1>
+            <a href="events.php">← ワイン会一覧に戻る</a>
+        </header>
 
-  <?php if (!empty($error)) : ?>
-    <p style="color:red;"><?= htmlspecialchars($error, ENT_QUOTES, 'UTF-8') ?></p>
-  <?php endif; ?>
+        <?php if (!empty($error)): ?>
+            <div class="error-msg">
+                <?= htmlspecialchars($error, ENT_QUOTES, 'UTF-8') ?>
+            </div>
+        <?php endif; ?>
 
-  <form action="events_new.php" method="post">
-    <p>
-      タイトル（必須）：<br>
-      <input type="text" name="title" size="40"
-             value="<?= isset($title) ? htmlspecialchars($title, ENT_QUOTES, 'UTF-8') : '' ?>">
-    </p>
+        <div class="card">
+            <form action="events_new.php" method="post">
+                <label>タイトル（必須）</label>
+                <input type="text" name="title" placeholder="例：ボルドー左岸の会"
+                    value="<?= isset($title) ? htmlspecialchars($title, ENT_QUOTES, 'UTF-8') : '' ?>">
 
-    <p>
-      開催日（必須）：<br>
-      <input type="date" name="event_date"
-             value="<?= isset($event_date) ? htmlspecialchars($event_date, ENT_QUOTES, 'UTF-8') : '' ?>">
-    </p>
+                <label>開催日（必須）</label>
+                <input type="date" name="event_date"
+                    value="<?= isset($event_date) ? htmlspecialchars($event_date, ENT_QUOTES, 'UTF-8') : '' ?>">
 
-    <p>
-      場所：<br>
-      <input type="text" name="place" size="40"
-             value="<?= isset($place) ? htmlspecialchars($place, ENT_QUOTES, 'UTF-8') : '' ?>">
-    </p>
+                <label>場所</label>
+                <input type="text" name="place" placeholder="例：レストラン〇〇"
+                    value="<?= isset($place) ? htmlspecialchars($place, ENT_QUOTES, 'UTF-8') : '' ?>">
 
-    <p>
-      メモ：<br>
-      <textarea name="memo" cols="50" rows="4"><?= isset($memo) ? htmlspecialchars($memo, ENT_QUOTES, 'UTF-8') : '' ?></textarea>
-    </p>
+                <label>メモ</label>
+                <textarea name="memo" cols="50" rows="4"
+                    placeholder="参加メンバー、持ち込みリストなど"><?= isset($memo) ? htmlspecialchars($memo, ENT_QUOTES, 'UTF-8') : '' ?></textarea>
 
-    <p>
-      <button type="submit">登録する</button>
-    </p>
-  </form>
+                <button type="submit">登録する</button>
+            </form>
+        </div>
+    </div>
 </body>
+
 </html>
