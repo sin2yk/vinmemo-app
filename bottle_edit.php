@@ -171,7 +171,7 @@ require_once 'layout/header.php';
             <label>Memo</label>
             <textarea name="memo" rows="4"><?= h($bottle['memo']) ?></textarea>
 
-            <button type="submit" style="margin-top:20px;">Update</button>
+            <button type="submit" style="margin-top:20px;">この内容で更新する</button>
         </form>
     <?php else: ?>
         <p>Bottle not found.</p>

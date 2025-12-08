@@ -1,86 +1,86 @@
 :root {
-    /* Wine Theme Palette */
-    --bg-color: #2e0e12;
-    /* Deep Burgundy/Wine Background */
-    --card-bg: #4a1821;
-    /* Lighter Wine / Merlot for cards */
-    --text-main: #f7f7f7;
-    /* Off-white / Cream for readability */
-    --text-muted: #dcc0c0;
-    /* Muted pinkish-gray */
-    --accent: #d4af37;
-    /* Gold/Champagne */
-    --accent-hover: #b4942b;
-    /* Darker Gold */
-    --border: #63242e;
-    /* Subtle wine border */
-    --danger: #ff6b6b;
-    /* Softer red for errors on dark bg */
-    --font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  /* Wine Theme Palette */
+  --bg-color: #2e0e12;
+  /* Deep Burgundy/Wine Background */
+  --card-bg: #4a1821;
+  /* Lighter Wine / Merlot for cards */
+  --text-main: #f7f7f7;
+  /* Off-white / Cream for readability */
+  --text-muted: #dcc0c0;
+  /* Muted pinkish-gray */
+  --accent: #d4af37;
+  /* Gold/Champagne */
+  --accent-hover: #b4942b;
+  /* Darker Gold */
+  --border: #63242e;
+  /* Subtle wine border */
+  --danger: #ff6b6b;
+  /* Softer red for errors on dark bg */
+  --font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
 }
 
 * {
-    box-sizing: border-box;
+  box-sizing: border-box;
 }
 
 body {
-    margin: 0;
-    padding: 0;
-    background-color: var(--bg-color);
-    color: var(--text-main);
-    font-family: var(--font-family);
-    line-height: 1.6;
+  margin: 0;
+  padding: 0;
+  background-color: var(--bg-color);
+  color: var(--text-main);
+  font-family: var(--font-family);
+  line-height: 1.6;
 }
 
 h1,
 h2,
 h3 {
-    margin-top: 0;
-    font-weight: 600;
-    color: #fff;
-    /* Crisp white for headers */
+  margin-top: 0;
+  font-weight: 600;
+  color: #fff;
+  /* Crisp white for headers */
 }
 
 a {
-    color: var(--accent);
-    text-decoration: none;
-    transition: color 0.2s ease;
+  color: var(--accent);
+  text-decoration: none;
+  transition: color 0.2s ease;
 }
 
 a:hover {
-    color: var(--accent-hover);
-    text-decoration: underline;
+  color: var(--accent-hover);
+  text-decoration: underline;
 }
 
 .container {
-    max-width: 800px;
-    margin: 40px auto;
-    padding: 0 20px;
+  max-width: 800px;
+  margin: 40px auto;
+  padding: 0 20px;
 }
 
 /* Header / Nav */
 header {
-    margin-bottom: 40px;
-    border-bottom: 1px solid var(--border);
-    padding-bottom: 20px;
+  margin-bottom: 40px;
+  border-bottom: 1px solid var(--border);
+  padding-bottom: 20px;
 }
 
 /* Cards / Sections */
 .card {
-    background-color: var(--card-bg);
-    padding: 30px;
-    border-radius: 12px;
-    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.4);
-    /* Deeper shadow for depth */
-    margin-bottom: 30px;
+  background-color: var(--card-bg);
+  padding: 30px;
+  border-radius: 12px;
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.4);
+  /* Deeper shadow for depth */
+  margin-bottom: 30px;
 }
 
 /* Form Styles */
 label {
-    display: block;
-    margin-bottom: 8px;
-    font-weight: 500;
-    color: var(--text-muted);
+  display: block;
+  margin-bottom: 8px;
+  font-weight: 500;
+  color: var(--text-muted);
 }
 
 input[type="text"],
@@ -88,203 +88,204 @@ input[type="date"],
 input[type="email"],
 input[type="password"],
 textarea {
-    width: 100%;
-    padding: 12px;
-    border: 1px solid var(--border);
-    background-color: #260a0d;
-    /* Very dark wine, almost black */
-    color: #fff;
-    border-radius: 8px;
-    margin-bottom: 20px;
-    font-size: 1rem;
-    font-family: inherit;
-    transition: border-color 0.2s;
+  width: 100%;
+  padding: 12px;
+  border: 1px solid var(--border);
+  background-color: #260a0d;
+  /* Very dark wine, almost black */
+  color: #fff;
+  border-radius: 8px;
+  margin-bottom: 20px;
+  font-size: 1rem;
+  font-family: inherit;
+  transition: border-color 0.2s;
 }
 
 input:focus,
 textarea:focus {
-    outline: none;
-    border-color: var(--accent);
+  outline: none;
+  border-color: var(--accent);
 }
 
 button,
 .button {
-    display: inline-block;
-    background-color: var(--accent);
-    color: #2e0e12;
-    /* Dark wine text on gold button */
-    border: none;
-    padding: 10px 18px;
-    font-size: 1rem;
-    font-weight: 600;
-    border-radius: 8px;
-    cursor: pointer;
-    text-decoration: none;
-    transition: background-color 0.2s, transform 0.1s;
-    text-align: center;
+  display: inline-block;
+  background-color: var(--accent);
+  color: #2e0e12;
+  /* Dark wine text on gold button */
+  border: none;
+  padding: 10px 18px;
+  font-size: 1rem;
+  font-weight: 600;
+  border-radius: 8px;
+  cursor: pointer;
+  text-decoration: none;
+  transition: background-color 0.2s, transform 0.1s;
+  text-align: center;
 }
 
 button:hover,
 .button:hover {
-    background-color: var(--accent-hover);
-    text-decoration: none;
-    color: #2e0e12;
+  background-color: var(--accent-hover);
+  text-decoration: none;
+  color: #2e0e12;
 }
 
 button:active,
 .button:active {
-    transform: scale(0.98);
+  transform: scale(0.98);
 }
 
 button[disabled] {
-    background-color: #555;
-    color: #888;
-    cursor: not-allowed;
+  background-color: #555;
+  color: #888;
+  cursor: not-allowed;
 }
 
 /* Tables */
 table {
-    width: 100%;
-    border-collapse: collapse;
-    margin-top: 20px;
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 20px;
 }
 
 th,
 td {
-    padding: 12px 15px;
-    text-align: left;
-    border-bottom: 1px solid var(--border);
+  padding: 12px 15px;
+  text-align: left;
+  border-bottom: 1px solid var(--border);
 }
 
 th {
-    background-color: rgba(0, 0, 0, 0.2);
-    color: var(--text-muted);
-    font-weight: 600;
+  background-color: rgba(0, 0, 0, 0.2);
+  color: var(--text-muted);
+  font-weight: 600;
 }
 
 tr:hover {
-    background-color: rgba(255, 255, 255, 0.05);
+  background-color: rgba(255, 255, 255, 0.05);
 }
 
 /* Utility */
 .error-msg {
-    color: var(--danger);
-    background: rgba(255, 107, 107, 0.1);
-    padding: 10px;
-    border-radius: 6px;
-    margin-bottom: 20px;
-    border-left: 3px solid var(--danger);
+  color: var(--danger);
+  background: rgba(255, 107, 107, 0.1);
+  padding: 10px;
+  border-radius: 6px;
+  margin-bottom: 20px;
+  border-left: 3px solid var(--danger);
 }
 
 hr {
-    border: none;
-    border-top: 1px solid var(--border);
-    margin: 30px 0;
+  border: none;
+  border-top: 1px solid var(--border);
+  margin: 30px 0;
 }
 
 /* Alignment */
 .text-right {
-    text-align: right;
+  text-align: right;
 }
 
 .text-center {
-    text-align: center;
+  text-align: center;
 }
 
 /* Form Layouts (Added for Bottle Entry) */
 .form-section {
-    border: 1px solid var(--border);
-    padding: 20px;
-    margin-bottom: 20px;
-    border-radius: 8px;
-    background-color: rgba(0, 0, 0, 0.2);
+  border: 1px solid var(--border);
+  padding: 20px;
+  margin-bottom: 20px;
+  border-radius: 8px;
+  background-color: rgba(0, 0, 0, 0.2);
 }
 
 .form-section h3 {
-    margin-top: 0;
-    border-bottom: 1px solid var(--border);
-    padding-bottom: 10px;
-    margin-bottom: 15px;
-    font-size: 1.1rem;
-    color: var(--accent);
+  margin-top: 0;
+  border-bottom: 1px solid var(--border);
+  padding-bottom: 10px;
+  margin-bottom: 15px;
+  font-size: 1.1rem;
+  color: var(--accent);
 }
 
 .form-group {
-    margin-bottom: 15px;
+  margin-bottom: 15px;
 }
 
 .form-row {
-    display: flex;
-    gap: 20px;
+  display: flex;
+  gap: 20px;
 }
 
 .form-row .form-group {
-    flex: 1;
+  flex: 1;
 }
 
 small {
-    color: var(--text-muted);
-    display: block;
-    margin-top: 5px;
+  color: var(--text-muted);
+  display: block;
+  margin-top: 5px;
 }
 
 select {
-    width: 100%;
-    padding: 12px;
-    border: 1px solid var(--border);
-    background-color: #260a0d;
-    color: #fff;
-    border-radius: 8px;
-    margin-bottom: 20px;
-    font-size: 1rem;
-    font-family: inherit;
-    appearance: none; /* simple styling */
+  width: 100%;
+  padding: 12px;
+  border: 1px solid var(--border);
+  background-color: #260a0d;
+  color: #fff;
+  border-radius: 8px;
+  margin-bottom: 20px;
+  font-size: 1rem;
+  font-family: inherit;
+  appearance: none;
+  /* simple styling */
 }
 
 input[type="number"] {
-    width: 100%;
-    padding: 12px;
-    border: 1px solid var(--border);
-    background-color: #260a0d;
-    color: #fff;
-    border-radius: 8px;
-    margin-bottom: 20px;
-    font-size: 1rem;
-    font-family: inherit;
+  width: 100%;
+  padding: 12px;
+  border: 1px solid var(--border);
+  background-color: #260a0d;
+  color: #fff;
+  border-radius: 8px;
+  margin-bottom: 20px;
+  font-size: 1rem;
+  font-family: inherit;
 }
 
 /* MyPage Styles */
 .section-title {
-    border-bottom: 2px solid var(--accent);
-    padding-bottom: 10px;
-    margin-top: 40px;
-    margin-bottom: 20px;
-    color: #fff;
-    font-size: 1.4rem;
+  border-bottom: 2px solid var(--accent);
+  padding-bottom: 10px;
+  margin-top: 40px;
+  margin-bottom: 20px;
+  color: #fff;
+  font-size: 1.4rem;
 }
 
 .list-item {
-    background: rgba(0, 0, 0, 0.2);
-    padding: 15px;
-    margin-bottom: 10px;
-    border-radius: 8px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    border: 1px solid transparent;
-    transition: border-color 0.2s;
+  background: rgba(0, 0, 0, 0.2);
+  padding: 15px;
+  margin-bottom: 10px;
+  border-radius: 8px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border: 1px solid transparent;
+  transition: border-color 0.2s;
 }
 
 .list-item:hover {
-    border-color: var(--accent);
+  border-color: var(--accent);
 }
 
 .bottle-card {
-    background-color: var(--card-bg);
-    padding: 15px;
-    margin-bottom: 15px;
-    border-radius: 8px;
-    box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+  background-color: var(--card-bg);
+  padding: 15px;
+  margin-bottom: 15px;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
 }
 
 /* ラベル左＋ブラインドチェック右の横並び */
@@ -329,6 +330,7 @@ input[type="number"] {
   .radio-row {
     gap: 0.35rem;
   }
+
   .radio-row label {
     font-size: 0.85rem;
   }
@@ -415,18 +417,19 @@ input[type="number"] {
 
 .blind-note {
   font-size: 0.85rem;
-  background-color: #f7f7ff;
-  border-left: 3px solid #555;
+  background-color: rgba(255, 255, 255, 0.03);
+  border-left: 2px solid rgba(255, 215, 128, 0.7);
   padding: 0.5rem 0.6rem;
   margin-bottom: 0.8rem;
+  color: #fbead2;
 }
 
 /* ブラインド中の項目を視覚的に変える */
 .form-group.is-blind {
-  border: 1px dashed #999;
+  border: 1px dashed rgba(255, 215, 128, 0.6);
   border-radius: 4px;
   padding: 0.5rem 0.6rem;
-  background-color: #fdf7f2;
+  background-color: rgba(0, 0, 0, 0.35);
 }
 
 .form-group.is-blind input,
@@ -436,9 +439,9 @@ input[type="number"] {
 }
 
 /* select の背景色（PCブラウザ中心） */
-.bottle-form select {
-  background-color: #ffffff; /* 好みで #f9f9f9 などに変更可 */
-}
+/* .bottle-form select {
+  background-color: #ffffff; 
+} */
 
 /* レスポンシブ：タブレット・モバイル向け調整 */
 @media (max-width: 900px) {

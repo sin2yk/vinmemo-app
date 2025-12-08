@@ -65,11 +65,11 @@ require_once 'layout/header.php';
     <div class="card text-center">
         <h2>Login Required</h2>
         <p>Please login from Home.</p>
-        <a href="home.php" class="button">Go Home</a>
+        <a href="home.php" class="button">ホームへ</a>
 
         <hr>
         <p>Debug:</p>
-        <a href="mypage.php?login_as=1" class="button" style="background:#555;">Login as ID=1</a>
+        <a href="mypage.php?login_as=1" class="button" style="background:#555;">ID=1としてログイン</a>
     </div>
 <?php else: ?>
 
@@ -122,7 +122,7 @@ require_once 'layout/header.php';
                     <?= h($b['vintage'] ?: 'NV') ?> / <?= h($b['owner_label']) ?>
                 </div>
                 <div style="text-align:right; margin-top:10px;">
-                    <a href="event_show.php?id=<?= h($b['event_id']) ?>" style="font-size:0.9em;">View Event →</a>
+                    <a href="event_show.php?id=<?= h($b['event_id']) ?>" style="font-size:0.9em;">イベントを表示 →</a>
                 </div>
             </div>
         <?php endforeach; ?>
