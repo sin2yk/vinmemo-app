@@ -12,14 +12,14 @@ $error = null;
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     // 基本情報
-    $owner_label = trim($_POST['owner_label'] ?? '');
-    $wine_name = trim($_POST['wine_name'] ?? '');
+    $owner_label   = trim($_POST['owner_label']   ?? '');
+    $wine_name     = trim($_POST['wine_name']     ?? '');
     $producer_name = trim($_POST['producer_name'] ?? '');
-    $country = trim($_POST['country'] ?? '');
-    $region = trim($_POST['region'] ?? '');
-    $region_other = trim($_POST['region_other'] ?? '');
-    $appellation = trim($_POST['appellation'] ?? '');
-    $color = $_POST['color'] ?? 'red';
+    $country       = trim($_POST['country']       ?? '');
+    $region        = trim($_POST['region']        ?? '');
+    $region_other  = trim($_POST['region_other']  ?? '');
+    $appellation   = trim($_POST['appellation']   ?? '');
+    $color         = $_POST['color'] ?? 'red';
 
     // ヴィンテージ（BYO風セレクト → INT / NULL へマッピング）
     $vintage_raw = $_POST['vintage'] ?? '';
@@ -35,17 +35,61 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
     }
 
-    // 容量・価格・テーマ適合
-    $bottle_size_ml = filter_input(INPUT_POST, 'bottle_size_ml', FILTER_VALIDATE_INT);
-    if (!$bottle_size_ml) {
+    // 容量：radio + select から bottle_size_ml を決定
+    $bottle_size_type  = $_POST['bottle_size_type'] ?? 'bottle';
+    $bottle_size_other = $_POST['bottle_size_other'] ?? '';
+
+    if ($bottle_size_type === 'bottle') {
         $bottle_size_ml = 750;
+    } elseif ($bottle_size_type === 'magnum') {
+        $bottle_size_ml = 1500;
+    } else {
+        // other
+        switch ($bottle_size_other) {
+            case 'demi':
+                $bottle_size_ml = 375;
+                break;
+            case 'clavelin':
+                $bottle_size_ml = 620;
+                break;
+            case 'jeroboam':
+                $bottle_size_ml = 3000;
+                break;
+            case 'other_custom':
+                $custom_ml = filter_input(INPUT_POST, 'bottle_size_custom', FILTER_VALIDATE_INT);
+                $bottle_size_ml = $custom_ml && $custom_ml > 0 ? $custom_ml : 750;
+                break;
+            default:
+                $bottle_size_ml = 750;
+                break;
+        }
     }
 
-    $est_price_yen = filter_input(INPUT_POST, 'est_price_yen', FILTER_VALIDATE_INT);
-    if ($est_price_yen === false) {
-        $est_price_yen = null;
+    // 参考価格：ラジオ（casual〜icon）→ est_price_yen に代表値として保存
+    $price_band = $_POST['price_band'] ?? '';
+
+    switch ($price_band) {
+        case 'casual':  // 〜5千円
+            $est_price_yen = 5000;
+            break;
+        case 'bistro':  // 〜1万円
+            $est_price_yen = 10000;
+            break;
+        case 'fine':    // 〜2万円
+            $est_price_yen = 20000;
+            break;
+        case 'luxury':  // 〜5万円
+            $est_price_yen = 50000;
+            break;
+        case 'icon':    // それ以上
+            $est_price_yen = 100000;
+            break;
+        default:
+            $est_price_yen = null;
+            break;
     }
 
+    // テーマ適合度：ラジオ 1〜5（視覚上は 5→1 の順で並べる）
     $theme_fit_score = filter_input(INPUT_POST, 'theme_fit_score', FILTER_VALIDATE_INT);
     if ($theme_fit_score === false) {
         $theme_fit_score = null;
@@ -83,7 +127,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
             // ログインユーザー情報（将来のMYボトル表示用）
             $brought_by_user_id = $_SESSION['user_id'] ?? null;
-            $brought_by_type = $brought_by_user_id ? 'guest' : null;
+            $brought_by_type    = $brought_by_user_id ? 'guest' : null;
 
             $sql = 'INSERT INTO bottle_entries (
                         event_id,
@@ -182,27 +226,37 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
 // GET で event_id 無しで来た場合の簡易防御
 if (!$event_id) {
-    $error = $error ?? 'Event ID is missing.';
+    $error = $error ?? 'イベントIDが指定されていません。';
 }
-
-$page_title = 'VinMemo - New Bottle';
-require_once 'layout/header.php';
 ?>
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <title>VinMemo - ボトル登録</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div class="container bottle-page">
+    <header class="page-header">
+        <h1>ボトルを登録</h1>
+        <?php if ($event_id): ?>
+            <a class="back-link" href="event_show.php?id=<?= htmlspecialchars($event_id, ENT_QUOTES, 'UTF-8') ?>">← イベントに戻る</a>
+        <?php endif; ?>
+    </header>
 
-<header>
-    <h1>Register Bottle</h1>
-    <?php if ($event_id): ?>
-        <a href="event_show.php?id=<?= h($event_id) ?>">← Back to Event</a>
+    <?php if ($error): ?>
+        <div class="error"><?= htmlspecialchars($error, ENT_QUOTES, 'UTF-8') ?></div>
     <?php endif; ?>
-</header>
 
-<?php if ($error): ?>
-    <div class="error-msg"><?= h($error) ?></div>
-<?php endif; ?>
+    <?php if ($event_id): ?>
+    <form action="bottle_new.php" method="post" class="bottle-form">
+        <input type="hidden" name="event_id" value="<?= htmlspecialchars($event_id, ENT_QUOTES, 'UTF-8') ?>">
 
-<?php if ($event_id): ?>
-    <form action="bottle_new.php" method="post" class="card">
-        <input type="hidden" name="event_id" value="<?= h($event_id) ?>">
+        <p class="blind-note">
+            ※ このフォームでは、項目ごとに「ブラインド(非公開)」チェックを入れることで、
+            当日の表示からその情報を隠すことができます。ブラインド中の項目は背景色と枠線で表示が変わります。
+        </p>
 
         <!-- 基本情報 -->
         <div class="form-section">
@@ -210,27 +264,13 @@ require_once 'layout/header.php';
 
             <div class="form-row">
                 <div class="form-group">
-                    <label>お名前（ニックネーム可） / Your Name<span class="required">*</span></label>
+                    <div class="label-row">
+                        <span>お名前（ニックネーム可） / Your Name<span class="required">*</span></span>
+                        <!-- 名前をブラインドする意味は薄いのでチェックなし -->
+                    </div>
                     <input type="text" name="owner_label" required>
                 </div>
             </div>
-
-            <!-- ブラインド設定（BYO風だが is_blind 1bitに集約） -->
-            <fieldset class="blind-fieldset"
-                style="border:1px solid var(--border); padding:10px; border-radius:8px; margin-bottom:15px; background:rgba(0,0,0,0.1);">
-                <legend style="color:var(--text-muted);">ブラインド設定（隠したい項目） / Blind settings</legend>
-                <label><input type="checkbox" name="blind_producer" value="1"> 生産者を隠す</label><br>
-                <label><input type="checkbox" name="blind_wine_name" value="1"> ワイン名を隠す</label><br>
-                <label><input type="checkbox" name="blind_vintage" value="1"> ヴィンテージを隠す</label><br>
-                <label><input type="checkbox" name="blind_region" value="1"> 産地を隠す</label><br>
-                <label><input type="checkbox" name="blind_price" value="1"> 価格帯（参考価格）を隠す</label><br>
-                <label><input type="checkbox" name="blind_comment" value="1"> メモ／コメントを隠す</label><br>
-            </fieldset>
-            <p style="font-size:0.85em; color:var(--text-muted);">
-                ※現時点では「どれか1つでもチェック → is_blind=1」で保存されます。<br>
-                将来のバージョンでフィールド別ブラインドに拡張予定です。
-            </p>
-
         </div>
 
         <!-- ワイン情報 -->
@@ -239,29 +279,48 @@ require_once 'layout/header.php';
 
             <div class="form-row">
                 <div class="form-group">
-                    <label>生産者 / Producer<span class="required">*</span></label>
+                    <div class="label-row">
+                        <span>生産者 / Producer<span class="required">*</span></span>
+                        <label class="blind-inline">
+                            <input type="checkbox" name="blind_producer" value="1"> ブラインド
+                        </label>
+                    </div>
                     <input type="text" name="producer_name" placeholder="例：Emmanuel Rouget" required>
                 </div>
                 <div class="form-group">
-                    <label>ワイン名 / Wine name<span class="required">*</span></label>
+                    <div class="label-row">
+                        <span>ワイン名 / Wine name<span class="required">*</span></span>
+                        <label class="blind-inline">
+                            <input type="checkbox" name="blind_wine_name" value="1"> ブラインド
+                        </label>
+                    </div>
                     <input type="text" name="wine_name" placeholder="例：Echezeaux" required>
                 </div>
             </div>
 
             <div class="form-row">
                 <div class="form-group">
-                    <label>国 / Country</label>
+                    <div class="label-row">
+                        <span>国 / Country</span>
+                    </div>
                     <input type="text" name="country" placeholder="例：France">
                 </div>
                 <div class="form-group">
-                    <label>アペラシオン / Appellation</label>
+                    <div class="label-row">
+                        <span>アペラシオン / Appellation</span>
+                    </div>
                     <input type="text" name="appellation" placeholder="例：Vosne-Romanée">
                 </div>
             </div>
 
             <div class="form-row">
                 <div class="form-group">
-                    <label>産地 / Region</label>
+                    <div class="label-row">
+                        <span>産地 / Region</span>
+                        <label class="blind-inline">
+                            <input type="checkbox" name="blind_region" value="1"> ブラインド
+                        </label>
+                    </div>
                     <select name="region">
                         <option value="">選択してください</option>
                         <option value="Bourgogne">ブルゴーニュ</option>
@@ -276,20 +335,22 @@ require_once 'layout/header.php';
                         <option value="California">カリフォルニア</option>
                         <option value="Other">その他</option>
                     </select>
-                    <input type="text" name="region_other" placeholder="その他の場合はこちらにご記入ください" style="margin-top:4px;">
+                    <input type="text" name="region_other" placeholder="その他の場合はこちらにご記入ください" class="input-inline-top">
                 </div>
 
                 <div class="form-group">
-                    <label>タイプ / Type</label>
-                    <select name="color" required>
-                        <option value="sparkling">Sparkling (泡)</option>
-                        <option value="white">White (白)</option>
-                        <option value="orange">Orange (オレンジ)</option>
-                        <option value="rose">Rosé (ロゼ)</option>
-                        <option value="red" selected>Red (赤)</option>
-                        <option value="sweet">Sweet (甘口)</option>
-                        <option value="fortified">Fortified (酒精強化)</option>
-                    </select>
+                    <div class="label-row">
+                        <span>タイプ / Type</span>
+                    </div>
+                    <div class="radio-row">
+                        <label><input type="radio" name="color" value="sparkling"> 泡</label>
+                        <label><input type="radio" name="color" value="white"> 白</label>
+                        <label><input type="radio" name="color" value="orange"> オレンジ</label>
+                        <label><input type="radio" name="color" value="rose"> ロゼ</label>
+                        <label><input type="radio" name="color" value="red" checked> 赤</label>
+                        <label><input type="radio" name="color" value="sweet"> 甘口</label>
+                        <label><input type="radio" name="color" value="fortified"> 酒精強化</label>
+                    </div>
                 </div>
             </div>
         </div>
@@ -300,41 +361,79 @@ require_once 'layout/header.php';
 
             <div class="form-row">
                 <div class="form-group">
-                    <label>ヴィンテージ / Vintage</label>
+                    <div class="label-row">
+                        <span>ヴィンテージ / Vintage</span>
+                        <label class="blind-inline">
+                            <input type="checkbox" name="blind_vintage" value="1"> ブラインド
+                        </label>
+                    </div>
                     <select name="vintage">
                         <option value="">選択してください</option>
                         <option value="NV">NV（ノン・ヴィンテージ）</option>
                         <option value="1970_or_earlier">1970年以前</option>
                         <?php
-                        $currentYear = (int) date('Y');
+                        $currentYear = (int)date('Y');
                         for ($y = $currentYear; $y >= 1971; $y--): ?>
                             <option value="<?= $y ?>"><?= $y ?></option>
                         <?php endfor; ?>
                     </select>
                     <small>※DB上は数値として保存されます（1970年以前は「1970」扱い）。</small>
                 </div>
+
                 <div class="form-group">
-                    <label>容量(ml) / Size</label>
-                    <input type="number" name="bottle_size_ml" value="750" min="30">
+                    <div class="label-row">
+                        <span>容量 / Bottle size</span>
+                    </div>
+
+                    <div class="radio-row">
+                        <label><input type="radio" name="bottle_size_type" value="bottle" checked> Bottle (750ml)</label>
+                        <label><input type="radio" name="bottle_size_type" value="magnum"> Magnum (1500ml)</label>
+                        <label><input type="radio" name="bottle_size_type" value="other"> Other</label>
+                    </div>
+
+                    <div class="other-size-row">
+                        <select name="bottle_size_other">
+                            <option value="">選択してください</option>
+                            <option value="demi">Demi (375ml)</option>
+                            <option value="clavelin">Clavelin (620ml)</option>
+                            <option value="jeroboam">Jeroboam (3000ml)</option>
+                            <option value="other_custom">その他（ml指定）</option>
+                        </select>
+                        <input type="number" name="bottle_size_custom" placeholder="例：500 (ml)" min="30" class="input-inline-top">
+                    </div>
+                    <small>※未指定の場合は 750ml として扱います。</small>
                 </div>
             </div>
 
             <div class="form-row">
                 <div class="form-group">
-                    <label>参考価格(円) / Estimated price</label>
-                    <input type="number" name="est_price_yen" placeholder="10000" min="0">
-                    <small>目安：〜5k=casual, 〜10k=bistro, 〜20k=fine, 〜50k=luxury, それ以上=icon</small>
+                    <div class="label-row">
+                        <span>参考価格帯 / Price band</span>
+                        <label class="blind-inline">
+                            <input type="checkbox" name="blind_price" value="1"> ブラインド
+                        </label>
+                    </div>
+                    <div class="radio-row">
+                        <label><input type="radio" name="price_band" value="casual"> casual（〜5千円）</label>
+                        <label><input type="radio" name="price_band" value="bistro"> bistro（〜1万円）</label>
+                        <label><input type="radio" name="price_band" value="fine"> fine（〜2万円）</label>
+                        <label><input type="radio" name="price_band" value="luxury"> luxury（〜5万円）</label>
+                        <label><input type="radio" name="price_band" value="icon"> icon（それ以上）</label>
+                    </div>
+                    <small>※DB上はそれぞれの帯の代表値（5k/10k/20k/50k/100k）として保存します。</small>
                 </div>
+
                 <div class="form-group">
-                    <label>テーマ適合度 / Theme fit (1-5)</label>
-                    <select name="theme_fit_score">
-                        <option value="">選択してください</option>
-                        <option value="1">1：かなりズレているかも</option>
-                        <option value="2">2</option>
-                        <option value="3" selected>3：まあまあ合っている</option>
-                        <option value="4">4</option>
-                        <option value="5">5：ドンピシャだと思う</option>
-                    </select>
+                    <div class="label-row">
+                        <span>テーマ適合度 / Theme fit</span>
+                    </div>
+                    <div class="radio-row">
+                        <label><input type="radio" name="theme_fit_score" value="5"> 5：ドンピシャ</label>
+                        <label><input type="radio" name="theme_fit_score" value="4"> 4：かなり合う</label>
+                        <label><input type="radio" name="theme_fit_score" value="3" checked> 3：まあまあ</label>
+                        <label><input type="radio" name="theme_fit_score" value="2"> 2：ややズレ</label>
+                        <label><input type="radio" name="theme_fit_score" value="1"> 1：かなりズレ</label>
+                    </div>
                 </div>
             </div>
         </div>
@@ -343,14 +442,48 @@ require_once 'layout/header.php';
         <div class="form-section">
             <h3>メモ / Memo</h3>
             <div class="form-group">
+                <div class="label-row">
+                    <span>メモ / Notes</span>
+                    <label class="blind-inline">
+                        <input type="checkbox" name="blind_comment" value="1"> ブラインド
+                    </label>
+                </div>
                 <textarea name="memo" rows="4" placeholder="コメントやサーブ順の希望など"></textarea>
             </div>
         </div>
 
         <button type="submit" class="button" style="width:100%;">この内容で登録する</button>
     </form>
-<?php else: ?>
-    <p>Event information missing.</p>
-<?php endif; ?>
+    <?php else: ?>
+        <p>イベント情報が取得できませんでした。</p>
+    <?php endif; ?>
+</div>
 
-<?php require_once 'layout/footer.php'; ?>
+<script>
+// ブラインドチェックされた項目を視覚的に強調
+(function() {
+    function updateBlindStyles() {
+        const blindChecks = document.querySelectorAll('.blind-inline input[type="checkbox"]');
+        blindChecks.forEach(function(cb) {
+            const group = cb.closest('.form-group');
+            if (!group) return;
+            if (cb.checked) {
+                group.classList.add('is-blind');
+            } else {
+                group.classList.remove('is-blind');
+            }
+        });
+    }
+
+    document.addEventListener('change', function(e) {
+        if (e.target.matches('.blind-inline input[type="checkbox"]')) {
+            updateBlindStyles();
+        }
+    });
+
+    // 初期状態の反映（編集画面にも流用できるように）
+    document.addEventListener('DOMContentLoaded', updateBlindStyles);
+})();
+</script>
+</body>
+</html>

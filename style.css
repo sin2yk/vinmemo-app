@@ -286,3 +286,187 @@ input[type="number"] {
     border-radius: 8px;
     box-shadow: 0 4px 8px rgba(0,0,0,0.3);
 }
+
+/* ラベル左＋ブラインドチェック右の横並び */
+.label-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.blind-inline {
+  font-size: 0.85rem;
+  white-space: nowrap;
+}
+
+/* ラジオボタンを横並び（必要に応じて折り返し） */
+.radio-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.radio-row label {
+  white-space: nowrap;
+  font-size: 0.9rem;
+}
+
+/* 容量 other の行も横方向ベースで、スマホで折り返し */
+.other-size-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-top: 0.25rem;
+}
+
+.input-inline-top {
+  margin-top: 4px;
+}
+
+/* スマホでの余白調整（必要なら） */
+@media (max-width: 600px) {
+  .radio-row {
+    gap: 0.35rem;
+  }
+  .radio-row label {
+    font-size: 0.85rem;
+  }
+}
+
+/* === VinMemo Bottle Page Layout / Responsive === */
+
+.container.bottle-page {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 1rem 1.25rem;
+}
+
+.page-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+}
+
+.back-link {
+  font-size: 0.9rem;
+  text-decoration: none;
+}
+
+.bottle-form .form-section {
+  margin-bottom: 1.25rem;
+  padding: 0.75rem 0.75rem 0.5rem;
+  border-bottom: 1px solid #eee;
+}
+
+.bottle-form h3 {
+  margin-top: 0;
+  margin-bottom: 0.75rem;
+  font-size: 1rem;
+}
+
+.form-row {
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.form-row .form-group {
+  flex: 1 1 260px;
+  min-width: 0;
+}
+
+.label-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.25rem;
+}
+
+.blind-inline {
+  font-size: 0.85rem;
+  white-space: nowrap;
+}
+
+.radio-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.radio-row label {
+  white-space: nowrap;
+  font-size: 0.9rem;
+}
+
+.other-size-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-top: 0.25rem;
+}
+
+.input-inline-top {
+  margin-top: 4px;
+}
+
+.blind-note {
+  font-size: 0.85rem;
+  background-color: #f7f7ff;
+  border-left: 3px solid #555;
+  padding: 0.5rem 0.6rem;
+  margin-bottom: 0.8rem;
+}
+
+/* ブラインド中の項目を視覚的に変える */
+.form-group.is-blind {
+  border: 1px dashed #999;
+  border-radius: 4px;
+  padding: 0.5rem 0.6rem;
+  background-color: #fdf7f2;
+}
+
+.form-group.is-blind input,
+.form-group.is-blind select,
+.form-group.is-blind textarea {
+  opacity: 0.85;
+}
+
+/* select の背景色（PCブラウザ中心） */
+.bottle-form select {
+  background-color: #ffffff; /* 好みで #f9f9f9 などに変更可 */
+}
+
+/* レスポンシブ：タブレット・モバイル向け調整 */
+@media (max-width: 900px) {
+  .container.bottle-page {
+    max-width: 100%;
+    padding: 0.75rem;
+  }
+}
+
+@media (max-width: 600px) {
+  .page-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .back-link {
+    margin-top: 0.25rem;
+  }
+
+  .form-row {
+    flex-direction: column;
+  }
+
+  .radio-row {
+    gap: 0.35rem;
+  }
+
+  .radio-row label {
+    font-size: 0.85rem;
+  }
+}
