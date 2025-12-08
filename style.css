@@ -382,9 +382,18 @@ small {
 @media (max-width: 768px) {
 
   /* Stack form rows on mobile */
-  .form-row {
+  .form-row,
+  .bottle-form .form-row {
     flex-direction: column;
     gap: 0;
+  }
+
+  .container.bottle-page {
+    padding: 0;
+  }
+
+  .page-header {
+    padding: 0 16px;
   }
 
   .form-row .form-group {
@@ -397,7 +406,7 @@ small {
   }
 
   .form-section {
-    padding: 15px;
+    padding: 12px;
   }
 
   /* Make radio rows cleaner on narrow screens */
