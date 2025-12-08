@@ -190,3 +190,99 @@ hr {
 .text-center {
     text-align: center;
 }
+
+/* Form Layouts (Added for Bottle Entry) */
+.form-section {
+    border: 1px solid var(--border);
+    padding: 20px;
+    margin-bottom: 20px;
+    border-radius: 8px;
+    background-color: rgba(0, 0, 0, 0.2);
+}
+
+.form-section h3 {
+    margin-top: 0;
+    border-bottom: 1px solid var(--border);
+    padding-bottom: 10px;
+    margin-bottom: 15px;
+    font-size: 1.1rem;
+    color: var(--accent);
+}
+
+.form-group {
+    margin-bottom: 15px;
+}
+
+.form-row {
+    display: flex;
+    gap: 20px;
+}
+
+.form-row .form-group {
+    flex: 1;
+}
+
+small {
+    color: var(--text-muted);
+    display: block;
+    margin-top: 5px;
+}
+
+select {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid var(--border);
+    background-color: #260a0d;
+    color: #fff;
+    border-radius: 8px;
+    margin-bottom: 20px;
+    font-size: 1rem;
+    font-family: inherit;
+    appearance: none; /* simple styling */
+}
+
+input[type="number"] {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid var(--border);
+    background-color: #260a0d;
+    color: #fff;
+    border-radius: 8px;
+    margin-bottom: 20px;
+    font-size: 1rem;
+    font-family: inherit;
+}
+
+/* MyPage Styles */
+.section-title {
+    border-bottom: 2px solid var(--accent);
+    padding-bottom: 10px;
+    margin-top: 40px;
+    margin-bottom: 20px;
+    color: #fff;
+    font-size: 1.4rem;
+}
+
+.list-item {
+    background: rgba(0, 0, 0, 0.2);
+    padding: 15px;
+    margin-bottom: 10px;
+    border-radius: 8px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border: 1px solid transparent;
+    transition: border-color 0.2s;
+}
+
+.list-item:hover {
+    border-color: var(--accent);
+}
+
+.bottle-card {
+    background-color: var(--card-bg);
+    padding: 15px;
+    margin-bottom: 15px;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+}
