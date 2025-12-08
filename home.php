@@ -1,94 +1,67 @@
 <?php
-// ここではまだ PHP ロジックは使わず、
-// 将来 MySQL に繋ぐときに育てていくイメージ。
+// home.php
+require_once 'layout/header.php';
 ?>
-<!DOCTYPE html>
-<html lang="ja">
 
-<head>
-  <meta charset="UTF-8">
-  <title>VinMemo v1 – Home</title>
+<div class="card">
+  <h2>Welcome to VinMemo</h2>
+  <p id="user-info">Confirming login...</p>
 
-  <link rel="stylesheet" href="style.css">
+  <hr>
 
-  <!-- Google Analytics GA4 -->
-  <script async src="https://www.googletagmanager.com/gtag/js?id=G-6BXQJQF1K5"></script>
-  <script>
-    window.dataLayer = window.dataLayer || [];
-    function gtag() {
-      dataLayer.push(arguments);
-    }
-    gtag("js", new Date());
-    gtag("config", "G-6BXQJQF1K5");
-  </script>
+  <h3>Menu</h3>
+  <ul>
+    <li><a href="events.php">Event List</a></li>
+    <li><a href="entry.php">Bottle Entry (Legacy)</a></li>
+    <li><a href="mypage.php">My Page</a></li>
+  </ul>
 
-</head>
-
-<body>
-  <div class="container">
-    <header>
-      <h1>VinMemo Home</h1>
-      <p id="user-info">ログイン確認中...</p>
-      <button id="logout-btn">ログアウト</button>
-    </header>
-
-    <div class="card">
-      <h2>ここから先が VinMemo 本体</h2>
-      <ul>
-        <li><a href="events.php">ワイン会一覧（Events）</a></li>
-        <li><a href="entry.php">ボトル登録（Bottle Entry）</a></li>
-        <li><a href="mypage.php">マイページ（自分のボトル履歴）</a></li>
-      </ul>
-    </div>
+  <div style="margin-top:20px;">
+    <button id="logout-btn">Logout (Firebase)</button>
   </div>
+</div>
 
-  <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-app.js";
-    import {
-      getAuth,
-      onAuthStateChanged,
-      signOut
-    } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-auth.js";
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-app.js";
+  import {
+    getAuth,
+    onAuthStateChanged,
+    signOut
+  } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-auth.js";
 
-    // ★ index.html と同じ firebaseConfig をそのまま貼る（値は変えない）
-    const firebaseConfig = {
-      apiKey: "AIzaSyAWy-qFkXZM3tMSwoMYeTo2SrJHyVkuZ9c",
-      authDomain: "vinmemo-v1.firebaseapp.com",
-      projectId: "vinmemo-v1",
-      storageBucket: "vinmemo-v1.firebasestorage.app",
-      messagingSenderId: "559734690298",
-      appId: "1:559734690298:web:171793d9abbe724f77d443",
-      measurementId: "G-6BXQJQF1K5"
-    };
+  const firebaseConfig = {
+    apiKey: "AIzaSyAWy-qFkXZM3tMSwoMYeTo2SrJHyVkuZ9c",
+    authDomain: "vinmemo-v1.firebaseapp.com",
+    projectId: "vinmemo-v1",
+    storageBucket: "vinmemo-v1.firebasestorage.app",
+    messagingSenderId: "559734690298",
+    appId: "1:559734690298:web:171793d9abbe724f77d443",
+    measurementId: "G-6BXQJQF1K5"
+  };
 
-    const app = initializeApp(firebaseConfig);
-    const auth = getAuth(app);
+  const app = initializeApp(firebaseConfig);
+  const auth = getAuth(app);
 
-    const userInfoEl = document.getElementById('user-info');
-    const logoutBtn = document.getElementById('logout-btn');
+  const userInfoEl = document.getElementById('user-info');
+  const logoutBtn = document.getElementById('logout-btn');
 
-    // ここでもログイン状態を監視
-    onAuthStateChanged(auth, (user) => {
-      if (user) {
-        userInfoEl.textContent = `ログイン中：${user.email}`;
-      } else {
-        // ログインしていなければ index.html へ追い返す
-        window.location.href = 'index.html';
-      }
-    });
+  onAuthStateChanged(auth, (user) => {
+    if (user) {
+      userInfoEl.textContent = `Logged in as: ${user.email}`;
+    } else {
+      window.location.href = 'index.html';
+    }
+  });
 
-    // ログアウトボタン
-    logoutBtn.addEventListener('click', async () => {
-      try {
-        await signOut(auth);
-        // ログアウトしたらログインページへ戻す
-        window.location.href = 'index.html';
-      } catch (err) {
-        console.error(err);
-        alert('ログアウトエラー：' + err.message);
-      }
-    });
-  </script>
-</body>
+  logoutBtn.addEventListener('click', async () => {
+    try {
+      await signOut(auth);
+      window.location.href = 'index.html';
+    } catch (err) {
+      console.error(err);
+      alert('Logout error: ' + err.message);
+    }
+  });
+</script>
 
-</html>
+<?php require_once 'layout/footer.php'; ?>

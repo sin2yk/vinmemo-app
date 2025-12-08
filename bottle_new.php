@@ -12,14 +12,14 @@ $error = null;
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     // 基本情報
-    $owner_label   = trim($_POST['owner_label']   ?? '');
-    $wine_name     = trim($_POST['wine_name']     ?? '');
+    $owner_label = trim($_POST['owner_label'] ?? '');
+    $wine_name = trim($_POST['wine_name'] ?? '');
     $producer_name = trim($_POST['producer_name'] ?? '');
-    $country       = trim($_POST['country']       ?? '');
-    $region        = trim($_POST['region']        ?? '');
-    $region_other  = trim($_POST['region_other']  ?? '');
-    $appellation   = trim($_POST['appellation']   ?? '');
-    $color         = $_POST['color'] ?? 'red';
+    $country = trim($_POST['country'] ?? '');
+    $region = trim($_POST['region'] ?? '');
+    $region_other = trim($_POST['region_other'] ?? '');
+    $appellation = trim($_POST['appellation'] ?? '');
+    $color = $_POST['color'] ?? 'red';
 
     // ヴィンテージ（BYO風セレクト → INT / NULL へマッピング）
     $vintage_raw = $_POST['vintage'] ?? '';
@@ -83,7 +83,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
             // ログインユーザー情報（将来のMYボトル表示用）
             $brought_by_user_id = $_SESSION['user_id'] ?? null;
-            $brought_by_type    = $brought_by_user_id ? 'guest' : null;
+            $brought_by_type = $brought_by_user_id ? 'guest' : null;
 
             $sql = 'INSERT INTO bottle_entries (
                         event_id,
@@ -182,32 +182,27 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
 // GET で event_id 無しで来た場合の簡易防御
 if (!$event_id) {
-    $error = $error ?? 'イベントIDが指定されていません。';
+    $error = $error ?? 'Event ID is missing.';
 }
+
+$page_title = 'VinMemo - New Bottle';
+require_once 'layout/header.php';
 ?>
-<!DOCTYPE html>
-<html lang="ja">
-<head>
-    <meta charset="UTF-8">
-    <title>VinMemo - ボトル登録</title>
-    <link rel="stylesheet" href="style.css">
-</head>
-<body>
-<div class="container">
-    <header>
-        <h1>ボトルを登録</h1>
-        <?php if ($event_id): ?>
-            <a href="event_show.php?id=<?= htmlspecialchars($event_id, ENT_QUOTES, 'UTF-8') ?>">← イベントに戻る</a>
-        <?php endif; ?>
-    </header>
 
-    <?php if ($error): ?>
-        <div class="error"><?= htmlspecialchars($error, ENT_QUOTES, 'UTF-8') ?></div>
-    <?php endif; ?>
-
+<header>
+    <h1>Register Bottle</h1>
     <?php if ($event_id): ?>
-    <form action="bottle_new.php" method="post" class="bottle-form">
-        <input type="hidden" name="event_id" value="<?= htmlspecialchars($event_id, ENT_QUOTES, 'UTF-8') ?>">
+        <a href="event_show.php?id=<?= h($event_id) ?>">← Back to Event</a>
+    <?php endif; ?>
+</header>
+
+<?php if ($error): ?>
+    <div class="error-msg"><?= h($error) ?></div>
+<?php endif; ?>
+
+<?php if ($event_id): ?>
+    <form action="bottle_new.php" method="post" class="card">
+        <input type="hidden" name="event_id" value="<?= h($event_id) ?>">
 
         <!-- 基本情報 -->
         <div class="form-section">
@@ -221,8 +216,9 @@ if (!$event_id) {
             </div>
 
             <!-- ブラインド設定（BYO風だが is_blind 1bitに集約） -->
-            <fieldset class="blind-fieldset">
-                <legend>ブラインド設定（隠したい項目） / Blind settings</legend>
+            <fieldset class="blind-fieldset"
+                style="border:1px solid var(--border); padding:10px; border-radius:8px; margin-bottom:15px; background:rgba(0,0,0,0.1);">
+                <legend style="color:var(--text-muted);">ブラインド設定（隠したい項目） / Blind settings</legend>
                 <label><input type="checkbox" name="blind_producer" value="1"> 生産者を隠す</label><br>
                 <label><input type="checkbox" name="blind_wine_name" value="1"> ワイン名を隠す</label><br>
                 <label><input type="checkbox" name="blind_vintage" value="1"> ヴィンテージを隠す</label><br>
@@ -230,7 +226,7 @@ if (!$event_id) {
                 <label><input type="checkbox" name="blind_price" value="1"> 価格帯（参考価格）を隠す</label><br>
                 <label><input type="checkbox" name="blind_comment" value="1"> メモ／コメントを隠す</label><br>
             </fieldset>
-            <p class="hint">
+            <p style="font-size:0.85em; color:var(--text-muted);">
                 ※現時点では「どれか1つでもチェック → is_blind=1」で保存されます。<br>
                 将来のバージョンでフィールド別ブラインドに拡張予定です。
             </p>
@@ -310,7 +306,7 @@ if (!$event_id) {
                         <option value="NV">NV（ノン・ヴィンテージ）</option>
                         <option value="1970_or_earlier">1970年以前</option>
                         <?php
-                        $currentYear = (int)date('Y');
+                        $currentYear = (int) date('Y');
                         for ($y = $currentYear; $y >= 1971; $y--): ?>
                             <option value="<?= $y ?>"><?= $y ?></option>
                         <?php endfor; ?>
@@ -353,9 +349,8 @@ if (!$event_id) {
 
         <button type="submit" class="button" style="width:100%;">この内容で登録する</button>
     </form>
-    <?php else: ?>
-        <p>イベント情報が取得できませんでした。</p>
-    <?php endif; ?>
-</div>
-</body>
-</html>
+<?php else: ?>
+    <p>Event information missing.</p>
+<?php endif; ?>
+
+<?php require_once 'layout/footer.php'; ?>

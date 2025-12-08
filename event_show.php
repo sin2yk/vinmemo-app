@@ -1,17 +1,29 @@
 <?php
-// event_show.php : イベント詳細表示
+// event_show.php : Event Details and Bottle List
+// Refactored to match BYO design concepts
 
 require_once 'db_connect.php';
+// session_start() will be handled in layout/header.php if not already, 
+// but we might need session values for logic before header.
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
 
-// まず初期化（エラー時にも $bottles が未定義にならないように）
-$bottles = [];
-
-// IDパラメータの検証
 $id = filter_input(INPUT_GET, 'id', FILTER_VALIDATE_INT);
-if ($id === null || $id === false) {
-    $error = '無効なIDです。';
+$error = null;
+$event = null;
+$bottles = [];
+$stats = [
+    'total' => 0,
+    'theme_fit_avg' => 0,
+    'types' => [],
+    'prices' => []
+];
+
+if (!$id) {
+    $error = 'Invalid Event ID.';
 } else {
-    // イベント本体を取得
+    // 1. Get Event
     $sql = 'SELECT * FROM events WHERE id = :id';
     $stmt = $pdo->prepare($sql);
     $stmt->bindValue(':id', $id, PDO::PARAM_INT);
@@ -19,154 +31,175 @@ if ($id === null || $id === false) {
     $event = $stmt->fetch(PDO::FETCH_ASSOC);
 
     if (!$event) {
-        $error = 'イベントが見つかりませんでした。';
+        $error = 'Event not found.';
     } else {
-        // ★ イベントが見つかった場合だけ、紐づくボトル一覧を取得
+        // 2. Get Bottles
         $sql = 'SELECT * FROM bottle_entries 
                 WHERE event_id = :event_id
-                ORDER BY id ASC';
+                ORDER BY created_at ASC'; // BYO uses created_at/ID order usually
         $stmt = $pdo->prepare($sql);
         $stmt->bindValue(':event_id', $id, PDO::PARAM_INT);
         $stmt->execute();
         $bottles = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+        // 3. Stats Calculation
+        $stats['total'] = count($bottles);
+        $sumFit = 0;
+        $countFit = 0;
+        foreach ($bottles as $b) {
+            // Type Count
+            $type = $b['color'] ?: 'Unknown';
+            if (!isset($stats['types'][$type]))
+                $stats['types'][$type] = 0;
+            $stats['types'][$type]++;
+
+            // Theme Fit (if set)
+            if ($b['theme_fit_score']) {
+                $sumFit += $b['theme_fit_score'];
+                $countFit++;
+            }
+        }
+        if ($countFit > 0) {
+            $stats['theme_fit_avg'] = round($sumFit / $countFit, 2);
+        }
     }
 }
+
+// 4. Determine Role
+// layout/header.php includes helpers.php, but we need it now for logic.
+require_once 'helpers.php';
+$currentUserId = $_SESSION['user_id'] ?? null;
+$eventRole = ($id && $currentUserId) ? getEventRole($pdo, $id, $currentUserId) : 'guest';
+
+// Page Setup
+$page_title = $event ? 'VinMemo - ' . $event['title'] : 'VinMemo - Error';
+require_once 'layout/header.php';
 ?>
 
-<!DOCTYPE html>
-<html lang="ja">
+<?php if ($error): ?>
+    <div class="error-msg"><?= h($error) ?></div>
+    <p><a href="events.php">Back to List</a></p>
+<?php else: ?>
 
-<head>
-    <meta charset="UTF-8">
-    <title>VinMemo v1 – Event Details</title>
-    <link rel="stylesheet" href="style.css">
-</head>
-
-<body>
-    <div class="container">
-        <header>
-            <h1>イベント詳細</h1>
-            <a href="events.php">← イベント一覧に戻る</a>
-        </header>
-
-        <?php if (isset($error)): ?>
-            <div class="error-msg">
-                <?= htmlspecialchars($error, ENT_QUOTES, 'UTF-8') ?>
-                <br><br>
-                <a href="events.php">一覧に戻る</a>
+    <header style="margin-bottom:20px;">
+        <div style="display:flex; justify-content:space-between; align-items:flex-start;">
+            <div>
+                <h1 style="margin:0;"><?= h($event['title']) ?></h1>
+                <p style="margin:5px 0 0 0; color:var(--text-muted);">
+                    <?= h($event['event_date']) ?> @ <?= h($event['place']) ?>
+                </p>
             </div>
+            <div>
+                <a href="events.php" class="button" style="background:#555; font-size:0.9rem;">Back</a>
+            </div>
+        </div>
+
+        <?php if ($event['memo']): ?>
+            <div style="margin-top:15px; padding:15px; background:rgba(255,255,255,0.05); border-radius:8px;">
+                <?= nl2br(h($event['memo'])) ?>
+            </div>
+        <?php endif; ?>
+    </header>
+
+    <!-- Summary Panel -->
+    <section class="card" style="padding:20px;">
+        <h3 style="margin-top:0; border-bottom:1px solid var(--border); padding-bottom:10px;">
+            Summary
+            <?php if ($eventRole === 'organizer'): ?>
+                <span style="font-size:0.8em; color:var(--accent); margin-left:10px;">(Organizer View)</span>
+            <?php endif; ?>
+        </h3>
+        <div style="display:flex; flex-wrap:wrap; gap:20px;">
+            <div>
+                <strong>Total Bottles:</strong> <?= $stats['total'] ?>
+            </div>
+            <div>
+                <strong>Avg Theme Fit:</strong> <?= $stats['theme_fit_avg'] ?>
+            </div>
+            <div>
+                <strong>Breakdown:</strong>
+                <?php foreach ($stats['types'] as $type => $count): ?>
+                    <span style="margin-right:10px;"><?= ucfirst(h($type)) ?>: <?= $count ?></span>
+                <?php endforeach; ?>
+            </div>
+        </div>
+    </section>
+
+    <!-- Actions -->
+    <div style="margin:20px 0; text-align:right;">
+        <a href="bottle_new.php?event_id=<?= $id ?>" class="button">＋ Add My Bottle</a>
+    </div>
+
+    <!-- Bottle List -->
+    <section>
+        <h2>Bottle List</h2>
+        <?php if ($stats['total'] === 0): ?>
+            <p>No bottles registered yet.</p>
         <?php else: ?>
+            <?php foreach ($bottles as $index => $b): ?>
+                <?php
+                // Check permissions
+                $isOwner = ($currentUserId && $b['brought_by_user_id'] == $currentUserId);
+                $isAdmin = ($eventRole === 'organizer');
+                $canEdit = ($isAdmin || $isOwner);
 
-            <!-- イベント情報カード -->
-            <div class="card">
-                <h2><?= htmlspecialchars($event['title'], ENT_QUOTES, 'UTF-8') ?></h2>
+                // Blind Logic: Mask if blind AND (not admin AND not owner)
+                $shouldMask = ($b['is_blind'] && !$isAdmin && !$isOwner);
+                ?>
+                <div class="bottle-card"
+                    style="border-left: 5px solid <?= $b['color'] === 'white' ? '#eee' : ($b['color'] === 'sparkling' ? 'gold' : '#800020') ?>;">
+                    <div style="display:flex; justify-content:space-between; align-items:flex-start;">
+                        <div>
+                            <div style="font-size:0.9em; color:var(--text-muted); margin-bottom:5px;">
+                                #<?= $index + 1 ?>
+                                <span style="color:var(--accent); font-weight:bold; margin-left:5px;">
+                                    <?= h($b['owner_label']) ?>
+                                </span>
+                            </div>
 
-                <table style="margin-bottom: 20px;">
-                    <tr>
-                        <th style="width: 30%;">開催日</th>
-                        <td><?= htmlspecialchars($event['event_date'], ENT_QUOTES, 'UTF-8') ?></td>
-                    </tr>
-                    <tr>
-                        <th>場所</th>
-                        <td><?= htmlspecialchars($event['place'], ENT_QUOTES, 'UTF-8') ?></td>
-                    </tr>
-                    <tr>
-                        <th>メモ</th>
-                        <td><?= nl2br(htmlspecialchars($event['memo'], ENT_QUOTES, 'UTF-8')) ?></td>
-                    </tr>
-                    <tr>
-                        <th>作成日時</th>
-                        <td><?= htmlspecialchars($event['created_at'], ENT_QUOTES, 'UTF-8') ?></td>
-                    </tr>
-                </table>
-            </div>
-            <!-- ★ ここに「ボトル追加」リンクを置く -->
-            <p>
-                <a href="bottle_new.php?event_id=<?= htmlspecialchars($id) ?>">
-                    ＋ このイベントにボトルを追加
-                </a>
-            </p>
-            <h2>ボトル一覧</h2>
-
-            <?php if (count($bottles) === 0): ?>
-                <p>まだボトルは登録されていません。</p>
-            <?php else: ?>
-                <?php foreach ($bottles as $index => $b): ?>
-                    <div class="bottle-card" style="position:relative;">
-                        <div style="font-weight:bold; font-size:1.1em;">
-                            #<?= $index + 1 ?>
-                            <span style="color:var(--accent); margin-left:10px;">
-                                <?= htmlspecialchars($b['owner_label']) ?>
-                            </span>
-                        </div>
-
-                        <div style="margin: 10px 0;">
-                            <?php if ($b['is_blind']): ?>
-                                <span
-                                    style="background:var(--accent); color:#000; padding:2px 6px; border-radius:4px; font-size:0.8em; font-weight:bold;">BLIND</span>
-                            <?php endif; ?>
-
-                            <span style="font-size:1.2em; font-weight:bold;">
-                                <?= htmlspecialchars($b['wine_name']) ?>
-                            </span>
-                        </div>
-
-                        <div style="font-size:0.9em; color:var(--text-muted); line-height:1.5;">
-                            <?php
-                            $details = [];
-                            if ($b['vintage'])
-                                $details[] = $b['vintage'];
-                            if ($b['producer_name'])
-                                $details[] = $b['producer_name'];
-                            if ($b['country'])
-                                $details[] = $b['country'];
-                            if ($b['region'])
-                                $details[] = $b['region'];
-                            if ($b['appellation'])
-                                $details[] = $b['appellation'];
-                            if ($b['color'])
-                                $details[] = ucfirst($b['color']);
-                            echo implode(' / ', array_map(function ($s) {
-                                return htmlspecialchars($s); }, $details));
-                            ?>
-                        </div>
-
-                        <?php if ($b['est_price_yen'] || $b['theme_fit_score']): ?>
-                            <div style="font-size:0.85em; margin-top:5px; color:#aaa;">
-                                <?php if ($b['est_price_yen']): ?>
-                                    参考価格: ¥<?= number_format($b['est_price_yen']) ?>
+                            <div style="font-size:1.3rem; font-weight:bold;">
+                                <?php if ($b['is_blind']): ?>
+                                    <span
+                                        style="background:var(--accent); color:#000; padding:2px 6px; border-radius:4px; font-size:0.6em; vertical-align:middle;">BLIND</span>
                                 <?php endif; ?>
-                                <?php if ($b['theme_fit_score']): ?>
-                                    / テーマ適合: <?= $b['theme_fit_score'] ?>/5
+                                <?= mask_if_blind($b['wine_name'], $shouldMask) ?>
+                            </div>
+
+                            <div style="margin-top:5px; color:#ccc;">
+                                <?= mask_if_blind($b['vintage'] ?: 'NV', $shouldMask, 'XXXX') ?> |
+                                <?= mask_if_blind($b['producer_name'], $shouldMask) ?> |
+                                <?= mask_if_blind($b['region'], $shouldMask) ?>
+                            </div>
+                        </div>
+
+                        <?php if ($canEdit): ?>
+                            <div style="min-width:120px; text-align:right;">
+                                <a href="bottle_edit.php?id=<?= $b['id'] ?>" style="font-size:0.9em; margin-right:10px;">Edit</a>
+                                <?php if ($isAdmin || $isOwner): // Redundant check but clear intent ?>
+                                    <a href="bottle_delete.php?id=<?= $b['id'] ?>" onclick="return confirm('Delete this bottle?');"
+                                        style="color:var(--danger); font-size:0.9em;">Delete</a>
                                 <?php endif; ?>
                             </div>
                         <?php endif; ?>
+                    </div>
+
+                    <!-- Details Row -->
+                    <div style="margin-top:10px; font-size:0.9em; color:#aaa; border-top:1px dashed #555; padding-top:10px;">
+                        Price: <?= mask_if_blind($b['est_price_yen'] ? '¥' . number_format($b['est_price_yen']) : '-', $shouldMask) ?>
+                        | Theme Fit: <?= h($b['theme_fit_score'] ?: '-') ?>/5
 
                         <?php if ($b['memo']): ?>
-                            <div style="margin-top:8px; padding-top:8px; border-top:1px dashed #555; font-size:0.9em;">
-                                <?= nl2br(htmlspecialchars($b['memo'])) ?>
+                            <div style="margin-top:5px; color:#ddd;">
+                                Memo: <br>
+                                <?= mask_if_blind(nl2br($b['memo']), $shouldMask, 'Matches Blind Mode') ?>
                             </div>
                         <?php endif; ?>
-
-                        <div style="margin-top:15px; text-align:right;">
-                            <a href="bottle_edit.php?id=<?= $b['id'] ?>" class="button"
-                                style="padding:5px 10px; font-size:0.9em; margin-right:5px;">編集</a>
-                            <a href="javascript:void(0);" onclick="confirmDelete(<?= $b['id'] ?>)" class="button"
-                                style="padding:5px 10px; font-size:0.9em; background-color:var(--danger); color:#fff;">削除</a>
-                        </div>
                     </div>
-                <?php endforeach; ?>
-            <?php endif; ?>
-
-            <script>
-                function confirmDelete(id) {
-                    if (confirm('本当に削除しますか？\nAre you sure you want to delete this bottle?')) {
-                        window.location.href = 'bottle_delete.php?id=' + id;
-                    }
-                }
-            </script>
+                </div>
+            <?php endforeach; ?>
         <?php endif; ?>
-    </div>
-</body>
+    </section>
 
-</html>
+<?php endif; ?>
+
+<?php require_once 'layout/footer.php'; ?>
