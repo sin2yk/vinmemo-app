@@ -23,12 +23,12 @@ $val = $stmt->fetch(PDO::FETCH_ASSOC);
 // ユーザーが存在し、パスワード一致ならログイン成功
 if ($val && password_verify($lpw, $val['lpw'])) {
     $_SESSION['chk_ssid'] = session_id();
-    $_SESSION['user_id']  = $val['id'];
-    $_SESSION['name']     = $val['name'];
-    $_SESSION['role']     = $val['role'];
+    $_SESSION['user_id'] = $val['id'];
+    $_SESSION['name'] = $val['name'];
+    $_SESSION['role'] = $val['role'];
 
     // ログイン後の遷移先（BYOトップ）
-    redirect('index.php');  // index.php がまだなら list.php でもOK
+    redirect('index.html');  // index.html がまだなら list.php でもOK
 } else {
     exit('Login Error: IDまたはパスワードが違います');
 }

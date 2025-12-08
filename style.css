@@ -38,7 +38,6 @@ h3 {
   margin-top: 0;
   font-weight: 600;
   color: #fff;
-  /* Crisp white for headers */
 }
 
 a {
@@ -71,7 +70,6 @@ header {
   padding: 30px;
   border-radius: 12px;
   box-shadow: 0 8px 16px rgba(0, 0, 0, 0.4);
-  /* Deeper shadow for depth */
   margin-bottom: 30px;
 }
 
@@ -87,34 +85,40 @@ input[type="text"],
 input[type="date"],
 input[type="email"],
 input[type="password"],
+input[type="number"],
+select,
 textarea {
   width: 100%;
   padding: 12px;
   border: 1px solid var(--border);
   background-color: #260a0d;
-  /* Very dark wine, almost black */
   color: #fff;
   border-radius: 8px;
   margin-bottom: 20px;
-  font-size: 1rem;
+  font-size: 16px;
+  /* Optimized for mobile to prevent zoom */
   font-family: inherit;
   transition: border-color 0.2s;
+  appearance: none;
+  /* Uniform appearance */
 }
 
 input:focus,
+select:focus,
 textarea:focus {
   outline: none;
   border-color: var(--accent);
 }
 
+/* Button Styles */
 button,
 .button {
   display: inline-block;
   background-color: var(--accent);
   color: #2e0e12;
-  /* Dark wine text on gold button */
   border: none;
-  padding: 10px 18px;
+  padding: 12px 20px;
+  /* Slightly larger touch target */
   font-size: 1rem;
   font-weight: 600;
   border-radius: 8px;
@@ -167,7 +171,8 @@ tr:hover {
 }
 
 /* Utility */
-.error-msg {
+.error-msg,
+.error {
   color: var(--danger);
   background: rgba(255, 107, 107, 0.1);
   padding: 10px;
@@ -182,7 +187,6 @@ hr {
   margin: 30px 0;
 }
 
-/* Alignment */
 .text-right {
   text-align: right;
 }
@@ -191,11 +195,26 @@ hr {
   text-align: center;
 }
 
-/* Form Layouts (Added for Bottle Entry) */
+small {
+  color: var(--text-muted);
+  display: block;
+  margin-top: 5px;
+  font-size: 0.85rem;
+}
+
+/* === Bottle Form Specifics === */
+
+.bottle-form {
+  max-width: 640px;
+  /* Requested max-width */
+  margin: 0 auto;
+  padding: 16px 0;
+}
+
 .form-section {
   border: 1px solid var(--border);
   padding: 20px;
-  margin-bottom: 20px;
+  margin-bottom: 24px;
   border-radius: 8px;
   background-color: rgba(0, 0, 0, 0.2);
 }
@@ -204,15 +223,16 @@ hr {
   margin-top: 0;
   border-bottom: 1px solid var(--border);
   padding-bottom: 10px;
-  margin-bottom: 15px;
+  margin-bottom: 20px;
   font-size: 1.1rem;
   color: var(--accent);
 }
 
 .form-group {
-  margin-bottom: 15px;
+  margin-bottom: 20px;
 }
 
+/* Layout: PC 2-column, Mobile 1-column */
 .form-row {
   display: flex;
   gap: 20px;
@@ -220,47 +240,108 @@ hr {
 
 .form-row .form-group {
   flex: 1;
+  /* Equal width columns */
+  min-width: 0;
+  /* Prevent overflow */
 }
 
-small {
+/* Label & Blind Checkbox row */
+.label-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+  gap: 10px;
+}
+
+.label-row span {
+  font-weight: 500;
   color: var(--text-muted);
-  display: block;
-  margin-top: 5px;
 }
 
-select {
-  width: 100%;
-  padding: 12px;
-  border: 1px solid var(--border);
-  background-color: #260a0d;
-  color: #fff;
-  border-radius: 8px;
+.blind-inline {
+  font-size: 0.85rem;
+  color: var(--accent);
+  /* Make it subtle but visible */
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.blind-inline input[type="checkbox"] {
+  width: auto;
+  margin: 0;
+  /* Reset default input styles for checkbox if needed */
+}
+
+/* Visually distinguish blinded groups */
+.form-group.is-blind {
+  border: 1px dashed rgba(255, 215, 128, 0.5);
+  padding: 10px;
+  border-radius: 6px;
+  background-color: rgba(0, 0, 0, 0.2);
+  margin-top: -11px;
+  /* Offset padding to align visually */
+  margin-bottom: 9px;
+}
+
+.form-group.is-blind .label-row {
+  margin-top: 0;
+}
+
+.blind-note {
+  font-size: 0.9rem;
+  background-color: rgba(212, 175, 55, 0.1);
+  border-left: 3px solid var(--accent);
+  padding: 10px 15px;
   margin-bottom: 20px;
-  font-size: 1rem;
-  font-family: inherit;
-  appearance: none;
-  /* simple styling */
+  color: #fbead2;
+  border-radius: 4px;
 }
 
-input[type="number"] {
-  width: 100%;
-  padding: 12px;
-  border: 1px solid var(--border);
-  background-color: #260a0d;
-  color: #fff;
-  border-radius: 8px;
-  margin-bottom: 20px;
-  font-size: 1rem;
-  font-family: inherit;
+/* Radio buttons container */
+.radio-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  padding: 6px 0;
 }
 
-/* MyPage Styles */
+.radio-row label {
+  font-weight: normal;
+  color: var(--text-main);
+  margin-bottom: 0;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  cursor: pointer;
+}
+
+.radio-row input[type="radio"] {
+  width: auto;
+  margin: 0;
+}
+
+/* Other size row */
+.other-size-row {
+  display: flex;
+  gap: 10px;
+  margin-top: 10px;
+}
+
+.input-inline-top {
+  margin-top: 0;
+  /* Reset */
+}
+
+/* MyPage Styles (kept for compatibility) */
 .section-title {
   border-bottom: 2px solid var(--accent);
   padding-bottom: 10px;
   margin-top: 40px;
   margin-bottom: 20px;
-  color: #fff;
   font-size: 1.4rem;
 }
 
@@ -288,188 +369,54 @@ input[type="number"] {
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
 }
 
-/* ラベル左＋ブラインドチェック右の横並び */
-.label-row {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  gap: 0.5rem;
-}
+/* === Responsive / Mobile === */
 
-.blind-inline {
-  font-size: 0.85rem;
-  white-space: nowrap;
-}
-
-/* ラジオボタンを横並び（必要に応じて折り返し） */
-.radio-row {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.5rem;
-}
-
-.radio-row label {
-  white-space: nowrap;
-  font-size: 0.9rem;
-}
-
-/* 容量 other の行も横方向ベースで、スマホで折り返し */
-.other-size-row {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.5rem;
-  margin-top: 0.25rem;
-}
-
-.input-inline-top {
-  margin-top: 4px;
-}
-
-/* スマホでの余白調整（必要なら） */
-@media (max-width: 600px) {
-  .radio-row {
-    gap: 0.35rem;
-  }
-
-  .radio-row label {
-    font-size: 0.85rem;
-  }
-}
-
-/* === VinMemo Bottle Page Layout / Responsive === */
-
-.container.bottle-page {
-  max-width: 900px;
-  margin: 0 auto;
-  padding: 1rem 1.25rem;
-}
-
-.page-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: baseline;
-  gap: 0.75rem;
-  margin-bottom: 1rem;
-}
-
-.back-link {
-  font-size: 0.9rem;
-  text-decoration: none;
-}
-
-.bottle-form .form-section {
-  margin-bottom: 1.25rem;
-  padding: 0.75rem 0.75rem 0.5rem;
-  border-bottom: 1px solid #eee;
-}
-
-.bottle-form h3 {
-  margin-top: 0;
-  margin-bottom: 0.75rem;
-  font-size: 1rem;
-}
-
-.form-row {
-  display: flex;
-  gap: 1rem;
-  flex-wrap: wrap;
-}
-
-.form-row .form-group {
-  flex: 1 1 260px;
-  min-width: 0;
-}
-
-.label-row {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  gap: 0.5rem;
-  margin-bottom: 0.25rem;
-}
-
-.blind-inline {
-  font-size: 0.85rem;
-  white-space: nowrap;
-}
-
-.radio-row {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.5rem;
-}
-
-.radio-row label {
-  white-space: nowrap;
-  font-size: 0.9rem;
-}
-
-.other-size-row {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.5rem;
-  margin-top: 0.25rem;
-}
-
-.input-inline-top {
-  margin-top: 4px;
-}
-
-.blind-note {
-  font-size: 0.85rem;
-  background-color: rgba(255, 255, 255, 0.03);
-  border-left: 2px solid rgba(255, 215, 128, 0.7);
-  padding: 0.5rem 0.6rem;
-  margin-bottom: 0.8rem;
-  color: #fbead2;
-}
-
-/* ブラインド中の項目を視覚的に変える */
-.form-group.is-blind {
-  border: 1px dashed rgba(255, 215, 128, 0.6);
-  border-radius: 4px;
-  padding: 0.5rem 0.6rem;
-  background-color: rgba(0, 0, 0, 0.35);
-}
-
-.form-group.is-blind input,
-.form-group.is-blind select,
-.form-group.is-blind textarea {
-  opacity: 0.85;
-}
-
-/* select の背景色（PCブラウザ中心） */
-/* .bottle-form select {
-  background-color: #ffffff; 
-} */
-
-/* レスポンシブ：タブレット・モバイル向け調整 */
 @media (max-width: 900px) {
   .container.bottle-page {
     max-width: 100%;
-    padding: 0.75rem;
+    padding: 0 15px;
   }
 }
 
-@media (max-width: 600px) {
+@media (max-width: 768px) {
+
+  /* Stack form rows on mobile */
+  .form-row {
+    flex-direction: column;
+    gap: 0;
+  }
+
+  .form-row .form-group {
+    margin-bottom: 20px;
+  }
+
+  /* Adjust padding for small screens */
+  .bottle-form {
+    padding: 10px 0;
+  }
+
+  .form-section {
+    padding: 15px;
+  }
+
+  /* Make radio rows cleaner on narrow screens */
+  .radio-row {
+    gap: 10px 15px;
+    /* Vertical Horizontal */
+  }
+
+  .other-size-row {
+    flex-direction: column;
+    gap: 10px;
+  }
+
   .page-header {
     flex-direction: column;
     align-items: flex-start;
   }
 
   .back-link {
-    margin-top: 0.25rem;
-  }
-
-  .form-row {
-    flex-direction: column;
-  }
-
-  .radio-row {
-    gap: 0.35rem;
-  }
-
-  .radio-row label {
-    font-size: 0.85rem;
+    margin-top: 10px;
+    display: inline-block;
   }
 }

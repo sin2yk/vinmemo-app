@@ -71,6 +71,11 @@ require_once 'helpers.php';
 $currentUserId = $_SESSION['user_id'] ?? null;
 $eventRole = ($id && $currentUserId) ? getEventRole($pdo, $id, $currentUserId) : 'guest';
 
+// --- Debug / Temporary: 手動ビュー切り替え ---
+if (isset($_GET['view']) && in_array($_GET['view'], ['organizer', 'guest'], true)) {
+    $eventRole = $_GET['view'];
+}
+
 // Page Setup
 $page_title = $event ? 'VinMemo - ' . $event['title'] : 'VinMemo - Error';
 require_once 'layout/header.php';
@@ -87,6 +92,18 @@ require_once 'layout/header.php';
                 <h1 style="margin:0;"><?= h($event['title']) ?></h1>
                 <p style="margin:5px 0 0 0; color:var(--text-muted);">
                     <?= h($event['event_date']) ?> @ <?= h($event['place']) ?>
+
+                    <?php if ($eventRole === 'organizer'): ?>
+                        <span style="color:var(--accent); margin-left:10px;">[幹事ビュー]</span>
+                        <a href="event_show.php?id=<?= h($id) ?>&view=guest" style="margin-left:10px; font-size:0.8em;">
+                            ゲストビューで見る
+                        </a>
+                    <?php else: ?>
+                        <span style="margin-left:10px;">[ゲストビュー]</span>
+                        <a href="event_show.php?id=<?= h($id) ?>&view=organizer" style="margin-left:10px; font-size:0.8em;">
+                            幹事ビューで見る
+                        </a>
+                    <?php endif; ?>
                 </p>
             </div>
             <div>
@@ -185,7 +202,8 @@ require_once 'layout/header.php';
 
                     <!-- Details Row -->
                     <div style="margin-top:10px; font-size:0.9em; color:#aaa; border-top:1px dashed #555; padding-top:10px;">
-                        Price: <?= mask_if_blind($b['est_price_yen'] ? '¥' . number_format($b['est_price_yen']) : '-', $shouldMask) ?>
+                        Price:
+                        <?= mask_if_blind($b['est_price_yen'] ? '¥' . number_format($b['est_price_yen']) : '-', $shouldMask) ?>
                         | Theme Fit: <?= h($b['theme_fit_score'] ?: '-') ?>/5
 
                         <?php if ($b['memo']): ?>

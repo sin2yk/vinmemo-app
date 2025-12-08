@@ -50,7 +50,7 @@ Create `layout/header.php` and `layout/footer.php`.
 - Copyright/Footer text.
 
 **Pages to update**:
-- `index.php` (Login/Landing) - maybe distinct, but could share basics.
+- `index.html` (Login/Landing) - maybe distinct, but could share basics.
 - `home.php`
 - `events.php`, `events_new.php`, `event_show.php`
 - `bottle_new.php`, `bottle_edit.php`

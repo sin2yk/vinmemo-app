@@ -6,7 +6,7 @@ loginCheck();
 
 // ★ ここでロールチェック（幹事だけOK）
 if ($_SESSION['role'] !== 'organizer') {
-    exit('ACCESS DENIED: organizer only');
+  exit('ACCESS DENIED: organizer only');
 }
 
 require 'db_connect.php'; // $pdo を用意するファイル
@@ -15,15 +15,15 @@ $pdo = get_pdo();
 
 // 1. 削除リクエスト処理
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['delete_id'])) {
-    $delete_id = (int)$_POST['delete_id'];
+  $delete_id = (int) $_POST['delete_id'];
 
-    $sql = 'DELETE FROM bottle_entries WHERE id = :id';
-    $stmt = $pdo->prepare($sql);
-    $stmt->bindValue(':id', $delete_id, PDO::PARAM_INT);
-    $stmt->execute();
+  $sql = 'DELETE FROM bottle_entries WHERE id = :id';
+  $stmt = $pdo->prepare($sql);
+  $stmt->bindValue(':id', $delete_id, PDO::PARAM_INT);
+  $stmt->execute();
 
-    header('Location: list_admin.php');
-    exit;
+  header('Location: list_admin.php');
+  exit;
 }
 
 // 2. 一覧取得
@@ -34,11 +34,13 @@ $entries = $stmt->fetchAll(PDO::FETCH_ASSOC);
 ?>
 <!DOCTYPE html>
 <html lang="ja">
+
 <head>
   <meta charset="UTF-8">
   <title>BYO一覧（主催者用）</title>
   <link rel="stylesheet" href="style.css">
 </head>
+
 <body>
   <header class="header">
     <div class="header-inner">
@@ -53,7 +55,7 @@ $entries = $stmt->fetchAll(PDO::FETCH_ASSOC);
   </header>
   <!-- グローバルナビ -->
   <nav class="nav-links">
-    <a href="index.php">トップ</a>
+    <a href="index.html">トップ</a>
     <a href="register.php">持ち寄り登録フォーム</a>
     <a href="list.php">参加者用ワインリスト</a>
     <a href="list_admin.php">幹事用ワインリスト</a>
@@ -87,8 +89,7 @@ $entries = $stmt->fetchAll(PDO::FETCH_ASSOC);
             <a class="btn-link" href="edit.php?id=<?= $row['id'] ?>">編集</a>
             <form action="list_admin.php" method="post" style="display:inline;">
               <input type="hidden" name="delete_id" value="<?= $row['id'] ?>">
-              <button class="btn-danger" type="submit"
-                      onclick="return confirm('本当に削除しますか？');">
+              <button class="btn-danger" type="submit" onclick="return confirm('本当に削除しますか？');">
                 削除
               </button>
             </form>
@@ -98,7 +99,7 @@ $entries = $stmt->fetchAll(PDO::FETCH_ASSOC);
     </table>
 
     <p class="mt-20">
-      <a href="index.php">トップへ戻る</a>
+      <a href="index.html">トップへ戻る</a>
     </p>
   </main>
 </body>

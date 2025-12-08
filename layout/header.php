@@ -60,7 +60,7 @@ require_once __DIR__ . '/../helpers.php';
             <div class="header-inner">
                 <div class="header-title">
                     <h1 style="margin:0; font-size:1.5rem;">
-                        <a href="index.php" style="color:white; text-decoration:none;">VinMemo</a>
+                        <a href="index.html" style="color:white; text-decoration:none;">VinMemo</a>
                     </h1>
                 </div>
                 <div class="header-user">
@@ -68,7 +68,7 @@ require_once __DIR__ . '/../helpers.php';
                         Login: <?= isset($_SESSION['name']) ? h($_SESSION['name']) : 'User' ?>
                         | <a href="logout.php">Logout</a>
                     <?php else: ?>
-                        <a href="index.php">Login</a>
+                        <a href="index.html">Login</a>
                     <?php endif; ?>
                 </div>
             </div>
