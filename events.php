@@ -20,7 +20,7 @@ require_once 'layout/header.php';
   <p>No events found.</p>
 <?php else: ?>
   <div class="card">
-    <table>
+    <table class="event-table">
       <thead>
         <tr>
           <th>Title</th>
@@ -44,6 +44,32 @@ require_once 'layout/header.php';
         <?php endforeach; ?>
       </tbody>
     </table>
+
+    <div class="event-list-cards">
+      <?php foreach ($events as $event): ?>
+        <div class="event-card">
+          <div class="event-card-title">
+            <a href="event_show.php?id=<?= h($event['id']) ?>">
+              <?= h($event['title']) ?>
+            </a>
+          </div>
+          <div class="event-card-meta">
+            <div class="event-card-row">
+              <span class="label">Date</span>
+              <span class="value"><?= h($event['event_date']) ?></span>
+            </div>
+            <div class="event-card-row">
+              <span class="label">Place</span>
+              <span class="value"><?= h($event['place']) ?></span>
+            </div>
+            <div class="event-card-row">
+              <span class="label">Memo</span>
+              <span class="value"><?= nl2br(h($event['memo'])) ?></span>
+            </div>
+          </div>
+        </div>
+      <?php endforeach; ?>
+    </div>
   </div>
 <?php endif; ?>
 

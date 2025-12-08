@@ -55,31 +55,28 @@ require_once __DIR__ . '/../helpers.php';
 </head>
 
 <body>
-    <header class="header">
-        <div class="container" style="margin: 0 auto; padding: 20px 0;">
-            <div class="header-inner">
-                <div class="header-title">
-                    <h1 style="margin:0; font-size:1.5rem;">
-                        <a href="index.html" style="color:white; text-decoration:none;">VinMemo</a>
-                    </h1>
-                </div>
-                <div class="header-user">
-                    <?php if (isset($_SESSION['user_id'])): ?>
-                        Login: <?= isset($_SESSION['name']) ? h($_SESSION['name']) : 'User' ?>
-                        | <a href="logout.php">Logout</a>
-                    <?php else: ?>
-                        <a href="index.html">Login</a>
-                    <?php endif; ?>
-                </div>
+    <header class="site-header">
+        <div class="header-inner">
+            <div class="site-title">
+                <h1><a href="index.html">VinMemo</a></h1>
             </div>
 
             <?php if (isset($_SESSION['user_id'])): ?>
-                <nav class="nav-links">
+                <nav class="main-nav">
                     <a href="home.php">Home</a>
                     <a href="events.php">Event List</a>
                     <a href="mypage.php">My Page</a>
                 </nav>
             <?php endif; ?>
+
+            <div class="login-info">
+                <?php if (isset($_SESSION['user_id'])): ?>
+                    Login: <?= isset($_SESSION['name']) ? h($_SESSION['name']) : 'User' ?>
+                    | <a href="logout.php">Logout</a>
+                <?php else: ?>
+                    <a href="index.html">Login</a>
+                <?php endif; ?>
+            </div>
         </div>
     </header>
 

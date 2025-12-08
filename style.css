@@ -58,10 +58,99 @@ a:hover {
 }
 
 /* Header / Nav */
-header {
+/* Header / Nav */
+.site-header {
   margin-bottom: 40px;
   border-bottom: 1px solid var(--border);
-  padding-bottom: 20px;
+  background-color: rgba(0, 0, 0, 0.2);
+}
+
+.header-inner {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 12px 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.site-title h1 {
+  margin: 0;
+  font-size: 1.5rem;
+}
+
+.site-title a {
+  color: white;
+  text-decoration: none;
+}
+
+.main-nav {
+  display: flex;
+  gap: 20px;
+}
+
+.main-nav a {
+  color: var(--text-muted);
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.main-nav a:hover {
+  color: var(--accent);
+}
+
+.login-info {
+  font-size: 0.9em;
+  color: var(--text-muted);
+}
+
+/* Event List Cards (Mobile) */
+.event-list-cards {
+  display: none;
+  /* Hidden by default on desktop */
+  flex-direction: column;
+  gap: 16px;
+}
+
+.event-card {
+  background-color: var(--card-bg);
+  padding: 16px;
+  border-radius: 12px;
+  border: 1px solid var(--border);
+}
+
+.event-card-title {
+  font-size: 1.1rem;
+  font-weight: 700;
+  margin-bottom: 8px;
+}
+
+.event-card-title a {
+  color: var(--accent);
+}
+
+.event-card-meta {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.event-card-row {
+  display: flex;
+  font-size: 0.9rem;
+}
+
+.event-card-row .label {
+  min-width: 60px;
+  color: var(--text-muted);
+  font-weight: 500;
+  opacity: 0.8;
+}
+
+.event-card-row .value {
+  flex: 1;
+  color: var(--text-main);
 }
 
 /* Cards / Sections */
@@ -371,6 +460,38 @@ small {
 }
 
 /* === Responsive / Mobile === */
+
+@media (max-width: 899px) {
+
+  /* Header adjustments */
+  .header-inner {
+    flex-wrap: wrap;
+    justify-content: space-between;
+    row-gap: 12px;
+    padding: 12px 16px;
+  }
+
+  .main-nav {
+    order: 3;
+    /* Push nav to bottom line if needed, or keeping normal flow */
+    flex-basis: 100%;
+    margin-top: 4px;
+    gap: 16px;
+  }
+
+  .login-info {
+    font-size: 0.85em;
+  }
+
+  /* Event List: Switch to Cards */
+  .event-table {
+    display: none;
+  }
+
+  .event-list-cards {
+    display: flex;
+  }
+}
 
 @media (max-width: 900px) {
   .container.bottle-page {
