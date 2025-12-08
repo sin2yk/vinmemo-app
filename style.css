@@ -208,7 +208,7 @@ small {
   max-width: 640px;
   /* Requested max-width */
   margin: 0 auto;
-  padding: 16px 0;
+  padding: 16px;
 }
 
 .form-section {
@@ -392,7 +392,7 @@ small {
 
   /* Adjust padding for small screens */
   .bottle-form {
-    padding: 10px 0;
+    padding: 16px;
   }
 
   .form-section {
