@@ -142,6 +142,78 @@ require_once 'layout/header.php';
         </div>
     </section>
 
+    <!-- Organizer Only: Visibility Controls -->
+    <?php if ($eventRole === 'organizer'): ?>
+        <?php
+        $isRevealed = isEventRevealed($event);
+        $listConfig = json_decode($event['list_field_visibility'] ?? '[]', true);
+        // Default check logic: keys missing = true (visible), or logic in helpers relies on existing keys
+        // For the form, we need to know if it's CHECKED.
+        // Helper logic: if ($cfg[$key] === false) -> hidden. So if unset, it is visible.
+        function isChecked($conf, $key)
+        {
+            return !isset($conf[$key]) || $conf[$key] !== false;
+        }
+        ?>
+        <section class="card" style="padding:20px; border:1px solid var(--accent); background:rgba(255,167,38,0.1);">
+            <h3 style="margin-top:0; color:var(--accent);">Organizer Controls</h3>
+
+            <div style="display:flex; flex-wrap:wrap; gap:30px;">
+
+                <!-- 1. Reveal Control -->
+                <div style="flex:1; min-width:300px;">
+                    <h4>Blind Reveal Status</h4>
+                    <p>
+                        Status:
+                        <?php if ($isRevealed): ?>
+                            <strong style="color:#4caf50;">REVEALED (Open)</strong>
+                        <?php else: ?>
+                            <strong style="color:#ff9800;">BLIND</strong>
+                        <?php endif; ?>
+                    </p>
+                    <?php if (!$isRevealed): ?>
+                        <form method="post" action="event_update_visibility.php"
+                            onsubmit="return confirm('Reveal ALL bottles to guests?');">
+                            <input type="hidden" name="event_id" value="<?= h($id) ?>">
+                            <button type="submit" name="action" value="reveal_all" class="button"
+                                style="background:#ff9800; color:black;">
+                                ⚡ Reveal All / 答え合わせ
+                            </button>
+                        </form>
+                    <?php else: ?>
+                        <p style="font-size:0.9em; color:#aaa;">Event is fully revealed.</p>
+                    <?php endif; ?>
+                </div>
+
+                <!-- 2. List Restriction Control -->
+                <div style="flex:1; min-width:300px;">
+                    <h4>Guest List Display Rules</h4>
+                    <p style="font-size:0.85em; color:#ccc;">Uncheck fields to HIDE them from the guest list (even in Full
+                        mode).</p>
+                    <form method="post" action="event_update_visibility.php">
+                        <input type="hidden" name="event_id" value="<?= h($id) ?>">
+                        <input type="hidden" name="action" value="update_list_constraints">
+
+                        <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
+                            <label><input type="checkbox" name="field_owner_label" <?= isChecked($listConfig, 'owner_label') ? 'checked' : '' ?>> Owner Name</label>
+                            <label><input type="checkbox" name="field_country" <?= isChecked($listConfig, 'country') ? 'checked' : '' ?>> Country</label>
+                            <label><input type="checkbox" name="field_region" <?= isChecked($listConfig, 'region') ? 'checked' : '' ?>> Region</label>
+                            <label><input type="checkbox" name="field_appellation" <?= isChecked($listConfig, 'appellation') ? 'checked' : '' ?>> Appellation</label>
+                            <label><input type="checkbox" name="field_price_band" <?= isChecked($listConfig, 'price_band') ? 'checked' : '' ?>> Price Band</label>
+                            <label><input type="checkbox" name="field_theme_fit" <?= isChecked($listConfig, 'theme_fit') ? 'checked' : '' ?>> Theme Fit</label>
+                            <label><input type="checkbox" name="field_memo" <?= isChecked($listConfig, 'memo') ? 'checked' : '' ?>> Memo</label>
+                        </div>
+                        <div style="margin-top:10px;">
+                            <button type="submit" class="button" style="font-size:0.8rem; background:#555;">Update
+                                Rules</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </section>
+    <?php endif; ?>
+
+
     <!-- Actions -->
     <div style="margin:20px 0; text-align:right;">
         <a href="bottle_new.php?event_id=<?= $id ?>" class="button">＋ Add My Bottle</a>
@@ -149,7 +221,23 @@ require_once 'layout/header.php';
 
     <!-- Bottle List -->
     <section>
-        <h2>Bottle List</h2>
+        <div style="display:flex; justify-content:space-between; align-items:flex-end; margin-bottom:15px;">
+            <h2 style="margin:0;">Bottle List</h2>
+            
+            <!-- Guest View Density Toggle -->
+            <?php if ($eventRole === 'guest'): ?>
+                <?php $viewMode = $_GET['mode'] ?? 'standard'; // simple, standard, full ?>
+                <div class="view-mode-toggle" style="font-size:0.85rem;">
+                    View: 
+                    <a href="?id=<?= $id ?>&view=guest&mode=simple" 
+                       style="<?= $viewMode === 'simple' ? 'font-weight:bold; color:var(--accent);' : 'color:#888;' ?>">Simple</a> |
+                    <a href="?id=<?= $id ?>&view=guest&mode=standard"
+                       style="<?= $viewMode === 'standard' ? 'font-weight:bold; color:var(--accent);' : 'color:#888;' ?>">Standard</a> |
+                    <a href="?id=<?= $id ?>&view=guest&mode=full"
+                       style="<?= $viewMode === 'full' ? 'font-weight:bold; color:var(--accent);' : 'color:#888;' ?>">Full</a>
+                </div>
+            <?php endif; ?>
+        </div>
 
         <?php if ($stats['total'] === 0): ?>
             <p>No bottles registered yet.</p>
@@ -157,160 +245,126 @@ require_once 'layout/header.php';
             <div class="bottle-list-container">
                 <?php foreach ($bottles as $index => $b): ?>
                     <?php
-                    // --- hide_from_list: ゲストビューでは非表示 ---
-                    $hideFromList = !empty($b['hide_from_list']);
-                    if ($eventRole !== 'organizer' && $hideFromList) {
-                        continue;
-                    }
+                    // --- 1. Get Visible Data ---
+                    // use helper function
+                    $visible = getVisibleFields($b, $event, $eventRole);
+                    $displayName = getBottleDisplayName($visible, $b, $index);
+                    
+                    // --- 2. Determine Display Mode ---
+                    // If guest, use requested mode. If organizer, force 'full' (or custom organizer view).
+                    $currentMode = ($eventRole === 'organizer') ? 'organizer_full' : ($viewMode ?? 'standard');
 
-                    // --- ブラインド判定（カラム名は安全に参照） ---
-                    $isBlind = !empty($b['is_blind']) || !empty($b['blind_flag']);
+                    // --- 3. Construct Lines based on Mode ---
+                    
+                    // Line 1: Label (#1 Owner)
+                    // If owner is hidden, just show #1
+                    $ownerStr = $visible['owner_label'] ? (' ' . h($visible['owner_label'])) : '';
+                    $line1 = '#' . ($index + 1) . $ownerStr;
 
-                    // 基本情報
-                    $no = $index + 1;
-                    $owner = $b['owner_label'] ?? '';
-                    $producer = $b['producer_name'] ?? '';
-                    $wineName = $b['wine_name'] ?? '';
-                    $vintage = $b['vintage'] ?? '';
-                    $country = $b['country'] ?? '';
-                    $region = $b['region'] ?? '';
-                    $appellation = $b['appellation'] ?? '';
-                    $color = $b['color'] ?? '';
-                    $sizeCode = $b['bottle_size'] ?? null;
-                    $themeFit = $b['theme_fit_score'] ?? null;
-                    $priceBand = $b['price_band_label'] ?? ($b['price_band'] ?? '');
-                    $memo = $b['memo'] ?? '';
-
-                    // line1: 「#1 吉川」
-                    $line1 = '#' . $no . ' ' . h($owner);
-
-                    // ブラインド時の表示制御
-                    if ($isBlind && $eventRole === 'guest') {
-                        $line2 = 'Blind Bottle';
-                        $line3 = '※ ブラインド表示中 / Hidden for blind tasting';
-                        $origin = '';
-                    } else {
-                        $line2 = $producer;
-                        $line3 = $wineName;
-                        if ($vintage !== '') {
-                            $line3 .= ' ' . h($vintage);
-                        }
-                        $originParts = array_filter([$country, $region, $appellation]);
-                        $origin = implode(' / ', $originParts);
-                    }
-
-                    // line4: タイプ・容量など
-                    $specParts = [];
-                    if ($color !== '') {
-                        $specParts[] = ucfirst($color);
-                    }
-                    if ($sizeCode) {
-                        // helpers.php の getBottleSizeLabel() を想定
-                        $specParts[] = getBottleSizeLabel($sizeCode);
-                    }
-                    $line4 = implode(' · ', $specParts);
-
-                    // line5: 産地
-                    $line5 = $origin;
-
-                    // line6: 価格帯・テーマフィット
-                    $metaParts = [];
-                    if ($priceBand !== '') {
-                        $metaParts[] = 'Price ' . h($priceBand);
-                    }
-                    if ($themeFit) {
-                        $metaParts[] = 'Theme Fit ' . h($themeFit);
-                    }
-                    $line6 = implode(' · ', $metaParts);
-
-                    // line7: メモ
-                    $line7 = $memo;
+                    // Line 2 & 3: Main Bottle Info
+                    // If it's a "Blind Bottle" title, we might style it differently
+                    $mainTitle = h($displayName);
+                    
+                    // Detailed Rendering Logic
+                    // We'll build HTML parts based on $visible data directly, rather than old $line2/$line3 vars.
+                    
                     ?>
 
                     <div class="bottle-card" style="margin-bottom:20px; padding:14px 16px; border-radius:12px;
-                                background:rgba(0,0,0,0.2); border-left:3px solid var(--accent);">
-                        <!-- line 1 -->
-                        <div class="line-1-label" style="font-size:0.9em; color:var(--text-muted);">
-                            <?= h($line1) ?>
+                                background:rgba(0,0,0,0.2); border-left:3px solid var(--accent); position:relative;">
+                        
+                        <!-- Header Line -->
+                        <div class="line-1-label" style="font-size:0.9em; color:var(--text-muted); display:flex; justify-content:space-between;">
+                            <span><?= $line1 ?></span>
+                            <!-- Organizer: Blind Status Badge -->
+                            <?php if ($eventRole === 'organizer' && $b['is_blind']): ?>
+                                <span style="font-size:0.8em; color:var(--accent-gold);">
+                                    BLIND (Level: <?= h($b['blind_reveal_level']) ?>)
+                                </span>
+                            <?php endif; ?>
                         </div>
 
-                        <!-- line 2 -->
-                        <?php if ($line2 !== ''): ?>
-                            <div class="line-2-producer" style="font-weight:bold; color:var(--accent-gold); margin-top:4px;">
-                                <?= h($line2) ?>
-                            </div>
-                        <?php endif; ?>
+                        <!-- Main Title (Producer / Wine Name or Blind Label) -->
+                        <div class="line-main" style="font-size:1.2em; font-weight:600; margin-top:4px; color:var(--text-main);">
+                            <?= $mainTitle ?>
+                        </div>
 
-                        <!-- line 3 -->
-                        <?php if ($line3 !== ''): ?>
-                            <div class="line-3-wine" style="font-size:1.2em; font-weight:600;
-                                        margin-top:4px; margin-bottom:2px; color:var(--text-main);">
-                                <?= h($line3) ?>
-                            </div>
-                        <?php endif; ?>
+                        <?php if ($currentMode === 'simple'): ?>
+                            <!-- SIMPLE MODE: Just Vintage if visible (and not already in title) -->
+                            <!-- mostly done in title, maybe just color/size -->
+                        <?php else: ?>
+                            <!-- STANDARD / FULL / ORGANIZER -->
+                            
+                            <!-- Specs: Color, Size -->
+                            <?php 
+                                $specs = [];
+                                if ($visible['color']) $specs[] = ucfirst($visible['color']);
+                                if ($visible['size'] != 750) $specs[] = getBottleSizeLabel($visible['size']);
+                                if (!empty($specs)):
+                            ?>
+                                <div class="line-specs" style="font-size:0.9rem; color:#ccc;">
+                                    <?= implode(' · ', $specs) ?>
+                                </div>
+                            <?php endif; ?>
 
-                        <!-- line 4 -->
-                        <?php if ($line4 !== ''): ?>
-                            <div class="line-4-specs" style="margin-top:2px;">
-                                <?= h($line4) ?>
-                            </div>
-                        <?php endif; ?>
+                            <!-- Origin: Country / Region / Appellation -->
+                            <?php 
+                                $orgs = array_filter([$visible['country'], $visible['region'], $visible['appellation']]);
+                                if (!empty($orgs)):
+                            ?>
+                                <div class="line-origin" style="font-size:0.9rem; color:var(--text-muted);">
+                                    <?= implode(' / ', array_map('h', $orgs)) ?>
+                                </div>
+                            <?php endif; ?>
 
-                        <!-- line 5 -->
-                        <?php if ($line5 !== ''): ?>
-                            <div class="line-5-origin" style="color:var(--text-muted); font-size:0.9em;">
-                                <?= h($line5) ?>
-                            </div>
-                        <?php endif; ?>
+                            <!-- Meta: Price, Theme Fit -->
+                            <?php
+                                $metas = [];
+                                if ($visible['price_band']) $metas[] = 'Price: ' . getPriceBandLabel($visible['price_band']);
+                                if ($visible['theme_fit']) $metas[] = 'Fit: ' . $visible['theme_fit'];
+                                if (!empty($metas)):
+                            ?>
+                                <div class="line-meta" style="font-size:0.85rem; color:var(--text-muted);">
+                                    <?= implode(' · ', array_map('h', $metas)) ?>
+                                </div>
+                            <?php endif; ?>
 
-                        <!-- line 6 -->
-                        <?php if ($line6 !== ''): ?>
-                            <div class="line-6-meta" style="color:var(--text-muted); font-size:0.85em; margin-top:2px;">
-                                <?= h($line6) ?>
-                            </div>
-                        <?php endif; ?>
+                            <!-- Memo: Only in FULL or ORGANIZER -->
+                            <?php if (($currentMode === 'full' || $currentMode === 'organizer_full') && !empty($visible['memo'])): ?>
+                                <div class="line-memo" style="margin-top:8px; font-size:0.9em; padding-top:4px; border-top:1px dashed #555; color:#ccc;">
+                                    <?= nl2br(h($visible['memo'])) ?>
+                                </div>
+                            <?php endif; ?>
 
-                        <!-- line 7 -->
-                        <?php if ($line7 !== ''): ?>
-                            <div class="line-7-memo" style="margin-top:8px; font-size:0.9em; padding-top:4px;
-                                        border-top:1px dashed #555; color:#ccc;">
-                                <?= nl2br(h($line7)) ?>
-                            </div>
-                        <?php endif; ?>
+                        <?php endif; // End Standard/Full ?>
 
-                        <!-- 幹事だけ Edit / Delete / Toggle Visibility -->
+                        <!-- Organizer Actions -->
                         <?php if ($eventRole === 'organizer'): ?>
-                            <div class="bottle-actions"
-                                style="margin-top:12px; padding-top:8px; border-top:1px solid rgba(255,255,255,0.1); display:flex; justify-content:space-between; align-items:center;">
+                            <div class="bottle-actions" style="margin-top:12px; padding-top:8px; border-top:1px solid rgba(255,255,255,0.1);">
+                                
+                                <!-- Blind Level Control -->
+                                <?php if ($b['is_blind']): ?>
+                                    <form method="post" action="bottle_update_blind_level.php" style="margin-bottom:10px; display:flex; align-items:center; gap:10px;">
+                                        <input type="hidden" name="event_id" value="<?= h($id) ?>">
+                                        <input type="hidden" name="bottle_id" value="<?= h($b['id']) ?>">
+                                        <label style="font-size:0.8rem; color:var(--accent-gold);">Reveal Level:</label>
+                                        <select name="blind_reveal_level" onchange="this.form.submit()" style="padding:2px; font-size:0.8rem;">
+                                            <option value="none" <?= $b['blind_reveal_level']==='none'?'selected':'' ?>>None (Blind)</option>
+                                            <option value="country" <?= $b['blind_reveal_level']==='country'?'selected':'' ?>>+Country</option>
+                                            <option value="country_vintage" <?= $b['blind_reveal_level']==='country_vintage'?'selected':'' ?>>+Country/Vint</option>
+                                            <option value="full" <?= $b['blind_reveal_level']==='full'?'selected':'' ?>>Full Reveal</option>
+                                        </select>
+                                    </form>
+                                <?php endif; ?>
 
-                                <!-- Toggle Visibility Form -->
-                                <form method="post" action="bottle_toggle_visibility.php" style="margin:0;">
-                                    <input type="hidden" name="bottle_id" value="<?= h($b['id']) ?>">
-                                    <input type="hidden" name="event_id" value="<?= h($id) ?>">
-
-                                    <?php if ($hideFromList): ?>
-                                        <button type="submit" name="action" value="show" class="button"
-                                            style="background-color:#4a90e2; color:white; font-size:0.8rem; padding:4px 8px;">
-                                            ワインリストに表示する / Show
-                                        </button>
-                                    <?php else: ?>
-                                        <button type="submit" name="action" value="hide" class="button"
-                                            style="background-color:rgba(255,255,255,0.1); color:#ccc; font-size:0.8rem; padding:4px 8px;">
-                                            ワインリストに表示しない / Hide
-                                        </button>
-                                    <?php endif; ?>
-                                </form>
-
-                                <div>
-                                    <a href="bottle_edit.php?id=<?= h($b['id']) ?>" class="button btn-edit"
-                                        style="font-size:0.8rem; padding:4px 10px; margin-right:4px;">Edit</a>
-                                    <a href="bottle_delete.php?id=<?= h($b['id']) ?>" class="button btn-danger"
-                                        style="font-size:0.8rem; padding:4px 10px;" onclick="return confirm('Delete this bottle?');">
-                                        Delete
-                                    </a>
+                                <!-- Edit/Delete -->
+                                <div style="text-align:right;">
+                                    <a href="bottle_edit.php?id=<?= h($b['id']) ?>" class="button btn-edit" style="font-size:0.8rem; padding:4px 10px;">Edit</a>
+                                    <!-- Legacy Hide Toggle could go here if needed, omitting for now as requested -->
                                 </div>
                             </div>
                         <?php endif; ?>
+
                     </div>
                     <!-- End Bottle Card -->
                 <?php endforeach; ?>
