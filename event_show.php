@@ -150,73 +150,174 @@ require_once 'layout/header.php';
     <!-- Bottle List -->
     <section>
         <h2>Bottle List</h2>
+
         <?php if ($stats['total'] === 0): ?>
             <p>No bottles registered yet.</p>
         <?php else: ?>
-            <?php foreach ($bottles as $index => $b): ?>
-                <?php
-                // Check permissions
-                $isOwner = ($currentUserId && $b['brought_by_user_id'] == $currentUserId);
-                $isAdmin = ($eventRole === 'organizer');
-                $canEdit = ($isAdmin || $isOwner);
+            <div class="bottle-list-container">
+                <?php foreach ($bottles as $index => $b): ?>
+                    <?php
+                    // --- hide_from_list: ゲストビューでは非表示 ---
+                    $hideFromList = !empty($b['hide_from_list']);
+                    if ($eventRole !== 'organizer' && $hideFromList) {
+                        continue;
+                    }
 
-                // Blind Logic: Mask if blind AND (not admin AND not owner)
-                $shouldMask = ($b['is_blind'] && !$isAdmin && !$isOwner);
-                ?>
-                <div class="bottle-card"
-                    style="border-left: 5px solid <?= $b['color'] === 'white' ? '#eee' : ($b['color'] === 'sparkling' ? 'gold' : '#800020') ?>;">
-                    <div style="display:flex; justify-content:space-between; align-items:flex-start;">
-                        <div>
-                            <div style="font-size:0.9em; color:var(--text-muted); margin-bottom:5px;">
-                                #<?= $index + 1 ?>
-                                <span style="color:var(--accent); font-weight:bold; margin-left:5px;">
-                                    <?= h($b['owner_label']) ?>
-                                </span>
-                            </div>
+                    // --- ブラインド判定（カラム名は安全に参照） ---
+                    $isBlind = !empty($b['is_blind']) || !empty($b['blind_flag']);
 
-                            <div style="font-size:1.3rem; font-weight:bold;">
-                                <?php if ($b['is_blind']): ?>
-                                    <span
-                                        style="background:var(--accent); color:#000; padding:2px 6px; border-radius:4px; font-size:0.6em; vertical-align:middle;">BLIND</span>
-                                <?php endif; ?>
-                                <?= mask_if_blind($b['wine_name'], $shouldMask) ?>
-                            </div>
+                    // 基本情報
+                    $no = $index + 1;
+                    $owner = $b['owner_label'] ?? '';
+                    $producer = $b['producer_name'] ?? '';
+                    $wineName = $b['wine_name'] ?? '';
+                    $vintage = $b['vintage'] ?? '';
+                    $country = $b['country'] ?? '';
+                    $region = $b['region'] ?? '';
+                    $appellation = $b['appellation'] ?? '';
+                    $color = $b['color'] ?? '';
+                    $sizeCode = $b['bottle_size'] ?? null;
+                    $themeFit = $b['theme_fit_score'] ?? null;
+                    $priceBand = $b['price_band_label'] ?? ($b['price_band'] ?? '');
+                    $memo = $b['memo'] ?? '';
 
-                            <div style="margin-top:5px; color:#ccc;">
-                                <?= mask_if_blind($b['vintage'] ?: 'NV', $shouldMask, 'XXXX') ?> |
-                                <?= mask_if_blind($b['producer_name'], $shouldMask) ?> |
-                                <?= mask_if_blind($b['region'], $shouldMask) ?>
-                            </div>
+                    // line1: 「#1 吉川」
+                    $line1 = '#' . $no . ' ' . h($owner);
+
+                    // ブラインド時の表示制御
+                    if ($isBlind && $eventRole === 'guest') {
+                        $line2 = 'Blind Bottle';
+                        $line3 = '※ ブラインド表示中 / Hidden for blind tasting';
+                        $origin = '';
+                    } else {
+                        $line2 = $producer;
+                        $line3 = $wineName;
+                        if ($vintage !== '') {
+                            $line3 .= ' ' . h($vintage);
+                        }
+                        $originParts = array_filter([$country, $region, $appellation]);
+                        $origin = implode(' / ', $originParts);
+                    }
+
+                    // line4: タイプ・容量など
+                    $specParts = [];
+                    if ($color !== '') {
+                        $specParts[] = ucfirst($color);
+                    }
+                    if ($sizeCode) {
+                        // helpers.php の getBottleSizeLabel() を想定
+                        $specParts[] = getBottleSizeLabel($sizeCode);
+                    }
+                    $line4 = implode(' · ', $specParts);
+
+                    // line5: 産地
+                    $line5 = $origin;
+
+                    // line6: 価格帯・テーマフィット
+                    $metaParts = [];
+                    if ($priceBand !== '') {
+                        $metaParts[] = 'Price ' . h($priceBand);
+                    }
+                    if ($themeFit) {
+                        $metaParts[] = 'Theme Fit ' . h($themeFit);
+                    }
+                    $line6 = implode(' · ', $metaParts);
+
+                    // line7: メモ
+                    $line7 = $memo;
+                    ?>
+
+                    <div class="bottle-card" style="margin-bottom:20px; padding:14px 16px; border-radius:12px;
+                                background:rgba(0,0,0,0.2); border-left:3px solid var(--accent);">
+                        <!-- line 1 -->
+                        <div class="line-1-label" style="font-size:0.9em; color:var(--text-muted);">
+                            <?= h($line1) ?>
                         </div>
 
-                        <?php if ($canEdit): ?>
-                            <div style="min-width:120px; text-align:right;">
-                                <a href="bottle_edit.php?id=<?= $b['id'] ?>" style="font-size:0.9em; margin-right:10px;">Edit</a>
-                                <?php if ($isAdmin || $isOwner): // Redundant check but clear intent ?>
-                                    <a href="bottle_delete.php?id=<?= $b['id'] ?>" onclick="return confirm('Delete this bottle?');"
-                                        style="color:var(--danger); font-size:0.9em;">Delete</a>
-                                <?php endif; ?>
+                        <!-- line 2 -->
+                        <?php if ($line2 !== ''): ?>
+                            <div class="line-2-producer" style="font-weight:bold; color:var(--accent-gold); margin-top:4px;">
+                                <?= h($line2) ?>
+                            </div>
+                        <?php endif; ?>
+
+                        <!-- line 3 -->
+                        <?php if ($line3 !== ''): ?>
+                            <div class="line-3-wine" style="font-size:1.2em; font-weight:600;
+                                        margin-top:4px; margin-bottom:2px; color:var(--text-main);">
+                                <?= h($line3) ?>
+                            </div>
+                        <?php endif; ?>
+
+                        <!-- line 4 -->
+                        <?php if ($line4 !== ''): ?>
+                            <div class="line-4-specs" style="margin-top:2px;">
+                                <?= h($line4) ?>
+                            </div>
+                        <?php endif; ?>
+
+                        <!-- line 5 -->
+                        <?php if ($line5 !== ''): ?>
+                            <div class="line-5-origin" style="color:var(--text-muted); font-size:0.9em;">
+                                <?= h($line5) ?>
+                            </div>
+                        <?php endif; ?>
+
+                        <!-- line 6 -->
+                        <?php if ($line6 !== ''): ?>
+                            <div class="line-6-meta" style="color:var(--text-muted); font-size:0.85em; margin-top:2px;">
+                                <?= h($line6) ?>
+                            </div>
+                        <?php endif; ?>
+
+                        <!-- line 7 -->
+                        <?php if ($line7 !== ''): ?>
+                            <div class="line-7-memo" style="margin-top:8px; font-size:0.9em; padding-top:4px;
+                                        border-top:1px dashed #555; color:#ccc;">
+                                <?= nl2br(h($line7)) ?>
+                            </div>
+                        <?php endif; ?>
+
+                        <!-- 幹事だけ Edit / Delete / Toggle Visibility -->
+                        <?php if ($eventRole === 'organizer'): ?>
+                            <div class="bottle-actions"
+                                style="margin-top:12px; padding-top:8px; border-top:1px solid rgba(255,255,255,0.1); display:flex; justify-content:space-between; align-items:center;">
+
+                                <!-- Toggle Visibility Form -->
+                                <form method="post" action="bottle_toggle_visibility.php" style="margin:0;">
+                                    <input type="hidden" name="bottle_id" value="<?= h($b['id']) ?>">
+                                    <input type="hidden" name="event_id" value="<?= h($id) ?>">
+
+                                    <?php if ($hideFromList): ?>
+                                        <button type="submit" name="action" value="show" class="button"
+                                            style="background-color:#4a90e2; color:white; font-size:0.8rem; padding:4px 8px;">
+                                            ワインリストに表示する / Show
+                                        </button>
+                                    <?php else: ?>
+                                        <button type="submit" name="action" value="hide" class="button"
+                                            style="background-color:rgba(255,255,255,0.1); color:#ccc; font-size:0.8rem; padding:4px 8px;">
+                                            ワインリストに表示しない / Hide
+                                        </button>
+                                    <?php endif; ?>
+                                </form>
+
+                                <div>
+                                    <a href="bottle_edit.php?id=<?= h($b['id']) ?>" class="button btn-edit"
+                                        style="font-size:0.8rem; padding:4px 10px; margin-right:4px;">Edit</a>
+                                    <a href="bottle_delete.php?id=<?= h($b['id']) ?>" class="button btn-danger"
+                                        style="font-size:0.8rem; padding:4px 10px;" onclick="return confirm('Delete this bottle?');">
+                                        Delete
+                                    </a>
+                                </div>
                             </div>
                         <?php endif; ?>
                     </div>
-
-                    <!-- Details Row -->
-                    <div style="margin-top:10px; font-size:0.9em; color:#aaa; border-top:1px dashed #555; padding-top:10px;">
-                        Price:
-                        <?= mask_if_blind($b['est_price_yen'] ? '¥' . number_format($b['est_price_yen']) : '-', $shouldMask) ?>
-                        | Theme Fit: <?= h($b['theme_fit_score'] ?: '-') ?>/5
-
-                        <?php if ($b['memo']): ?>
-                            <div style="margin-top:5px; color:#ddd;">
-                                Memo: <br>
-                                <?= mask_if_blind(nl2br($b['memo']), $shouldMask, 'Matches Blind Mode') ?>
-                            </div>
-                        <?php endif; ?>
-                    </div>
-                </div>
-            <?php endforeach; ?>
+                    <!-- End Bottle Card -->
+                <?php endforeach; ?>
+            </div>
         <?php endif; ?>
     </section>
+
 
 <?php endif; ?>
 

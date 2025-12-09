@@ -51,3 +51,109 @@ display_name varchar(255) NULL=NO DEFAULT=
 role_in_event varchar(32) NULL=NO DEFAULT=guest
 joined_at datetime NULL=NO DEFAULT=current_timestamp()
 
+--- Table: events ---
+id int(11) NULL=NO DEFAULT=
+title varchar(255) NULL=NO DEFAULT=
+event_type varchar(16) NULL=NO DEFAULT=BYO
+event_date date NULL=NO DEFAULT=
+place varchar(255) NULL=YES DEFAULT=
+memo text NULL=YES DEFAULT=
+created_at datetime NULL=YES DEFAULT=current_timestamp()
+venue_id int(11) NULL=YES DEFAULT=
+
+--- Table: venues ---
+id int(11) NULL=NO DEFAULT=
+name varchar(255) NULL=NO DEFAULT=
+venue_type varchar(50) NULL=NO DEFAULT=restaurant
+address varchar(255) NULL=YES DEFAULT=
+city varchar(100) NULL=YES DEFAULT=
+country varchar(100) NULL=YES DEFAULT=
+website_url varchar(255) NULL=YES DEFAULT=
+owner_user_id int(11) NULL=YES DEFAULT=
+created_at datetime NULL=NO DEFAULT=current_timestamp()
+updated_at datetime NULL=NO DEFAULT=current_timestamp()
+
+--- Table: bottle_entries ---
+id int(10) unsigned NULL=NO DEFAULT=
+event_id int(11) NULL=NO DEFAULT=
+participant_id int(11) NULL=YES DEFAULT=
+brought_by_type varchar(32) NULL=YES DEFAULT=
+brought_by_user_id int(11) NULL=YES DEFAULT=
+brought_by_venue_id int(11) NULL=YES DEFAULT=
+owner_label varchar(100) NULL=NO DEFAULT=
+wine_name varchar(255) NULL=NO DEFAULT=
+producer_name varchar(255) NULL=NO DEFAULT=
+country varchar(100) NULL=YES DEFAULT=
+region varchar(100) NULL=YES DEFAULT=
+appellation varchar(100) NULL=YES DEFAULT=
+color enum('sparkling','white','orange','rose','red','sweet','fortified') NULL=NO DEFAULT=
+vintage smallint(5) unsigned NULL=YES DEFAULT=
+bottle_size_ml smallint(5) unsigned NULL=NO DEFAULT=750
+est_price_yen int(10) unsigned NULL=YES DEFAULT=
+theme_fit_score tinyint(3) unsigned NULL=YES DEFAULT=
+is_blind tinyint(1) NULL=NO DEFAULT=0
+memo text NULL=YES DEFAULT=
+created_at datetime NULL=NO DEFAULT=current_timestamp()
+updated_at datetime NULL=NO DEFAULT=current_timestamp()
+
+--- Table: event_participants ---
+id int(11) NULL=NO DEFAULT=
+event_id int(11) NULL=NO DEFAULT=
+user_id int(11) NULL=YES DEFAULT=
+display_name varchar(255) NULL=NO DEFAULT=
+role_in_event varchar(32) NULL=NO DEFAULT=guest
+joined_at datetime NULL=NO DEFAULT=current_timestamp()
+
+--- Table: events ---
+id int(11) NULL=NO DEFAULT=
+title varchar(255) NULL=NO DEFAULT=
+event_type varchar(16) NULL=NO DEFAULT=BYO
+event_date date NULL=NO DEFAULT=
+place varchar(255) NULL=YES DEFAULT=
+memo text NULL=YES DEFAULT=
+created_at datetime NULL=YES DEFAULT=current_timestamp()
+venue_id int(11) NULL=YES DEFAULT=
+
+--- Table: venues ---
+id int(11) NULL=NO DEFAULT=
+name varchar(255) NULL=NO DEFAULT=
+venue_type varchar(50) NULL=NO DEFAULT=restaurant
+address varchar(255) NULL=YES DEFAULT=
+city varchar(100) NULL=YES DEFAULT=
+country varchar(100) NULL=YES DEFAULT=
+website_url varchar(255) NULL=YES DEFAULT=
+owner_user_id int(11) NULL=YES DEFAULT=
+created_at datetime NULL=NO DEFAULT=current_timestamp()
+updated_at datetime NULL=NO DEFAULT=current_timestamp()
+
+--- Table: bottle_entries ---
+id int(10) unsigned NULL=NO DEFAULT=
+event_id int(11) NULL=NO DEFAULT=
+participant_id int(11) NULL=YES DEFAULT=
+brought_by_type varchar(32) NULL=YES DEFAULT=
+brought_by_user_id int(11) NULL=YES DEFAULT=
+brought_by_venue_id int(11) NULL=YES DEFAULT=
+owner_label varchar(100) NULL=NO DEFAULT=
+wine_name varchar(255) NULL=NO DEFAULT=
+producer_name varchar(255) NULL=NO DEFAULT=
+country varchar(100) NULL=YES DEFAULT=
+region varchar(100) NULL=YES DEFAULT=
+appellation varchar(100) NULL=YES DEFAULT=
+color enum('sparkling','white','orange','rose','red','sweet','fortified') NULL=NO DEFAULT=
+vintage smallint(5) unsigned NULL=YES DEFAULT=
+bottle_size_ml smallint(5) unsigned NULL=NO DEFAULT=750
+est_price_yen int(10) unsigned NULL=YES DEFAULT=
+theme_fit_score tinyint(3) unsigned NULL=YES DEFAULT=
+is_blind tinyint(1) NULL=NO DEFAULT=0
+memo text NULL=YES DEFAULT=
+created_at datetime NULL=NO DEFAULT=current_timestamp()
+updated_at datetime NULL=NO DEFAULT=current_timestamp()
+
+--- Table: event_participants ---
+id int(11) NULL=NO DEFAULT=
+event_id int(11) NULL=NO DEFAULT=
+user_id int(11) NULL=YES DEFAULT=
+display_name varchar(255) NULL=NO DEFAULT=
+role_in_event varchar(32) NULL=NO DEFAULT=guest
+joined_at datetime NULL=NO DEFAULT=current_timestamp()
+

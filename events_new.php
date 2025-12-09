@@ -123,7 +123,7 @@ $page_title = 'VinMemo - New Event';
                     </div>
                     <div class="form-group">
                         <label>開始時間 / Start time</label>
-                        <input type="time" name="start_time"
+                        <input type="time" name="start_time" step="1800"
                             value="<?= isset($_POST['start_time']) ? htmlspecialchars($_POST['start_time']) : '' ?>">
                     </div>
                 </div>

@@ -52,3 +52,45 @@ function mask_if_blind($value, $blindFlag, $mask = '???')
     }
     return h($value);
 }
+
+/**
+ * Get display label for bottle size.
+ * 
+ * @param int $ml
+ * @return string
+ */
+function getBottleSizeLabel(int $ml): string
+{
+    switch ($ml) {
+        case 375:
+            return 'Demi';
+        case 620:
+            return 'Clavelin';
+        case 750:
+            return 'Bottle'; // Usually not shown if standard
+        case 1500:
+            return 'Magnum';
+        case 3000:
+            return 'Jeroboam';
+        default:
+            return $ml . 'ml';
+    }
+}
+
+/**
+ * Get display label for price band (Title Case).
+ * 
+ * @param string $band
+ * @return string
+ */
+function getPriceBandLabel(string $band): string
+{
+    $map = [
+        'casual' => 'Casual',
+        'bistro' => 'Bistro',
+        'fine' => 'Fine',
+        'luxury' => 'Luxury',
+        'icon' => 'Icon',
+    ];
+    return $map[$band] ?? ucfirst($band);
+}

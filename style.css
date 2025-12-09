@@ -1,22 +1,71 @@
 :root {
-  /* Wine Theme Palette */
-  --bg-color: #2e0e12;
-  /* Deep Burgundy/Wine Background */
-  --card-bg: #4a1821;
-  /* Lighter Wine / Merlot for cards */
+  /* Wine Theme Palette - Lightened & Vivid */
+  --bg-color: #3b141a;
+  /* Slightly lighter wine background */
+  --card-bg: #591e28;
+  /* Lighter wine / Merlot for cards */
   --text-main: #f7f7f7;
   /* Off-white / Cream for readability */
-  --text-muted: #dcc0c0;
-  /* Muted pinkish-gray */
-  --accent: #d4af37;
-  /* Gold/Champagne */
-  --accent-hover: #b4942b;
-  /* Darker Gold */
-  --border: #63242e;
-  /* Subtle wine border */
-  --danger: #ff6b6b;
-  /* Softer red for errors on dark bg */
+  --text-muted: #e6c5c5;
+  /* Lighter pinkish-gray for better contrast */
+  --accent: #ffd700;
+  /* Vivid Gold */
+  --accent-hover: #e6c200;
+  /* Darker Vivid Gold */
+  --border: #7a2c38;
+  /* Lighter wine border */
+  --danger: #ff4444;
+  /* Brighter Red for errors/delete */
   --font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+}
+
+/* Button Classes */
+.button,
+button,
+input[type="submit"] {
+  display: inline-block;
+  padding: 10px 20px;
+  background-color: var(--accent);
+  color: #2e0e12;
+  /* Dark text on gold button for contrast */
+  border: none;
+  border-radius: 4px;
+  font-weight: bold;
+  cursor: pointer;
+  text-align: center;
+  transition: background-color 0.2s;
+  font-size: 1rem;
+  text-decoration: none;
+}
+
+.button:hover,
+button:hover,
+input[type="submit"]:hover {
+  background-color: var(--accent-hover);
+  color: #2e0e12;
+  text-decoration: none;
+}
+
+.btn-primary {
+  /* Default is accent */
+}
+
+.btn-edit {
+  background-color: var(--accent);
+  color: #2e0e12;
+}
+
+.btn-edit:hover {
+  background-color: var(--accent-hover);
+}
+
+.btn-danger {
+  background-color: var(--danger);
+  color: white;
+}
+
+.btn-danger:hover {
+  background-color: #cc0000;
 }
 
 * {
