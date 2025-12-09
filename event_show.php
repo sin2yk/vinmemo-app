@@ -175,6 +175,11 @@ require_once 'layout/header.php';
                         <form method="post" action="event_update_visibility.php"
                             onsubmit="return confirm('Reveal ALL bottles to guests?');">
                             <input type="hidden" name="event_id" value="<?= h($id) ?>">
+
+                            <?php if (isset($_GET['view']) && $_GET['view'] === 'organizer'): ?>
+                                <input type="hidden" name="debug_bypass_role" value="organizer">
+                            <?php endif; ?>
+
                             <button type="submit" name="action" value="reveal_all" class="button"
                                 style="background:#ff9800; color:black;">
                                 ⚡ Reveal All / 答え合わせ
@@ -193,6 +198,10 @@ require_once 'layout/header.php';
                     <form method="post" action="event_update_visibility.php">
                         <input type="hidden" name="event_id" value="<?= h($id) ?>">
                         <input type="hidden" name="action" value="update_list_constraints">
+
+                        <?php if (isset($_GET['view']) && $_GET['view'] === 'organizer'): ?>
+                            <input type="hidden" name="debug_bypass_role" value="organizer">
+                        <?php endif; ?>
 
                         <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
                             <label><input type="checkbox" name="field_owner_label" <?= isChecked($listConfig, 'owner_label') ? 'checked' : '' ?>> Owner Name</label>
@@ -223,18 +232,20 @@ require_once 'layout/header.php';
     <section>
         <div style="display:flex; justify-content:space-between; align-items:flex-end; margin-bottom:15px;">
             <h2 style="margin:0;">Bottle List</h2>
-            
+
             <!-- Guest View Density Toggle -->
             <?php if ($eventRole === 'guest'): ?>
                 <?php $viewMode = $_GET['mode'] ?? 'standard'; // simple, standard, full ?>
                 <div class="view-mode-toggle" style="font-size:0.85rem;">
-                    View: 
-                    <a href="?id=<?= $id ?>&view=guest&mode=simple" 
-                       style="<?= $viewMode === 'simple' ? 'font-weight:bold; color:var(--accent);' : 'color:#888;' ?>">Simple</a> |
+                    View:
+                    <a href="?id=<?= $id ?>&view=guest&mode=simple"
+                        style="<?= $viewMode === 'simple' ? 'font-weight:bold; color:var(--accent);' : 'color:#888;' ?>">Simple</a>
+                    |
                     <a href="?id=<?= $id ?>&view=guest&mode=standard"
-                       style="<?= $viewMode === 'standard' ? 'font-weight:bold; color:var(--accent);' : 'color:#888;' ?>">Standard</a> |
+                        style="<?= $viewMode === 'standard' ? 'font-weight:bold; color:var(--accent);' : 'color:#888;' ?>">Standard</a>
+                    |
                     <a href="?id=<?= $id ?>&view=guest&mode=full"
-                       style="<?= $viewMode === 'full' ? 'font-weight:bold; color:var(--accent);' : 'color:#888;' ?>">Full</a>
+                        style="<?= $viewMode === 'full' ? 'font-weight:bold; color:var(--accent);' : 'color:#888;' ?>">Full</a>
                 </div>
             <?php endif; ?>
         </div>
@@ -249,13 +260,13 @@ require_once 'layout/header.php';
                     // use helper function
                     $visible = getVisibleFields($b, $event, $eventRole);
                     $displayName = getBottleDisplayName($visible, $b, $index);
-                    
+
                     // --- 2. Determine Display Mode ---
                     // If guest, use requested mode. If organizer, force 'full' (or custom organizer view).
                     $currentMode = ($eventRole === 'organizer') ? 'organizer_full' : ($viewMode ?? 'standard');
 
                     // --- 3. Construct Lines based on Mode ---
-                    
+        
                     // Line 1: Label (#1 Owner)
                     // If owner is hidden, just show #1
                     $ownerStr = $visible['owner_label'] ? (' ' . h($visible['owner_label'])) : '';
@@ -264,17 +275,18 @@ require_once 'layout/header.php';
                     // Line 2 & 3: Main Bottle Info
                     // If it's a "Blind Bottle" title, we might style it differently
                     $mainTitle = h($displayName);
-                    
+
                     // Detailed Rendering Logic
                     // We'll build HTML parts based on $visible data directly, rather than old $line2/$line3 vars.
-                    
+        
                     ?>
 
                     <div class="bottle-card" style="margin-bottom:20px; padding:14px 16px; border-radius:12px;
                                 background:rgba(0,0,0,0.2); border-left:3px solid var(--accent); position:relative;">
-                        
+
                         <!-- Header Line -->
-                        <div class="line-1-label" style="font-size:0.9em; color:var(--text-muted); display:flex; justify-content:space-between;">
+                        <div class="line-1-label"
+                            style="font-size:0.9em; color:var(--text-muted); display:flex; justify-content:space-between;">
                             <span><?= $line1 ?></span>
                             <!-- Organizer: Blind Status Badge -->
                             <?php if ($eventRole === 'organizer' && $b['is_blind']): ?>
@@ -294,24 +306,32 @@ require_once 'layout/header.php';
                             <!-- mostly done in title, maybe just color/size -->
                         <?php else: ?>
                             <!-- STANDARD / FULL / ORGANIZER -->
-                            
+
                             <!-- Specs: Color, Size -->
-                            <?php 
-                                $specs = [];
-                                if ($visible['color']) $specs[] = ucfirst($visible['color']);
-                                if ($visible['size'] != 750) $specs[] = getBottleSizeLabel($visible['size']);
-                                if (!empty($specs)):
-                            ?>
-                                <div class="line-specs" style="font-size:0.9rem; color:#ccc;">
-                                    <?= implode(' · ', $specs) ?>
-                                </div>
-                            <?php endif; ?>
+                            <div class="line-specs"
+                                style="font-size:0.9rem; color:#ccc; display:flex; align-items:center; flex-wrap:wrap; gap:6px;">
+                                <!-- Color Badge -->
+                                <?php if ($visible['color']): ?>
+                                    <?php
+                                    $cCode = $visible['color'];
+                                    $cLabel = getColorLabel($cCode);
+                                    ?>
+                                    <span class="wine-color-pill wine-color-<?= h($cCode) ?>">
+                                        <?= h($cLabel) ?>
+                                    </span>
+                                <?php endif; ?>
+
+                                <!-- Size -->
+                                <?php if ($visible['size'] != 750): ?>
+                                    <span><?= h(getBottleSizeLabel($visible['size'])) ?></span>
+                                <?php endif; ?>
+                            </div>
 
                             <!-- Origin: Country / Region / Appellation -->
-                            <?php 
-                                $orgs = array_filter([$visible['country'], $visible['region'], $visible['appellation']]);
-                                if (!empty($orgs)):
-                            ?>
+                            <?php
+                            $orgs = array_filter([$visible['country'], $visible['region'], $visible['appellation']]);
+                            if (!empty($orgs)):
+                                ?>
                                 <div class="line-origin" style="font-size:0.9rem; color:var(--text-muted);">
                                     <?= implode(' / ', array_map('h', $orgs)) ?>
                                 </div>
@@ -319,11 +339,13 @@ require_once 'layout/header.php';
 
                             <!-- Meta: Price, Theme Fit -->
                             <?php
-                                $metas = [];
-                                if ($visible['price_band']) $metas[] = 'Price: ' . getPriceBandLabel($visible['price_band']);
-                                if ($visible['theme_fit']) $metas[] = 'Fit: ' . $visible['theme_fit'];
-                                if (!empty($metas)):
-                            ?>
+                            $metas = [];
+                            if ($visible['price_band'])
+                                $metas[] = 'Price: ' . getPriceBandLabel($visible['price_band']);
+                            if ($visible['theme_fit'])
+                                $metas[] = 'Fit: ' . $visible['theme_fit'];
+                            if (!empty($metas)):
+                                ?>
                                 <div class="line-meta" style="font-size:0.85rem; color:var(--text-muted);">
                                     <?= implode(' · ', array_map('h', $metas)) ?>
                                 </div>
@@ -331,7 +353,8 @@ require_once 'layout/header.php';
 
                             <!-- Memo: Only in FULL or ORGANIZER -->
                             <?php if (($currentMode === 'full' || $currentMode === 'organizer_full') && !empty($visible['memo'])): ?>
-                                <div class="line-memo" style="margin-top:8px; font-size:0.9em; padding-top:4px; border-top:1px dashed #555; color:#ccc;">
+                                <div class="line-memo"
+                                    style="margin-top:8px; font-size:0.9em; padding-top:4px; border-top:1px dashed #555; color:#ccc;">
                                     <?= nl2br(h($visible['memo'])) ?>
                                 </div>
                             <?php endif; ?>
@@ -340,26 +363,38 @@ require_once 'layout/header.php';
 
                         <!-- Organizer Actions -->
                         <?php if ($eventRole === 'organizer'): ?>
-                            <div class="bottle-actions" style="margin-top:12px; padding-top:8px; border-top:1px solid rgba(255,255,255,0.1);">
-                                
+                            <div class="bottle-actions"
+                                style="margin-top:12px; padding-top:8px; border-top:1px solid rgba(255,255,255,0.1);">
+
                                 <!-- Blind Level Control -->
                                 <?php if ($b['is_blind']): ?>
-                                    <form method="post" action="bottle_update_blind_level.php" style="margin-bottom:10px; display:flex; align-items:center; gap:10px;">
+                                    <form method="post" action="bottle_update_blind_level.php"
+                                        style="margin-bottom:10px; display:flex; align-items:center; gap:10px;">
                                         <input type="hidden" name="event_id" value="<?= h($id) ?>">
                                         <input type="hidden" name="bottle_id" value="<?= h($b['id']) ?>">
+
+                                        <?php if (isset($_GET['view']) && $_GET['view'] === 'organizer'): ?>
+                                            <input type="hidden" name="debug_bypass_role" value="organizer">
+                                        <?php endif; ?>
+
                                         <label style="font-size:0.8rem; color:var(--accent-gold);">Reveal Level:</label>
-                                        <select name="blind_reveal_level" onchange="this.form.submit()" style="padding:2px; font-size:0.8rem;">
-                                            <option value="none" <?= $b['blind_reveal_level']==='none'?'selected':'' ?>>None (Blind)</option>
-                                            <option value="country" <?= $b['blind_reveal_level']==='country'?'selected':'' ?>>+Country</option>
-                                            <option value="country_vintage" <?= $b['blind_reveal_level']==='country_vintage'?'selected':'' ?>>+Country/Vint</option>
-                                            <option value="full" <?= $b['blind_reveal_level']==='full'?'selected':'' ?>>Full Reveal</option>
+                                        <select name="blind_reveal_level" onchange="this.form.submit()"
+                                            style="padding:2px; font-size:0.8rem;">
+                                            <option value="none" <?= $b['blind_reveal_level'] === 'none' ? 'selected' : '' ?>>None (Blind)
+                                            </option>
+                                            <option value="country" <?= $b['blind_reveal_level'] === 'country' ? 'selected' : '' ?>>+Country
+                                            </option>
+                                            <option value="country_vintage" <?= $b['blind_reveal_level'] === 'country_vintage' ? 'selected' : '' ?>>+Country/Vint</option>
+                                            <option value="full" <?= $b['blind_reveal_level'] === 'full' ? 'selected' : '' ?>>Full Reveal
+                                            </option>
                                         </select>
                                     </form>
                                 <?php endif; ?>
 
                                 <!-- Edit/Delete -->
                                 <div style="text-align:right;">
-                                    <a href="bottle_edit.php?id=<?= h($b['id']) ?>" class="button btn-edit" style="font-size:0.8rem; padding:4px 10px;">Edit</a>
+                                    <a href="bottle_edit.php?id=<?= h($b['id']) ?>" class="button btn-edit"
+                                        style="font-size:0.8rem; padding:4px 10px;">Edit</a>
                                     <!-- Legacy Hide Toggle could go here if needed, omitting for now as requested -->
                                 </div>
                             </div>

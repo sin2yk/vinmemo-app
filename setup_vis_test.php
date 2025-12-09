@@ -14,21 +14,21 @@ echo "Created Event ID: $eventId\n";
 // 2. Create Bottles
 
 // Bottle A: Blind, Reveal Level = None
-$sqlA = "INSERT INTO bottle_entries (event_id, owner_label, wine_name, producer_name, vintage, country, est_price_yen, is_blind, blind_reveal_level)
-         VALUES ($eventId, 'Owner A', 'Secret Wine A', 'Producer A', 2010, 'France', 10000, 1, 'none')";
+$sqlA = "INSERT INTO bottle_entries (event_id, owner_label, wine_name, producer_name, vintage, country, est_price_yen, is_blind, blind_reveal_level, color)
+         VALUES ($eventId, 'Owner A', 'Secret Wine A', 'Producer A', 2010, 'France', 10000, 1, 'none', 'red')";
 $pdo->query($sqlA);
-echo "Created Bottle A (Blind, None)\n";
+echo "Created Bottle A (Blind, None, Red)\n";
 
 // Bottle B: Blind, Reveal Level = Country
-$sqlB = "INSERT INTO bottle_entries (event_id, owner_label, wine_name, producer_name, vintage, country, est_price_yen, is_blind, blind_reveal_level)
-         VALUES ($eventId, 'Owner B', 'Secret Wine B', 'Producer B', 2015, 'Italy', 5000, 1, 'country')";
+$sqlB = "INSERT INTO bottle_entries (event_id, owner_label, wine_name, producer_name, vintage, country, est_price_yen, is_blind, blind_reveal_level, color)
+         VALUES ($eventId, 'Owner B', 'Secret Wine B', 'Producer B', 2015, 'Italy', 5000, 1, 'country', 'white')";
 $pdo->query($sqlB);
-echo "Created Bottle B (Blind, Country)\n";
+echo "Created Bottle B (Blind, Country, White)\n";
 
 // Bottle C: Not Blind
-$sqlC = "INSERT INTO bottle_entries (event_id, owner_label, wine_name, producer_name, vintage, country, est_price_yen, is_blind, blind_reveal_level)
-         VALUES ($eventId, 'Owner C', 'Open Wine C', 'Producer C', 2020, 'USA', 3000, 0, 'none')";
+$sqlC = "INSERT INTO bottle_entries (event_id, owner_label, wine_name, producer_name, vintage, country, est_price_yen, is_blind, blind_reveal_level, color)
+         VALUES ($eventId, 'Owner C', 'Open Wine C', 'Producer C', 2020, 'USA', 3000, 0, 'none', 'sparkling')";
 $pdo->query($sqlC);
-echo "Created Bottle C (Not Blind)\n";
+echo "Created Bottle C (Not Blind, Sparkling)\n";
 
 echo "Setup Complete.\nUrl: http://localhost/vinmemo-app/event_show.php?id=$eventId&view=organizer\n";

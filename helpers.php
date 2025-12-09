@@ -261,3 +261,25 @@ function getBottleDisplayName(array $visibleFields, array $originalBottle, int $
 
     return $title;
 }
+
+/**
+ * Get human-readable label for wine color/type.
+ * 
+ * @param string $colorCode
+ * @return string
+ */
+function getColorLabel(string $colorCode): string
+{
+    // You can customize these labels as needed
+    $map = [
+        'sparkling' => 'Sparkling',
+        'white' => 'White',
+        'rose' => 'Rosé',
+        'red' => 'Red',
+        'orange' => 'Orange',
+        'sweet' => 'Sweet',
+        'fortified' => 'Fortified',
+    ];
+    return $map[$colorCode] ?? ucfirst($colorCode);
+}
+
