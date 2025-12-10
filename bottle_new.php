@@ -100,64 +100,54 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         ];
         $est_price_yen = $bandToPrice[$form['price_band']] ?? null;
 
+        // Generate Edit Token
+        $editToken = bin2hex(random_bytes(32));
+
+        // Determine brought_by_user_id
+        $broughtByUserId = $_SESSION['user_id'] ?? null;
+
         $sql = "INSERT INTO bottle_entries (
-                    event_id,
-                    owner_label,
-                    wine_name,
-                    producer_name,
-                    country,
-                    region,
-                    appellation,
-                    color,
-                    vintage,
-                    bottle_size_ml,
-                    est_price_yen,
-                    theme_fit_score,
-                    is_blind,
-                    memo,
-                    created_at,
-                    updated_at
+                    event_id, brought_by_user_id, owner_label,
+                    producer_name, wine_name, vintage, bottle_size_ml,
+                    color, est_price_yen, theme_fit_score, memo,
+                    is_blind, blind_reveal_level, edit_token, created_at
                 ) VALUES (
-                    :event_id,
-                    :owner_label,
-                    :wine_name,
-                    :producer_name,
-                    :country,
-                    :region,
-                    :appellation,
-                    :color,
-                    :vintage,
-                    :bottle_size_ml,
-                    :est_price_yen,
-                    :theme_fit_score,
-                    :is_blind,
-                    :memo,
-                    NOW(),
-                    NOW()
+                    :event_id, :brought_by_user_id, :owner_label,
+                    :producer_name, :wine_name, :vintage, :bottle_size_ml,
+                    :color, :est_price_yen, :theme_fit_score, :memo,
+                    :is_blind, 'none', :edit_token, NOW()
                 )";
 
         $stmt = $pdo->prepare($sql);
-        $stmt->execute([
-            ':event_id' => $event_id,
-            ':owner_label' => $form['owner_label'],
-            ':wine_name' => $form['wine_name'],
-            ':producer_name' => $form['producer_name'],
-            ':country' => $form['country'] ?: null,
-            ':region' => $form['region'] ?: null,
-            ':appellation' => $form['appellation'] ?: null,
-            ':color' => $form['color'],
-            ':vintage' => $form['vintage'] ?: null,
-            ':bottle_size_ml' => $form['bottle_size_ml'] ?: 750,
-            ':est_price_yen' => $est_price_yen,
-            ':theme_fit_score' => $form['theme_fit_score'],
-            ':is_blind' => $form['is_blind'],
-            ':memo' => $form['memo'] ?: null,
-        ]);
+        $stmt->bindValue(':event_id', $event_id, PDO::PARAM_INT);
+        $stmt->bindValue(':brought_by_user_id', $broughtByUserId, PDO::PARAM_INT); // NULL allowed
+        $stmt->bindValue(':owner_label', $form['owner_label'], PDO::PARAM_STR);
+        $stmt->bindValue(':producer_name', $form['producer_name'], PDO::PARAM_STR);
+        $stmt->bindValue(':wine_name', $form['wine_name'], PDO::PARAM_STR);
+        $stmt->bindValue(':vintage', ($form['vintage'] ?: null), PDO::PARAM_STR);
+        $stmt->bindValue(':bottle_size_ml', $form['bottle_size_ml'], PDO::PARAM_INT);
+        $stmt->bindValue(':color', $form['color'], PDO::PARAM_STR);
+        $stmt->bindValue(':est_price_yen', $est_price_yen, PDO::PARAM_STR);
+        $stmt->bindValue(':theme_fit_score', $form['theme_fit_score'], PDO::PARAM_INT);
+        $stmt->bindValue(':memo', ($form['memo'] ?: null), PDO::PARAM_STR);
+        $stmt->bindValue(':is_blind', $form['is_blind'], PDO::PARAM_INT);
+        $stmt->bindValue(':edit_token', $editToken, PDO::PARAM_STR);
 
-        header('Location: event_show.php?id=' . $event_id);
+        $stmt->execute();
+
+        // Redirect logic
+        if ($broughtByUserId) {
+            // Organizer / Registered User
+            header('Location: event_show.php?id=' . $event_id);
+        } else {
+            // Guest -> Success Page with Link
+            header('Location: bottle_created.php?event_id=' . $event_id . '&token=' . $editToken);
+        }
         exit;
     }
 }
+
+
 
 // 5. 画面描画
 $page_title = 'VinMemo - ボトル登録 / Register Bottle';

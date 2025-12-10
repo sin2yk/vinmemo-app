@@ -600,3 +600,24 @@ small {
     display: inline-block;
   }
 }
+/* === Wine Color Badges === */
+.wine-color-pill {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 12px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  color: #fff;
+  border: 1px solid rgba(255,255,255,0.2);
+  margin-right: 4px;
+}
+
+.wine-color-sparkling { background-color: #ffd700; color: #2e0e12; }
+.wine-color-white     { background-color: #ffffcc; color: #2e0e12; }
+.wine-color-rose      { background-color: #ffc0cb; color: #2e0e12; }
+.wine-color-red       { background-color: #800000; color: #fff; }
+.wine-color-orange    { background-color: #ff8c00; color: #fff; }
+.wine-color-sweet     { background-color: #eba134; color: #2e0e12; }
+.wine-color-fortified { background-color: #4b0082; color: #fff; }
+

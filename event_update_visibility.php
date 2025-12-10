@@ -44,19 +44,23 @@ if ($action === 'reveal_all') {
 
     $config = [];
     // The keys we check for:
+    // The keys we check for (Strict Spec: Only Price Band and Memo are rule-controlled)
     $keys = [
-        'owner_label',
-        'country',
-        'region',
-        'appellation',
         'price_band',
-        'theme_fit',
         'memo'
     ];
 
     foreach ($keys as $k) {
-        $val = isset($_POST['field_' . $k]) ? true : false;
-        $config[$k] = $val;
+        // The form sends 'field_owner_label', we want to store 'owner_label'
+        $postKey = 'field_' . $k;
+        // Check if plain key exists too, just in case
+        if (isset($_POST[$postKey])) {
+            $config[$k] = true;
+        } elseif (isset($_POST[$k])) {
+            $config[$k] = true;
+        } else {
+            $config[$k] = false;
+        }
     }
 
     // Save as JSON

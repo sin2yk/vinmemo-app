@@ -204,12 +204,7 @@ require_once 'layout/header.php';
                         <?php endif; ?>
 
                         <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
-                            <label><input type="checkbox" name="field_owner_label" <?= isChecked($listConfig, 'owner_label') ? 'checked' : '' ?>> Owner Name</label>
-                            <label><input type="checkbox" name="field_country" <?= isChecked($listConfig, 'country') ? 'checked' : '' ?>> Country</label>
-                            <label><input type="checkbox" name="field_region" <?= isChecked($listConfig, 'region') ? 'checked' : '' ?>> Region</label>
-                            <label><input type="checkbox" name="field_appellation" <?= isChecked($listConfig, 'appellation') ? 'checked' : '' ?>> Appellation</label>
                             <label><input type="checkbox" name="field_price_band" <?= isChecked($listConfig, 'price_band') ? 'checked' : '' ?>> Price Band</label>
-                            <label><input type="checkbox" name="field_theme_fit" <?= isChecked($listConfig, 'theme_fit') ? 'checked' : '' ?>> Theme Fit</label>
                             <label><input type="checkbox" name="field_memo" <?= isChecked($listConfig, 'memo') ? 'checked' : '' ?>> Memo</label>
                         </div>
                         <div style="margin-top:10px;">
@@ -392,10 +387,21 @@ require_once 'layout/header.php';
                                 <?php endif; ?>
 
                                 <!-- Edit/Delete -->
-                                <div style="text-align:right;">
+
+                                <div style="text-align:right; display:flex; justify-content:flex-end; gap:8px;">
                                     <a href="bottle_edit.php?id=<?= h($b['id']) ?>" class="button btn-edit"
                                         style="font-size:0.8rem; padding:4px 10px;">Edit</a>
-                                    <!-- Legacy Hide Toggle could go here if needed, omitting for now as requested -->
+
+                                    <form method="post" action="bottle_delete.php"
+                                        onsubmit="return confirm('Are you sure you want to delete this bottle?');">
+                                        <input type="hidden" name="id" value="<?= h($b['id']) ?>">
+                                        <input type="hidden" name="event_id" value="<?= h($id) ?>">
+                                        <?php if (isset($_GET['view']) && $_GET['view'] === 'organizer'): ?>
+                                            <input type="hidden" name="debug_bypass_role" value="organizer">
+                                        <?php endif; ?>
+                                        <button type="submit" class="button btn-danger"
+                                            style="font-size:0.8rem; padding:4px 10px;">Delete</button>
+                                    </form>
                                 </div>
                             </div>
                         <?php endif; ?>

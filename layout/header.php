@@ -61,14 +61,15 @@ require_once __DIR__ . '/../helpers.php';
                 <h1><a href="index.html">VinMemo</a></h1>
             </div>
 
-            <?php if (isset($_SESSION['user_id'])): ?>
-                <nav class="main-nav">
-                    <a href="home.php">Home</a>
-                    <a href="events.php">Event List</a>
-                    <a href="mypage.php">My Page</a>
-                </nav>
-            <?php endif; ?>
+            <!-- Navigation (Always visible for V1 usability, ignoring strict session check) -->
+            <nav class="main-nav">
+                <a href="home.php">Home</a>
+                <a href="events.php">Event List</a>
+                <a href="mypage.php">My Page</a>
+            </nav>
 
+            <!-- Login info suspended until Firebase/PHP session integration is complete -->
+            <!-- 
             <div class="login-info">
                 <?php if (isset($_SESSION['user_id'])): ?>
                     Login: <?= isset($_SESSION['name']) ? h($_SESSION['name']) : 'User' ?>
@@ -77,6 +78,7 @@ require_once __DIR__ . '/../helpers.php';
                     <a href="index.html">Login</a>
                 <?php endif; ?>
             </div>
+            -->
         </div>
     </header>
 
