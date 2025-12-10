@@ -107,7 +107,7 @@ require_once 'layout/header.php';
                 </p>
             </div>
             <div>
-                <a href="events.php" class="button" style="background:#555; font-size:0.9rem;">Back</a>
+                <a href="events.php" class="btn btn-secondary btn-sm">← イベント一覧に戻る / Back to Event List</a>
             </div>
         </div>
 
@@ -208,8 +208,7 @@ require_once 'layout/header.php';
                             <label><input type="checkbox" name="field_memo" <?= isChecked($listConfig, 'memo') ? 'checked' : '' ?>> Memo</label>
                         </div>
                         <div style="margin-top:10px;">
-                            <button type="submit" class="button" style="font-size:0.8rem; background:#555;">Update
-                                Rules</button>
+                            <button type="submit" class="btn btn-primary">Update Rules</button>
                         </div>
                     </form>
                 </div>
@@ -276,8 +275,8 @@ require_once 'layout/header.php';
         
                     ?>
 
-                    <div class="bottle-card" style="margin-bottom:20px; padding:14px 16px; border-radius:12px;
-                                background:rgba(0,0,0,0.2); border-left:3px solid var(--accent); position:relative;">
+                    <div class="bottle-card bottle-card--<?= h($visible['color'] ?? 'red') ?>" style="margin-bottom:20px; padding:14px 16px; border-radius:12px;
+                                background:rgba(0,0,0,0.2); position:relative;">
 
                         <!-- Header Line -->
                         <div class="line-1-label"
@@ -389,8 +388,9 @@ require_once 'layout/header.php';
                                 <!-- Edit/Delete -->
 
                                 <div style="text-align:right; display:flex; justify-content:flex-end; gap:8px;">
-                                    <a href="bottle_edit.php?id=<?= h($b['id']) ?>" class="button btn-edit"
-                                        style="font-size:0.8rem; padding:4px 10px;">Edit</a>
+                                    <a href="bottle_edit.php?id=<?= h($b['id']) ?>" class="bottle-action-link">
+                                        Edit
+                                    </a>
 
                                     <form method="post" action="bottle_delete.php"
                                         onsubmit="return confirm('Are you sure you want to delete this bottle?');">
@@ -399,8 +399,9 @@ require_once 'layout/header.php';
                                         <?php if (isset($_GET['view']) && $_GET['view'] === 'organizer'): ?>
                                             <input type="hidden" name="debug_bypass_role" value="organizer">
                                         <?php endif; ?>
-                                        <button type="submit" class="button btn-danger"
-                                            style="font-size:0.8rem; padding:4px 10px;">Delete</button>
+                                        <button type="submit" class="bottle-action-link bottle-action-link--danger">
+                                            Delete
+                                        </button>
                                     </form>
                                 </div>
                             </div>

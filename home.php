@@ -12,8 +12,6 @@ require_once 'layout/header.php';
   <h3>Menu</h3>
   <ul>
     <li><a href="events.php">Event List</a></li>
-    <li><a href="entry.php">Bottle Entry (Legacy)</a></li>
-    <li><a href="byo_reference/list.php">Wine List (Legacy)</a></li>
     <li><a href="mypage.php">My Page</a></li>
   </ul>
 

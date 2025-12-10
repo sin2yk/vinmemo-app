@@ -22,51 +22,75 @@
 /* Button Classes */
 .button,
 button,
-input[type="submit"] {
+input[type="submit"],
+.btn {
   display: inline-block;
   padding: 10px 20px;
   background-color: var(--accent);
   color: #2e0e12;
-  /* Dark text on gold button for contrast */
   border: none;
   border-radius: 4px;
   font-weight: bold;
   cursor: pointer;
   text-align: center;
-  transition: background-color 0.2s;
+  transition: background-color 0.2s, transform 0.1s;
   font-size: 1rem;
   text-decoration: none;
+  line-height: normal;
 }
 
 .button:hover,
 button:hover,
-input[type="submit"]:hover {
+input[type="submit"]:hover,
+.btn:hover {
   background-color: var(--accent-hover);
   color: #2e0e12;
   text-decoration: none;
 }
 
-.btn-primary {
-  /* Default is accent */
+.button:active,
+button:active,
+input[type="submit"]:active,
+.btn:active {
+  transform: scale(0.98);
 }
 
-.btn-edit {
+/* Modifiers */
+.btn-primary {
   background-color: var(--accent);
   color: #2e0e12;
 }
 
-.btn-edit:hover {
+.btn-primary:hover {
   background-color: var(--accent-hover);
 }
 
+.btn-secondary {
+  background-color: #555;
+  color: #fff;
+}
+
+.btn-secondary:hover {
+  background-color: #777;
+}
+
 .btn-danger {
-  background-color: var(--danger);
-  color: white;
+  background-color: var(--accent);
+  color: #d32f2f;
+  /* Darker red for better contrast on yellow */
 }
 
 .btn-danger:hover {
-  background-color: #cc0000;
+  background-color: var(--accent-hover);
+  color: #b71c1c;
 }
+
+/* Size Modifiers */
+.btn-sm {
+  padding: 4px 10px;
+  font-size: 0.8rem;
+}
+
 
 * {
   box-sizing: border-box;
@@ -500,14 +524,6 @@ small {
   border-color: var(--accent);
 }
 
-.bottle-card {
-  background-color: var(--card-bg);
-  padding: 15px;
-  margin-bottom: 15px;
-  border-radius: 8px;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
-}
-
 /* === Responsive / Mobile === */
 
 @media (max-width: 899px) {
@@ -600,6 +616,7 @@ small {
     display: inline-block;
   }
 }
+
 /* === Wine Color Badges === */
 .wine-color-pill {
   display: inline-block;
@@ -609,15 +626,117 @@ small {
   font-weight: 600;
   text-transform: uppercase;
   color: #fff;
-  border: 1px solid rgba(255,255,255,0.2);
+  border: 1px solid rgba(255, 255, 255, 0.2);
   margin-right: 4px;
 }
 
-.wine-color-sparkling { background-color: #ffd700; color: #2e0e12; }
-.wine-color-white     { background-color: #ffffcc; color: #2e0e12; }
-.wine-color-rose      { background-color: #ffc0cb; color: #2e0e12; }
-.wine-color-red       { background-color: #800000; color: #fff; }
-.wine-color-orange    { background-color: #ff8c00; color: #fff; }
-.wine-color-sweet     { background-color: #eba134; color: #2e0e12; }
-.wine-color-fortified { background-color: #4b0082; color: #fff; }
+.wine-color-sparkling {
+  background-color: #ffd700;
+  color: #2e0e12;
+}
 
+.wine-color-white {
+  background-color: #ffffcc;
+  color: #2e0e12;
+}
+
+.wine-color-rose {
+  background-color: #ffc0cb;
+  color: #2e0e12;
+}
+
+.wine-color-red {
+  background-color: #800000;
+  color: #fff;
+}
+
+.wine-color-orange {
+  background-color: #ff8c00;
+  color: #fff;
+}
+
+.wine-color-sweet {
+  background-color: #eba134;
+  color: #2e0e12;
+}
+
+.wine-color-fortified {
+  background-color: #4b0082;
+  color: #fff;
+}
+
+/* Bottle Card Color Modifiers */
+.bottle-card {
+  background-color: var(--card-bg);
+  padding: 15px;
+  margin-bottom: 15px;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+  border-left: 5px solid #444;
+  /* Neutral Default */
+  transition: border-left-color 0.3s ease;
+}
+
+/* Specificity Boost to ensure override */
+.bottle-card.bottle-card--sparkling {
+  border-left-color: #ffd700;
+}
+
+.bottle-card.bottle-card--white {
+  border-left-color: #ffffcc;
+}
+
+.bottle-card.bottle-card--rose {
+  border-left-color: #ffc0cb;
+}
+
+.bottle-card.bottle-card--red {
+  border-left-color: #800000;
+}
+
+.bottle-card.bottle-card--orange {
+  border-left-color: #ff8c00;
+}
+
+.bottle-card.bottle-card--sweet {
+  border-left-color: #eba134;
+}
+
+.bottle-card.bottle-card--fortified {
+  border-left-color: #4b0082;
+}
+
+/* ---- Inline action buttons for bottle list ---- */
+/* TODO: button/.btn styles are duplicated; needs cleanup after v1 */
+
+.bottle-action-link {
+  background: none !important;
+  border: none !important;
+  padding: 0 6px !important;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #ffc107;
+  cursor: pointer;
+  line-height: 1.2;
+  display: inline-block;
+}
+
+/* button要素として使う場合に、ブラウザ/共通ボタンのクセを消す */
+button.bottle-action-link {
+  -webkit-appearance: none;
+  appearance: none;
+  border-radius: 0 !important;
+}
+
+/* Delete用だけ色変更 */
+.bottle-action-link--danger {
+  color: #ff5252;
+}
+
+/* hover 時も背景を絶対に出さない */
+.bottle-action-link:hover,
+.bottle-action-link--danger:hover,
+button.bottle-action-link:hover {
+  background: none !important;
+  text-decoration: underline;
+}
