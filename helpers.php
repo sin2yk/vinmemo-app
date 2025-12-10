@@ -83,8 +83,9 @@ function getBottleSizeLabel(int $ml): string
  * @param string $band
  * @return string
  */
-function getPriceBandLabel(string $band): string
+function getPriceBandLabel($band): string
 {
+    // String mapping
     $map = [
         'casual' => 'Casual',
         'bistro' => 'Bistro',
@@ -92,7 +93,30 @@ function getPriceBandLabel(string $band): string
         'luxury' => 'Luxury',
         'icon' => 'Icon',
     ];
-    return $map[$band] ?? ucfirst($band);
+    if (isset($map[$band])) {
+        return $map[$band];
+    }
+
+    // Numeric mapping (Reverse lookup from bottle_new.php logic)
+    $priceMap = [
+        3000 => 'Casual',
+        7000 => 'Bistro',
+        15000 => 'Fine',
+        30000 => 'Luxury',
+        80000 => 'Icon',
+    ];
+
+    if (isset($priceMap[(int) $band])) {
+        return $priceMap[(int) $band];
+    }
+
+    // Fallback: If unknown number, return 'Unknown' to avoid raw price display
+    // If it's a string not in map, maybe return ucfirst (legacy safety)
+    if (!is_numeric($band)) {
+        return ucfirst($band);
+    }
+
+    return 'Unknown';
 }
 
 /**

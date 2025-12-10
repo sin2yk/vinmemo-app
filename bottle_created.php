@@ -35,7 +35,7 @@ $cleanLink = (empty($_SERVER['HTTPS']) ? 'http' : 'https') . "://" . $_SERVER['H
 
     <div class="container" style="max-width:600px; margin-top:40px;">
         <div class="card" style="text-align:center; padding:40px 20px;">
-            <h2 style="color:var(--accent); margin-bottom:20px;">Bottle Added Successfully!</h2>
+            <h2 style="color:var(--accent); margin-bottom:20px;">ボトルを登録しました！ / Bottle Added!</h2>
             <p>Thank you for your contribution.</p>
 
             <div
@@ -54,7 +54,7 @@ $cleanLink = (empty($_SERVER['HTTPS']) ? 'http' : 'https') . "://" . $_SERVER['H
             </div>
 
             <div style="margin-top:30px;">
-                <a href="event_show.php?id=<?= h($eventId) ?>" class="button">Return to Event</a>
+                <a href="event_show.php?id=<?= h($eventId) ?>" class="button">イベントに戻る / Return to Event</a>
             </div>
         </div>
     </div>

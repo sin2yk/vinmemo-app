@@ -12,7 +12,7 @@ require_once 'layout/header.php';
 ?>
 
 <header style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
-  <h1 style="margin:0;">Event List</h1>
+  <h1 style="margin:0;">イベント一覧 / Event List</h1>
   <a href="events_new.php" class="button">＋ New Event</a>
 </header>
 

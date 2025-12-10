@@ -54,13 +54,13 @@ $myBottles = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
 <div class="page-container">
     <header class="page-header">
-        <h1>My Page</h1>
+        <h1>マイページ / My Page</h1>
         <p>Welcome, <?= h($_SESSION['display_name'] ?? 'User') ?></p>
     </header>
 
     <!-- SECTION 1: Organized Events -->
     <section class="mypage-section">
-        <h2>🎪 Events I Organized</h2>
+        <h2>🎪 自分が主催したイベント / Events I Organized</h2>
         <?php if (empty($myEvents)): ?>
             <p class="empty-state">No events organized yet.</p>
         <?php else: ?>
@@ -82,7 +82,7 @@ $myBottles = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
     <!-- SECTION 2: Participated Events -->
     <section class="mypage-section">
-        <h2>🍷 Events I Participated In</h2>
+        <h2>🍷 自分が参加したイベント / Events I Participated In</h2>
         <?php if (empty($participatedEvents)): ?>
             <p class="empty-state">No participation history yet.</p>
         <?php else: ?>
@@ -104,7 +104,7 @@ $myBottles = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
     <!-- SECTION 3: Bottle Timeline -->
     <section class="mypage-section">
-        <h2>🍾 My Bottles Timeline</h2>
+        <h2>🍾 自分のボトル履歴 / My Bottles Timeline</h2>
         <?php if (empty($myBottles)): ?>
             <p class="empty-state">You haven't registered any bottles yet.</p>
         <?php else: ?>

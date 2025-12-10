@@ -162,7 +162,7 @@ require_once 'layout/header.php';
 
                 <!-- 1. Reveal Control -->
                 <div style="flex:1; min-width:300px;">
-                    <h4>Blind Reveal Status</h4>
+                    <h4>ブラインド状況 / Blind Reveal Status</h4>
                     <p>
                         Status:
                         <?php if ($isRevealed): ?>
@@ -192,7 +192,7 @@ require_once 'layout/header.php';
 
                 <!-- 2. List Restriction Control -->
                 <div style="flex:1; min-width:300px;">
-                    <h4>Guest List Display Rules</h4>
+                    <h4>ゲスト表示ルール / Guest List Display Rules</h4>
                     <p style="font-size:0.85em; color:#ccc;">Uncheck fields to HIDE them from the guest list (even in Full
                         mode).</p>
                     <form method="post" action="event_update_visibility.php">
@@ -225,7 +225,7 @@ require_once 'layout/header.php';
     <!-- Bottle List -->
     <section>
         <div style="display:flex; justify-content:space-between; align-items:flex-end; margin-bottom:15px;">
-            <h2 style="margin:0;">Bottle List</h2>
+            <h2 style="margin:0;">ボトル一覧 / Bottle List</h2>
 
             <!-- Guest View Density Toggle -->
             <?php if ($eventRole === 'guest'): ?>
@@ -335,7 +335,7 @@ require_once 'layout/header.php';
                             <?php
                             $metas = [];
                             if ($visible['price_band'])
-                                $metas[] = 'Price: ' . getPriceBandLabel($visible['price_band']);
+                                $metas[] = '価格帯 / Price Band: ' . getPriceBandLabel($visible['price_band']);
                             if ($visible['theme_fit'])
                                 $metas[] = 'Fit: ' . $visible['theme_fit'];
                             if (!empty($metas)):
