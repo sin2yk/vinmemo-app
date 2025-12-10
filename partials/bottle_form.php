@@ -40,6 +40,17 @@ $submitLabel = $mode === 'edit' ? 'Save' : 'Add Bottle';
                 placeholder="Your Name">
         </div>
 
+        <?php if (!isset($_SESSION['user_id'])): ?>
+            <div class="form-group">
+                <label>メールアドレス / Email (For claiming history) <span style="color:var(--danger)">*</span></label>
+                <input type="email" name="guest_email" value="<?= h($form['guest_email'] ?? '') ?>"
+                    placeholder="your@email.com" required>
+                <small style="color:var(--text-muted); display:block; margin-top:4px;">
+                    Required to link this bottle to your account later.
+                </small>
+            </div>
+        <?php endif; ?>
+
         <div class="form-group">
             <label>生産者 / Producer <span style="color:var(--danger)">*</span></label>
             <input type="text" name="producer_name" value="<?= h($form['producer_name']) ?>" required

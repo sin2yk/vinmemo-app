@@ -61,11 +61,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $form['theme_fit_score'] = (int) ($_POST['theme_fit_score'] ?? 3);
     $form['is_blind'] = isset($_POST['is_blind']) ? 1 : 0;
     $form['memo'] = trim($_POST['memo'] ?? '');
+    $form['guest_email'] = trim($_POST['guest_email'] ?? '');
 
     // --- バリデーション ---
     if ($form['owner_label'] === '') {
         $errors[] = 'お名前 / Your Name は必須です。';
     }
+    // Guest Email Check
+    if (!isset($_SESSION['user_id']) && $form['guest_email'] === '') {
+        $errors[] = 'メールアドレス / Email is required for guests.';
+    }
+
     if ($form['producer_name'] === '') {
         $errors[] = '生産者 / Producer は必須です。';
     }
@@ -105,14 +111,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         // Determine brought_by_user_id
         $broughtByUserId = $_SESSION['user_id'] ?? null;
+        // Normalize Guest Email
+        $guestEmail = $broughtByUserId ? null : mb_strtolower($form['guest_email']);
 
         $sql = "INSERT INTO bottle_entries (
-                    event_id, brought_by_user_id, owner_label,
+                    event_id, brought_by_user_id, guest_email, owner_label,
                     producer_name, wine_name, vintage, bottle_size_ml,
                     color, est_price_yen, theme_fit_score, memo,
                     is_blind, blind_reveal_level, edit_token, created_at
                 ) VALUES (
-                    :event_id, :brought_by_user_id, :owner_label,
+                    :event_id, :brought_by_user_id, :guest_email, :owner_label,
                     :producer_name, :wine_name, :vintage, :bottle_size_ml,
                     :color, :est_price_yen, :theme_fit_score, :memo,
                     :is_blind, 'none', :edit_token, NOW()
@@ -121,6 +129,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $stmt = $pdo->prepare($sql);
         $stmt->bindValue(':event_id', $event_id, PDO::PARAM_INT);
         $stmt->bindValue(':brought_by_user_id', $broughtByUserId, PDO::PARAM_INT); // NULL allowed
+        $stmt->bindValue(':guest_email', $guestEmail, PDO::PARAM_STR); // NULL allowed
         $stmt->bindValue(':owner_label', $form['owner_label'], PDO::PARAM_STR);
         $stmt->bindValue(':producer_name', $form['producer_name'], PDO::PARAM_STR);
         $stmt->bindValue(':wine_name', $form['wine_name'], PDO::PARAM_STR);

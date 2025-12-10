@@ -1,133 +1,191 @@
 <?php
+// mypage.php
 require_once 'db_connect.php';
-// Helper already included by header, but logic needs it? Header includes helpers.php.
-// But we run logic before header. So:
 require_once 'helpers.php';
 
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
 
-$user_id = $_SESSION['user_id'] ?? null;
-$error = null;
+$currentUserId = $_SESSION['user_id'] ?? 0;
 
-// Debug simulator (preserved)
-if (isset($_GET['login_as'])) {
-    $user_id = (int) $_GET['login_as'];
-    $_SESSION['user_id'] = $user_id;
-    $_SESSION['name'] = "User{$user_id}";
-    $_SESSION['role'] = 'guest'; // Default
-}
-
-$organized_events = [];
-$joined_events = [];
-$my_bottles = [];
-
-if (!$user_id) {
-    // Not logged in
-} else {
-    // 1. Fetch Events (Organized vs Joined)
-    $sql = "SELECT e.*, ep.role_in_event 
-            FROM events e 
-            JOIN event_participants ep ON e.id = ep.event_id 
-            WHERE ep.user_id = :user_id 
-            ORDER BY e.event_date DESC";
-    $stmt = $pdo->prepare($sql);
-    $stmt->bindValue(':user_id', $user_id, PDO::PARAM_INT);
-    $stmt->execute();
-    $all_events = $stmt->fetchAll(PDO::FETCH_ASSOC);
-
-    foreach ($all_events as $evt) {
-        if ($evt['role_in_event'] === 'organizer') {
-            $organized_events[] = $evt;
-        } else {
-            $joined_events[] = $evt;
-        }
-    }
-
-    // 2. Fetch My Bottles
-    $sql = "SELECT b.*, e.title as event_title, e.event_date, e.id as event_id
-            FROM bottle_entries b 
-            JOIN events e ON b.event_id = e.id 
-            WHERE b.brought_by_user_id = :user_id 
-            ORDER BY e.event_date DESC, b.id ASC";
-    $stmt = $pdo->prepare($sql);
-    $stmt->bindValue(':user_id', $user_id, PDO::PARAM_INT);
-    $stmt->execute();
-    $my_bottles = $stmt->fetchAll(PDO::FETCH_ASSOC);
+if (!$currentUserId) {
+    header('Location: index.html');
+    exit;
 }
 
 $page_title = 'VinMemo - My Page';
 require_once 'layout/header.php';
+
+// Claim on load (Idempotent check)
+$userEmail = $_SESSION['email'] ?? '';
+if ($userEmail) {
+    claim_guest_bottles_for_user($pdo, $currentUserId, $userEmail);
+}
+
+// 1. Events I Organized
+$stmt = $pdo->prepare("SELECT * FROM events WHERE organizer_user_id = :uid ORDER BY event_date DESC");
+$stmt->execute([':uid' => $currentUserId]);
+$myEvents = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+// 2. Events I Participated In (Guest participation)
+$sqlParticipated = "SELECT DISTINCT e.* 
+                    FROM events e 
+                    JOIN bottle_entries b ON e.id = b.event_id 
+                    WHERE b.brought_by_user_id = :uid 
+                      AND (e.organizer_user_id != :uid OR e.organizer_user_id IS NULL)
+                    ORDER BY e.event_date DESC";
+$stmt = $pdo->prepare($sqlParticipated);
+$stmt->execute([':uid' => $currentUserId]);
+$participatedEvents = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+// 3. My Bottles (Timeline)
+// Assuming created_at exists, prioritizing event date then bottle creation
+$sqlBottles = "SELECT b.*, e.title AS event_title, e.event_date 
+               FROM bottle_entries b 
+               JOIN events e ON b.event_id = e.id 
+               WHERE b.brought_by_user_id = :uid 
+               ORDER BY e.event_date DESC, b.created_at DESC";
+$stmt = $pdo->prepare($sqlBottles);
+$stmt->execute([':uid' => $currentUserId]);
+$myBottles = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
 ?>
 
-<?php if (!$user_id): ?>
-    <div class="card text-center">
-        <h2>Login Required</h2>
-        <p>Please login from Home.</p>
-        <a href="home.php" class="button">ホームへ</a>
+<div class="page-container">
+    <header class="page-header">
+        <h1>My Page</h1>
+        <p>Welcome, <?= h($_SESSION['display_name'] ?? 'User') ?></p>
+    </header>
 
-        <hr>
-        <p>Debug:</p>
-        <a href="mypage.php?login_as=1" class="button" style="background:#555;">ID=1としてログイン</a>
-    </div>
-<?php else: ?>
-
-    <h2 class="section-title">Events I Organize</h2>
-    <?php if (empty($organized_events)): ?>
-        <p>No organized events.</p>
-    <?php else: ?>
-        <?php foreach ($organized_events as $evt): ?>
-            <div class="list-item" style="border-left: 5px solid var(--accent);">
-                <div>
-                    <strong><a href="event_show.php?id=<?= h($evt['id']) ?>"><?= h($evt['title']) ?></a></strong>
-                    <br>
-                    <span style="font-size:0.9em; color:#aaa;"><?= h($evt['event_date']) ?> @ <?= h($evt['place']) ?></span>
-                </div>
-                <span
-                    style="background:var(--accent); color:#000; padding:2px 8px; border-radius:4px; font-size:0.8em; font-weight:bold;">Organizer</span>
+    <!-- SECTION 1: Organized Events -->
+    <section class="mypage-section">
+        <h2>🎪 Events I Organized</h2>
+        <?php if (empty($myEvents)): ?>
+            <p class="empty-state">No events organized yet.</p>
+        <?php else: ?>
+            <div class="card-grid">
+                <?php foreach ($myEvents as $ev): ?>
+                    <a href="event_show.php?id=<?= h($ev['id']) ?>" class="event-card-link">
+                        <div class="card event-card">
+                            <h3><?= h($ev['title']) ?></h3>
+                            <div class="meta">
+                                <span>📅 <?= h($ev['event_date']) ?></span>
+                                📍 <?= h($ev['place']) ?>
+                            </div>
+                        </div>
+                    </a>
+                <?php endforeach; ?>
             </div>
-        <?php endforeach; ?>
-    <?php endif; ?>
+        <?php endif; ?>
+    </section>
 
-    <h2 class="section-title">Events I Joined</h2>
-    <?php if (empty($joined_events)): ?>
-        <p>No joined events.</p>
-    <?php else: ?>
-        <?php foreach ($joined_events as $evt): ?>
-            <div class="list-item">
-                <div>
-                    <strong><a href="event_show.php?id=<?= h($evt['id']) ?>"><?= h($evt['title']) ?></a></strong>
-                    <br>
-                    <span style="font-size:0.9em; color:#aaa;"><?= h($evt['event_date']) ?> @ <?= h($evt['place']) ?></span>
-                </div>
-                <span style="background:#555; padding:2px 8px; border-radius:4px; font-size:0.8em;">Guest</span>
+    <!-- SECTION 2: Participated Events -->
+    <section class="mypage-section">
+        <h2>🍷 Events I Participated In</h2>
+        <?php if (empty($participatedEvents)): ?>
+            <p class="empty-state">No participation history yet.</p>
+        <?php else: ?>
+            <div class="card-grid">
+                <?php foreach ($participatedEvents as $ev): ?>
+                    <a href="event_show.php?id=<?= h($ev['id']) ?>" class="event-card-link">
+                        <div class="card event-card">
+                            <h3><?= h($ev['title']) ?></h3>
+                            <div class="meta">
+                                <span>📅 <?= h($ev['event_date']) ?></span>
+                                📍 <?= h($ev['place']) ?>
+                            </div>
+                        </div>
+                    </a>
+                <?php endforeach; ?>
             </div>
-        <?php endforeach; ?>
-    <?php endif; ?>
+        <?php endif; ?>
+    </section>
 
-    <h2 class="section-title">My Bottles History</h2>
-    <?php if (empty($my_bottles)): ?>
-        <p>No bottles registered.</p>
-    <?php else: ?>
-        <?php foreach ($my_bottles as $b): ?>
-            <div class="bottle-card">
-                <div style="font-size:0.85em; color:var(--accent); margin-bottom:5px;">
-                    <?= h($b['event_date']) ?> - <?= h($b['event_title']) ?>
-                </div>
-                <div style="font-weight:bold; font-size:1.1em;">
-                    <?= h($b['wine_name']) ?>
-                </div>
-                <div style="font-size:0.9em; color:var(--text-muted);">
-                    <?= h($b['vintage'] ?: 'NV') ?> / <?= h($b['owner_label']) ?>
-                </div>
-                <div style="text-align:right; margin-top:10px;">
-                    <a href="event_show.php?id=<?= h($b['event_id']) ?>" style="font-size:0.9em;">イベントを表示 →</a>
-                </div>
+    <!-- SECTION 3: Bottle Timeline -->
+    <section class="mypage-section">
+        <h2>🍾 My Bottles Timeline</h2>
+        <?php if (empty($myBottles)): ?>
+            <p class="empty-state">You haven't registered any bottles yet.</p>
+        <?php else: ?>
+            <div class="bottle-list">
+                <?php foreach ($myBottles as $b): ?>
+                    <div class="card bottle-card-slim">
+                        <div class="bottle-header">
+                            <span class="wine-name"><?= h($b['wine_name']) ?></span>
+                            <span class="vintage"><?= $b['vintage'] ? h($b['vintage']) : 'NV' ?></span>
+                        </div>
+                        <div class="bottle-meta">
+                            Producer: <?= h($b['producer_name']) ?> |
+                            Event: <a href="event_show.php?id=<?= h($b['event_id']) ?>"><?= h($b['event_title']) ?></a>
+                            (<?= h($b['event_date']) ?>)
+                        </div>
+                        <?php if ($b['edit_token']): ?>
+                            <div class="bottle-actions" style="margin-top:5px;">
+                                <a href="bottle_edit.php?token=<?= h($b['edit_token']) ?>" class="btn-sm">Edit</a>
+                            </div>
+                        <?php endif; ?>
+                    </div>
+                <?php endforeach; ?>
             </div>
-        <?php endforeach; ?>
-    <?php endif; ?>
+        <?php endif; ?>
+    </section>
+</div>
 
-<?php endif; ?>
+<style>
+    .mypage-section {
+        margin-bottom: 40px;
+    }
+
+    .mypage-section h2 {
+        border-bottom: 2px solid var(--accent);
+        padding-bottom: 10px;
+        margin-bottom: 20px;
+    }
+
+    .card-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+        gap: 15px;
+    }
+
+    .event-card-link {
+        text-decoration: none;
+        color: inherit;
+    }
+
+    .event-card:hover {
+        transform: translateY(-2px);
+        border-color: var(--accent);
+        transition: all 0.2s;
+    }
+
+    .bottle-card-slim {
+        padding: 15px;
+        border-left: 4px solid var(--accent);
+    }
+
+    .bottle-header {
+        display: flex;
+        justify-content: space-between;
+        font-weight: bold;
+        font-size: 1.1rem;
+    }
+
+    .bottle-meta {
+        font-size: 0.9rem;
+        color: var(--text-muted);
+        margin-top: 5px;
+    }
+
+    .btn-sm {
+        font-size: 0.8rem;
+        padding: 2px 8px;
+        background: #444;
+        color: #fff;
+        text-decoration: none;
+        border-radius: 4px;
+    }
+</style>
 
 <?php require_once 'layout/footer.php'; ?>

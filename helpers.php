@@ -283,3 +283,34 @@ function getColorLabel(string $colorCode): string
     return $map[$colorCode] ?? ucfirst($colorCode);
 }
 
+
+/**
+ * Claims orphan guest bottles for a verified user by email.
+ * This should be called on login.
+ * 
+ * @param PDO $pdo
+ * @param int $userId
+ * @param string $email
+ * @return int Number of bottles claimed
+ */
+function claim_guest_bottles_for_user(PDO $pdo, int $userId, string $email): int
+{
+    // Normalize email: strict trim and lowercase
+    $normEmail = mb_strtolower(trim($email));
+
+    if (empty($normEmail)) {
+        return 0;
+    }
+
+    $sql = "UPDATE bottle_entries 
+            SET brought_by_user_id = :uid 
+            WHERE brought_by_user_id IS NULL 
+              AND LOWER(TRIM(guest_email)) = :email";
+
+    $stmt = $pdo->prepare($sql);
+    $stmt->bindValue(':uid', $userId, PDO::PARAM_INT);
+    $stmt->bindValue(':email', $normEmail, PDO::PARAM_STR);
+    $stmt->execute();
+
+    return $stmt->rowCount();
+}

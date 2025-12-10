@@ -127,10 +127,31 @@
     });
 
     // ログイン状態の監視
-    onAuthStateChanged(auth, (user) => {
+    onAuthStateChanged(auth, async (user) => {
       if (user) {
         // ログインしていたら、少しだけメッセージを出してから home.php へ
         setStatus(`ログイン中：${user.email}（VinMemoへ移動します…）`);
+
+        // Sync with PHP Session
+        try {
+          const res = await fetch('auth_sync.php', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              email: user.email,
+              uid: user.uid,
+              displayName: user.displayName
+            })
+          });
+          const data = await res.json();
+          if (data.success) {
+            console.log('Session synced. Claimed bottles: ' + data.claimed);
+          } else {
+            console.error('Session sync failed:', data.message);
+          }
+        } catch (e) {
+          console.error('Sync request error', e);
+        }
 
         // すぐ飛んでもいいけど、0.5秒くらい待つと安心感ある
         setTimeout(() => {
