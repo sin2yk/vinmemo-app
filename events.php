@@ -1,5 +1,6 @@
 <?php
 require_once 'db_connect.php';
+require_once 'helpers.php';
 
 // イベント一覧を新しい日付順で取得
 $sql = 'SELECT * FROM events ORDER BY event_date DESC';
@@ -39,7 +40,27 @@ require_once 'layout/header.php';
             </td>
             <td><?= h($event['event_date']) ?></td>
             <td><?= h($event['place']) ?></td>
-            <td><?= nl2br(h($event['memo'])) ?></td>
+            <td>
+              <?php
+              $parsed = parseEventMemo($event['memo']);
+              echo nl2br(h($parsed['note']));
+              ?>
+              <?php if (!empty($parsed['meta'])): ?>
+                <div style="margin-top:5px; font-size:0.8rem;">
+                  <?php if (!empty($parsed['meta']['event_style_detail'])): ?>
+                    <span
+                      style="display:inline-block; padding:2px 6px; background:#444; color:#fff; border-radius:4px; margin-right:4px;">
+                      <?= h(getEventStyleLabel($parsed['meta']['event_style_detail'])) ?>
+                    </span>
+                  <?php endif; ?>
+                  <?php if (!empty($parsed['meta']['blind_policy'])): ?>
+                    <span style="display:inline-block; padding:2px 6px; background:#553333; color:#ffdddd; border-radius:4px;">
+                      <?= h(getBlindPolicyLabel($parsed['meta']['blind_policy'])) ?>
+                    </span>
+                  <?php endif; ?>
+                </div>
+              <?php endif; ?>
+            </td>
           </tr>
         <?php endforeach; ?>
       </tbody>
@@ -64,7 +85,26 @@ require_once 'layout/header.php';
             </div>
             <div class="event-card-row">
               <span class="label">Memo</span>
-              <span class="value"><?= nl2br(h($event['memo'])) ?></span>
+              <span class="value">
+                <?php
+                $parsed = parseEventMemo($event['memo']);
+                echo nl2br(h($parsed['note']));
+                ?>
+                <?php if (!empty($parsed['meta'])): ?>
+                  <div style="margin-top:8px; display:flex; gap:5px; flex-wrap:wrap;">
+                    <?php if (!empty($parsed['meta']['event_style_detail'])): ?>
+                      <span style="font-size:0.75rem; padding:2px 8px; border-radius:10px; background:#444; color:#fff;">
+                        <?= h(getEventStyleLabel($parsed['meta']['event_style_detail'])) ?>
+                      </span>
+                    <?php endif; ?>
+                    <?php if (!empty($parsed['meta']['blind_policy'])): ?>
+                      <span style="font-size:0.75rem; padding:2px 8px; border-radius:10px; background:#553333; color:#ffdddd;">
+                        <?= h(getBlindPolicyLabel($parsed['meta']['blind_policy'])) ?>
+                      </span>
+                    <?php endif; ?>
+                  </div>
+                <?php endif; ?>
+              </span>
             </div>
           </div>
         </div>

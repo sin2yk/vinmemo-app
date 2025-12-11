@@ -338,3 +338,56 @@ function claim_guest_bottles_for_user(PDO $pdo, int $userId, string $email): int
 
     return $stmt->rowCount();
 }
+
+/**
+ * Parse event memo to separate user note and meta JSON.
+ * 
+ * @param string|null $memo
+ * @return array ['note' => string, 'meta' => array]
+ */
+function parseEventMemo($memo): array
+{
+    if (empty($memo)) {
+        return ['note' => '', 'meta' => []];
+    }
+    // Handle both linebreak types just in case
+    $parts = preg_split('/\n?\s*---META---\s*\n?/', $memo, 2);
+
+    $note = trim($parts[0] ?? '');
+    $meta = [];
+
+    if (isset($parts[1])) {
+        $decoded = json_decode(trim($parts[1]), true);
+        if (json_last_error() === JSON_ERROR_NONE && is_array($decoded)) {
+            $meta = $decoded;
+        }
+    }
+
+    return ['note' => $note, 'meta' => $meta];
+}
+
+/**
+ * Get display label for event style.
+ */
+function getEventStyleLabel($code): string
+{
+    $map = [
+        'full_byo' => 'Full BYO',
+        'half_byo' => 'Half BYO',
+        'no_byo' => 'No BYO',
+    ];
+    return $map[$code] ?? ucfirst($code);
+}
+
+/**
+ * Get display label for blind policy.
+ */
+function getBlindPolicyLabel($code): string
+{
+    $map = [
+        'none' => 'ブラインドなし',
+        'semi' => 'セミ・ブラインド',
+        'full' => 'フル・ブラインド',
+    ];
+    return $map[$code] ?? ucfirst($code);
+}

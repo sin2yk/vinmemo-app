@@ -3,6 +3,7 @@
 // Refactored to match BYO design concepts
 
 require_once 'db_connect.php';
+require_once 'helpers.php';
 // session_start() will be handled in layout/header.php if not already, 
 // but we might need session values for logic before header.
 if (session_status() === PHP_SESSION_NONE) {
@@ -65,15 +66,17 @@ if (!$id) {
     }
 }
 
-// 4. Determine Role
-// layout/header.php includes helpers.php, but we need it now for logic.
-require_once 'helpers.php';
-$currentUserId = $_SESSION['user_id'] ?? null;
-$eventRole = ($id && $currentUserId) ? getEventRole($pdo, $id, $currentUserId) : 'guest';
+// 4. Determine View Mode (Strict)
+$isLoggedIn = isset($_SESSION['user_id']);
+$isOwner = $isLoggedIn
+    && isset($event['organizer_user_id'])
+    && ($_SESSION['user_id'] == $event['organizer_user_id']);
 
-// --- Debug / Temporary: 手動ビュー切り替え ---
-if (isset($_GET['view']) && in_array($_GET['view'], ['organizer', 'guest'], true)) {
-    $eventRole = $_GET['view'];
+$view = 'guest'; // Default to guest view
+
+// Review: Only switch to organizer view if owner requests it explicitly
+if ($isOwner && isset($_GET['view']) && $_GET['view'] === 'organizer') {
+    $view = 'organizer';
 }
 
 // Page Setup
@@ -93,17 +96,17 @@ require_once 'layout/header.php';
                 <p style="margin:5px 0 0 0; color:var(--text-muted);">
                     <?= h($event['event_date']) ?> @ <?= h($event['place']) ?>
 
-                    <?php if ($eventRole === 'organizer'): ?>
-                        <span style="color:var(--accent); margin-left:10px;">[幹事ビュー]</span>
-                        <a href="event_show.php?id=<?= h($id) ?>&view=guest" style="margin-left:10px; font-size:0.8em;">
-                            ゲストビューで見る
-                        </a>
+                <div class="view-switch" style="display:inline-block; margin-left:10px;">
+                    <?php if ($view === 'guest'): ?>
+                        <span>[ゲストビュー]</span>
+                        <?php if ($isOwner): ?>
+                            | <a href="event_show.php?id=<?= h($id) ?>&view=organizer">幹事ビューで見る</a>
+                        <?php endif; ?>
                     <?php else: ?>
-                        <span style="margin-left:10px;">[ゲストビュー]</span>
-                        <a href="event_show.php?id=<?= h($id) ?>&view=organizer" style="margin-left:10px; font-size:0.8em;">
-                            幹事ビューで見る
-                        </a>
+                        <a href="event_show.php?id=<?= h($id) ?>">ゲストビューで見る</a>
+                        <span>[幹事ビュー]</span>
                     <?php endif; ?>
+                </div>
                 </p>
             </div>
             <div>
@@ -111,9 +114,61 @@ require_once 'layout/header.php';
             </div>
         </div>
 
-        <?php if ($event['memo']): ?>
+        <?php
+        $parsedMemo = parseEventMemo($event['memo']);
+        ?>
+        <?php if ($parsedMemo['note']): ?>
             <div style="margin-top:15px; padding:15px; background:rgba(255,255,255,0.05); border-radius:8px;">
-                <?= nl2br(h($event['memo'])) ?>
+                <?= nl2br(h($parsedMemo['note'])) ?>
+            </div>
+        <?php endif; ?>
+
+        <?php if (!empty($parsedMemo['meta'])): ?>
+            <?php $m = $parsedMemo['meta']; ?>
+            <div class="card" style="margin-top:20px; padding:20px; border-left:4px solid var(--accent);">
+                <h4
+                    style="margin-top:0; color:var(--text-main); border-bottom:1px solid #444; padding-bottom:10px; margin-bottom:15px;">
+                    イベント詳細情報 / Event Details
+                </h4>
+                <div style="display:grid; grid-template-columns: 1fr 1fr; gap:20px;">
+                    <!-- Left Column -->
+                    <div>
+                        <?php if (!empty($m['event_style_detail'])): ?>
+                            <div style="margin-bottom:15px;">
+                                <div style="font-size:0.85rem; color:var(--text-muted);">スタイル / Style</div>
+                                <div style="font-size:1.1rem; font-weight:bold;">
+                                    <?= h(getEventStyleLabel($m['event_style_detail'])) ?>
+                                </div>
+                            </div>
+                        <?php endif; ?>
+
+                        <?php if (!empty($m['blind_policy'])): ?>
+                            <div style="margin-bottom:15px;">
+                                <div style="font-size:0.85rem; color:var(--text-muted);">ブラインド / Blind Policy</div>
+                                <div><?= h(getBlindPolicyLabel($m['blind_policy'])) ?></div>
+                            </div>
+                        <?php endif; ?>
+
+                        <?php if (!empty($m['theme_description'])): ?>
+                            <div style="margin-bottom:15px;">
+                                <div style="font-size:0.85rem; color:var(--text-muted);">コンセプト / Concept</div>
+                                <div><?= nl2br(h($m['theme_description'])) ?></div>
+                            </div>
+                        <?php endif; ?>
+                    </div>
+
+                    <!-- Right Column -->
+                    <div>
+                        <?php if (!empty($m['bottle_rules'])): ?>
+                            <div style="margin-bottom:15px;">
+                                <div style="font-size:0.85rem; color:var(--text-muted);">持ち寄りルール / Bottle Rules</div>
+                                <div style="background:rgba(0,0,0,0.2); padding:10px; border-radius:4px;">
+                                    <?= nl2br(h($m['bottle_rules'])) ?>
+                                </div>
+                            </div>
+                        <?php endif; ?>
+                    </div>
+                </div>
             </div>
         <?php endif; ?>
     </header>
@@ -122,7 +177,7 @@ require_once 'layout/header.php';
     <section class="card" style="padding:20px;">
         <h3 style="margin-top:0; border-bottom:1px solid var(--border); padding-bottom:10px;">
             Summary
-            <?php if ($eventRole === 'organizer'): ?>
+            <?php if ($view === 'organizer'): ?>
                 <span style="font-size:0.8em; color:var(--accent); margin-left:10px;">(Organizer View)</span>
             <?php endif; ?>
         </h3>
@@ -143,7 +198,7 @@ require_once 'layout/header.php';
     </section>
 
     <!-- Organizer Only: Visibility Controls -->
-    <?php if ($eventRole === 'organizer'): ?>
+    <?php if ($view === 'organizer'): ?>
         <?php
         $isRevealed = isEventRevealed($event);
         $listConfig = json_decode($event['list_field_visibility'] ?? '[]', true);
@@ -228,7 +283,7 @@ require_once 'layout/header.php';
             <h2 style="margin:0;">ボトル一覧 / Bottle List</h2>
 
             <!-- Guest View Density Toggle -->
-            <?php if ($eventRole === 'guest'): ?>
+            <?php if ($view === 'guest'): ?>
                 <?php $viewMode = $_GET['mode'] ?? 'standard'; // simple, standard, full ?>
                 <div class="view-mode-toggle" style="font-size:0.85rem;">
                     View:
@@ -252,12 +307,13 @@ require_once 'layout/header.php';
                     <?php
                     // --- 1. Get Visible Data ---
                     // use helper function
-                    $visible = getVisibleFields($b, $event, $eventRole);
+                    // We pass $view as the role (since 'organizer' view means we act as organizer)
+                    $visible = getVisibleFields($b, $event, $view);
                     $displayName = getBottleDisplayName($visible, $b, $index);
 
                     // --- 2. Determine Display Mode ---
                     // If guest, use requested mode. If organizer, force 'full' (or custom organizer view).
-                    $currentMode = ($eventRole === 'organizer') ? 'organizer_full' : ($viewMode ?? 'standard');
+                    $currentMode = ($view === 'organizer') ? 'organizer_full' : ($viewMode ?? 'standard');
 
                     // --- 3. Construct Lines based on Mode ---
         
@@ -283,7 +339,7 @@ require_once 'layout/header.php';
                             style="font-size:0.9em; color:var(--text-muted); display:flex; justify-content:space-between;">
                             <span><?= $line1 ?></span>
                             <!-- Organizer: Blind Status Badge -->
-                            <?php if ($eventRole === 'organizer' && $b['is_blind']): ?>
+                            <?php if ($view === 'organizer' && $b['is_blind']): ?>
                                 <span style="font-size:0.8em; color:var(--accent-gold);">
                                     BLIND (Level: <?= h($b['blind_reveal_level']) ?>)
                                 </span>
@@ -356,7 +412,7 @@ require_once 'layout/header.php';
                         <?php endif; // End Standard/Full ?>
 
                         <!-- Organizer Actions -->
-                        <?php if ($eventRole === 'organizer'): ?>
+                        <?php if ($view === 'organizer'): ?>
                             <div class="bottle-actions"
                                 style="margin-top:12px; padding-top:8px; border-top:1px solid rgba(255,255,255,0.1);">
 

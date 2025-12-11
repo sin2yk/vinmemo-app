@@ -1,0 +1,11 @@
+Field: id                   | Type: int(11)         | Null: NO  | Default: NULL       | Extra: auto_increment
+Field: organizer_user_id    | Type: int(11)         | Null: YES | Default: NULL       | Extra: 
+Field: title                | Type: varchar(255)    | Null: NO  | Default: NULL       | Extra: 
+Field: event_type           | Type: varchar(16)     | Null: NO  | Default: BYO        | Extra: 
+Field: event_date           | Type: date            | Null: NO  | Default: NULL       | Extra: 
+Field: revealed_at          | Type: datetime        | Null: YES | Default: NULL       | Extra: 
+Field: list_field_visibility | Type: longtext        | Null: YES | Default: NULL       | Extra: 
+Field: place                | Type: varchar(255)    | Null: YES | Default: NULL       | Extra: 
+Field: memo                 | Type: text            | Null: YES | Default: NULL       | Extra: 
+Field: created_at           | Type: datetime        | Null: YES | Default: current_timestamp() | Extra: 
+Field: venue_id             | Type: int(11)         | Null: YES | Default: NULL       | Extra: 
