@@ -740,3 +740,72 @@ button.bottle-action-link:hover {
   background: none !important;
   text-decoration: underline;
 }
+
+/* Info Icon for Tooltips */
+/* Info Icon for Tooltips */
+.info-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.35rem;
+  /* Larger from 1rem */
+  height: 1.35rem;
+  font-size: 0.8rem;
+  border-radius: 9999px;
+  border: 1px solid #ffcc33;
+  /* VinMemo Yellow */
+  color: #ffcc33;
+  margin-left: 0.4rem;
+  cursor: help;
+  vertical-align: middle;
+}
+
+/* Tooltip Container */
+.has-tooltip {
+  position: relative;
+}
+
+/* Tooltip Panel */
+.tooltip-panel {
+  position: absolute;
+  z-index: 50;
+  left: 0;
+  top: 130%;
+  min-width: 260px;
+  max-width: 360px;
+  padding: 0.6rem 0.8rem;
+  font-size: 0.8rem;
+  line-height: 1.4;
+  background: #2b0d0f;
+  /* Dark Red */
+  color: #f5f5f5;
+  border-radius: 0.5rem;
+  border: 1px solid #ffcc33;
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.45);
+  opacity: 0;
+  transform: translateY(-4px);
+  pointer-events: none;
+  transition: opacity 0.15s ease, transform 0.15s ease;
+  white-space: normal;
+}
+
+/* Tooltip Visibility */
+.has-tooltip:hover .tooltip-panel,
+.has-tooltip:focus-within .tooltip-panel {
+  opacity: 1;
+  transform: translateY(0);
+  pointer-events: auto;
+}
+
+/* Help Chip for Bottle Size */
+.help-chip {
+  display: inline-flex;
+  align-items: center;
+  margin-top: 0.25rem;
+  padding: 0.15rem 0.5rem;
+  font-size: 0.75rem;
+  border-radius: 9999px;
+  border: 1px solid #ffcc33;
+  color: #ffcc33;
+  cursor: help;
+}

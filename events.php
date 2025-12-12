@@ -13,7 +13,7 @@ require_once 'layout/header.php';
 ?>
 
 <header style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
-  <h1 style="margin:0;">イベント一覧 / Event List</h1>
+  <h1 style="margin:0;">Event List / イベント一覧</h1>
   <a href="events_new.php" class="button">＋ New Event</a>
 </header>
 
@@ -24,10 +24,10 @@ require_once 'layout/header.php';
     <table class="event-table">
       <thead>
         <tr>
-          <th>Title</th>
-          <th>Date</th>
-          <th>Place</th>
-          <th>Memo</th>
+          <th>Title / イベント名</th>
+          <th>Date / 日程</th>
+          <th>Place / 場所</th>
+          <th>Memo / メモ</th>
         </tr>
       </thead>
       <tbody>
@@ -76,15 +76,15 @@ require_once 'layout/header.php';
           </div>
           <div class="event-card-meta">
             <div class="event-card-row">
-              <span class="label">Date</span>
+              <span class="label">Date / 日程</span>
               <span class="value"><?= h($event['event_date']) ?></span>
             </div>
             <div class="event-card-row">
-              <span class="label">Place</span>
+              <span class="label">Place / 場所</span>
               <span class="value"><?= h($event['place']) ?></span>
             </div>
             <div class="event-card-row">
-              <span class="label">Memo</span>
+              <span class="label">Memo / メモ</span>
               <span class="value">
                 <?php
                 $parsed = parseEventMemo($event['memo']);

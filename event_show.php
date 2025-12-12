@@ -98,19 +98,19 @@ require_once 'layout/header.php';
 
                 <div class="view-switch" style="display:inline-block; margin-left:10px;">
                     <?php if ($view === 'guest'): ?>
-                        <span>[ゲストビュー]</span>
+                        <span>[Guest View / ゲストビュー]</span>
                         <?php if ($isOwner): ?>
-                            | <a href="event_show.php?id=<?= h($id) ?>&view=organizer">幹事ビューで見る</a>
+                            | <a href="event_show.php?id=<?= h($id) ?>&view=organizer">View as Organizer / 幹事ビューで見る</a>
                         <?php endif; ?>
                     <?php else: ?>
-                        <a href="event_show.php?id=<?= h($id) ?>">ゲストビューで見る</a>
-                        <span>[幹事ビュー]</span>
+                        <a href="event_show.php?id=<?= h($id) ?>">View as Guest / ゲストビューで見る</a>
+                        <span>[Organizer View / 幹事ビュー]</span>
                     <?php endif; ?>
                 </div>
                 </p>
             </div>
             <div>
-                <a href="events.php" class="btn btn-secondary btn-sm">← イベント一覧に戻る / Back to Event List</a>
+                <a href="events.php" class="btn btn-secondary btn-sm">← Back to Event List / イベント一覧に戻る</a>
             </div>
         </div>
 
@@ -128,14 +128,14 @@ require_once 'layout/header.php';
             <div class="card" style="margin-top:20px; padding:20px; border-left:4px solid var(--accent);">
                 <h4
                     style="margin-top:0; color:var(--text-main); border-bottom:1px solid #444; padding-bottom:10px; margin-bottom:15px;">
-                    イベント詳細情報 / Event Details
+                    Event Details / イベント詳細情報
                 </h4>
                 <div style="display:grid; grid-template-columns: 1fr 1fr; gap:20px;">
                     <!-- Left Column -->
                     <div>
                         <?php if (!empty($m['event_style_detail'])): ?>
                             <div style="margin-bottom:15px;">
-                                <div style="font-size:0.85rem; color:var(--text-muted);">スタイル / Style</div>
+                                <div style="font-size:0.85rem; color:var(--text-muted);">Style / スタイル</div>
                                 <div style="font-size:1.1rem; font-weight:bold;">
                                     <?= h(getEventStyleLabel($m['event_style_detail'])) ?>
                                 </div>
@@ -144,14 +144,14 @@ require_once 'layout/header.php';
 
                         <?php if (!empty($m['blind_policy'])): ?>
                             <div style="margin-bottom:15px;">
-                                <div style="font-size:0.85rem; color:var(--text-muted);">ブラインド / Blind Policy</div>
+                                <div style="font-size:0.85rem; color:var(--text-muted);">Blind Policy / ブラインド</div>
                                 <div><?= h(getBlindPolicyLabel($m['blind_policy'])) ?></div>
                             </div>
                         <?php endif; ?>
 
                         <?php if (!empty($m['theme_description'])): ?>
                             <div style="margin-bottom:15px;">
-                                <div style="font-size:0.85rem; color:var(--text-muted);">コンセプト / Concept</div>
+                                <div style="font-size:0.85rem; color:var(--text-muted);">Concept / コンセプト</div>
                                 <div><?= nl2br(h($m['theme_description'])) ?></div>
                             </div>
                         <?php endif; ?>
@@ -161,7 +161,7 @@ require_once 'layout/header.php';
                     <div>
                         <?php if (!empty($m['bottle_rules'])): ?>
                             <div style="margin-bottom:15px;">
-                                <div style="font-size:0.85rem; color:var(--text-muted);">持ち寄りルール / Bottle Rules</div>
+                                <div style="font-size:0.85rem; color:var(--text-muted);">Bottle Rules / 持ち寄りルール</div>
                                 <div style="background:rgba(0,0,0,0.2); padding:10px; border-radius:4px;">
                                     <?= nl2br(h($m['bottle_rules'])) ?>
                                 </div>
@@ -176,20 +176,22 @@ require_once 'layout/header.php';
     <!-- Summary Panel -->
     <section class="card" style="padding:20px;">
         <h3 style="margin-top:0; border-bottom:1px solid var(--border); padding-bottom:10px;">
-            Summary
+            Summary / サマリー
             <?php if ($view === 'organizer'): ?>
                 <span style="font-size:0.8em; color:var(--accent); margin-left:10px;">(Organizer View)</span>
             <?php endif; ?>
         </h3>
         <div style="display:flex; flex-wrap:wrap; gap:20px;">
             <div>
-                <strong>Total Bottles:</strong> <?= $stats['total'] ?>
+                <strong>Total Bottles / 登録ボトル数:</strong> <?= $stats['total'] ?>
             </div>
+            <?php if (!empty($event['show_theme_fit'])): ?>
+                <div>
+                    <strong>Avg Theme Fit / 平均テーマ適合度:</strong> <?= $stats['theme_fit_avg'] ?>
+                </div>
+            <?php endif; ?>
             <div>
-                <strong>Avg Theme Fit:</strong> <?= $stats['theme_fit_avg'] ?>
-            </div>
-            <div>
-                <strong>Breakdown:</strong>
+                <strong>Breakdown / 内訳:</strong>
                 <?php foreach ($stats['types'] as $type => $count): ?>
                     <span style="margin-right:10px;"><?= ucfirst(h($type)) ?>: <?= $count ?></span>
                 <?php endforeach; ?>
@@ -217,7 +219,7 @@ require_once 'layout/header.php';
 
                 <!-- 1. Reveal Control -->
                 <div style="flex:1; min-width:300px;">
-                    <h4>ブラインド状況 / Blind Reveal Status</h4>
+                    <h4>Blind Reveal Status / ブラインド状況</h4>
                     <p>
                         Status:
                         <?php if ($isRevealed): ?>
@@ -247,9 +249,11 @@ require_once 'layout/header.php';
 
                 <!-- 2. List Restriction Control -->
                 <div style="flex:1; min-width:300px;">
-                    <h4>ゲスト表示ルール / Guest List Display Rules</h4>
-                    <p style="font-size:0.85em; color:#ccc;">Uncheck fields to HIDE them from the guest list (even in Full
-                        mode).</p>
+                    <h4>Guest List Display Rules / ゲスト表示ルール</h4>
+                    <p style="font-size:0.85em; color:#ccc;">
+                        Uncheck fields to hide them from the guest list (even in Full mode).<br>
+                        チェックを外した項目は、ゲストビューのボトルリストから非表示になります（Full モードでも表示されません）。
+                    </p>
                     <form method="post" action="event_update_visibility.php">
                         <input type="hidden" name="event_id" value="<?= h($id) ?>">
                         <input type="hidden" name="action" value="update_list_constraints">
@@ -259,8 +263,9 @@ require_once 'layout/header.php';
                         <?php endif; ?>
 
                         <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
-                            <label><input type="checkbox" name="field_price_band" <?= isChecked($listConfig, 'price_band') ? 'checked' : '' ?>> Price Band</label>
-                            <label><input type="checkbox" name="field_memo" <?= isChecked($listConfig, 'memo') ? 'checked' : '' ?>> Memo</label>
+                            <label><input type="checkbox" name="field_theme_fit" <?= !empty($event['show_theme_fit']) ? 'checked' : '' ?>> Theme Fit / テーマ適合度</label>
+                            <label><input type="checkbox" name="field_price_band" <?= isChecked($listConfig, 'price_band') ? 'checked' : '' ?>> Price Band / 価格帯</label>
+                            <label><input type="checkbox" name="field_memo" <?= isChecked($listConfig, 'memo') ? 'checked' : '' ?>> Memo / メモ</label>
                         </div>
                         <div style="margin-top:10px;">
                             <button type="submit" class="btn btn-primary">Update Rules</button>
@@ -280,7 +285,7 @@ require_once 'layout/header.php';
     <!-- Bottle List -->
     <section>
         <div style="display:flex; justify-content:space-between; align-items:flex-end; margin-bottom:15px;">
-            <h2 style="margin:0;">ボトル一覧 / Bottle List</h2>
+            <h2 style="margin:0;">Bottle List / ボトル一覧</h2>
 
             <!-- Guest View Density Toggle -->
             <?php if ($view === 'guest'): ?>
@@ -288,13 +293,16 @@ require_once 'layout/header.php';
                 <div class="view-mode-toggle" style="font-size:0.85rem;">
                     View:
                     <a href="?id=<?= $id ?>&view=guest&mode=simple"
-                        style="<?= $viewMode === 'simple' ? 'font-weight:bold; color:var(--accent);' : 'color:#888;' ?>">Simple</a>
+                        style="<?= $viewMode === 'simple' ? 'font-weight:bold; color:var(--accent);' : 'color:#888;' ?>">Simple
+                        / 簡易</a>
                     |
                     <a href="?id=<?= $id ?>&view=guest&mode=standard"
-                        style="<?= $viewMode === 'standard' ? 'font-weight:bold; color:var(--accent);' : 'color:#888;' ?>">Standard</a>
+                        style="<?= $viewMode === 'standard' ? 'font-weight:bold; color:var(--accent);' : 'color:#888;' ?>">Standard
+                        / 標準</a>
                     |
                     <a href="?id=<?= $id ?>&view=guest&mode=full"
-                        style="<?= $viewMode === 'full' ? 'font-weight:bold; color:var(--accent);' : 'color:#888;' ?>">Full</a>
+                        style="<?= $viewMode === 'full' ? 'font-weight:bold; color:var(--accent);' : 'color:#888;' ?>">Full /
+                        詳細</a>
                 </div>
             <?php endif; ?>
         </div>
@@ -392,8 +400,8 @@ require_once 'layout/header.php';
                             $metas = [];
                             if ($visible['price_band'])
                                 $metas[] = '価格帯 / Price Band: ' . getPriceBandLabel($visible['price_band']);
-                            if ($visible['theme_fit'])
-                                $metas[] = 'Fit: ' . $visible['theme_fit'];
+                            if ($visible['theme_fit'] && !empty($event['show_theme_fit']))
+                                $metas[] = 'Theme Fit / テーマ適合度: ' . $visible['theme_fit'];
                             if (!empty($metas)):
                                 ?>
                                 <div class="line-meta" style="font-size:0.85rem; color:var(--text-muted);">

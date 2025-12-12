@@ -35,12 +35,12 @@ $cleanLink = (empty($_SERVER['HTTPS']) ? 'http' : 'https') . "://" . $_SERVER['H
 
     <div class="container" style="max-width:600px; margin-top:40px;">
         <div class="card" style="text-align:center; padding:40px 20px;">
-            <h2 style="color:var(--accent); margin-bottom:20px;">ボトルを登録しました！ / Bottle Added!</h2>
+            <h2 style="color:var(--accent); margin-bottom:20px;">Bottle Added! / ボトルを登録しました！</h2>
             <p>Thank you for your contribution.</p>
 
             <div
                 style="background:rgba(255,152,0,0.1); border:1px solid var(--accent); padding:20px; border-radius:8px; margin:30px 0;">
-                <h4 style="margin-top:0; color:var(--text-main);">🔑 Save Your Secret Edit Link</h4>
+                <h4 style="margin-top:0; color:var(--text-main);">🔑 Save Your Secret Edit Link / 秘密の編集リンクを保存</h4>
                 <p style="font-size:0.9rem; color:var(--text-muted); margin-bottom:15px;">
                     This link is the <strong>ONLY</strong> way to edit or delete your bottle later without logging in.
                 </p>
@@ -54,7 +54,7 @@ $cleanLink = (empty($_SERVER['HTTPS']) ? 'http' : 'https') . "://" . $_SERVER['H
             </div>
 
             <div style="margin-top:30px;">
-                <a href="event_show.php?id=<?= h($eventId) ?>" class="button">イベントに戻る / Return to Event</a>
+                <a href="event_show.php?id=<?= h($eventId) ?>" class="button">Return to Event / イベントに戻る</a>
             </div>
         </div>
     </div>

@@ -38,22 +38,24 @@ if ($action === 'reveal_all') {
     $stmt->execute();
 
 } elseif ($action === 'update_list_constraints') {
-    // Update List Constraints
-    // We expect a set of checkboxes. 
-    // Unchecked boxes are not sent, so we must iterate over known keys.
+    // Display Rules Update (Includes show_theme_fit and JSON constraints)
 
+    // 1. Theme Fit Flag (Column)
+    $showThemeFit = isset($_POST['field_theme_fit']) ? 1 : 0;
+    $stmt = $pdo->prepare("UPDATE events SET show_theme_fit = :val WHERE id = :id");
+    $stmt->bindValue(':val', $showThemeFit, PDO::PARAM_INT);
+    $stmt->bindValue(':id', $eventId, PDO::PARAM_INT);
+    $stmt->execute();
+
+    // 2. List Constraints (JSON)
     $config = [];
-    // The keys we check for:
-    // The keys we check for (Strict Spec: Only Price Band and Memo are rule-controlled)
     $keys = [
         'price_band',
         'memo'
     ];
 
     foreach ($keys as $k) {
-        // The form sends 'field_owner_label', we want to store 'owner_label'
         $postKey = 'field_' . $k;
-        // Check if plain key exists too, just in case
         if (isset($_POST[$postKey])) {
             $config[$k] = true;
         } elseif (isset($_POST[$k])) {

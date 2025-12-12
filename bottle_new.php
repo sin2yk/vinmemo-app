@@ -159,17 +159,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
 
 // 5. 画面描画
-$page_title = 'VinMemo - ボトル登録 / Register Bottle';
+$page_title = 'VinMemo - Register Bottle / ボトル登録';
 require_once 'layout/header.php';
 ?>
 <div class="page-container">
     <header class="page-header">
-        <h1>ボトル登録 / Register Bottle</h1>
+        <h1>Register Bottle / ボトル登録</h1>
         <a class="back-link" href="event_show.php?id=<?= h($event_id) ?>">
-            ← このイベントのワインリストに戻る / Back to the event wine list
+            ← Back to the event wine list / このイベントのワインリストに戻る
         </a>
         <div style="margin-top:5px; color:var(--text-muted);">
-            イベント / Event:
+            Event / イベント:
             <?= h($event['title']) ?>
             (<?= h($event['event_date']) ?>)
             <?php if (!empty($event['place'])): ?>
