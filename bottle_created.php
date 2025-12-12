@@ -54,7 +54,8 @@ $cleanLink = (empty($_SERVER['HTTPS']) ? 'http' : 'https') . "://" . $_SERVER['H
             </div>
 
             <div style="margin-top:30px;">
-                <a href="event_show.php?id=<?= h($eventId) ?>" class="button">Return to Event / イベントに戻る</a>
+                <a href="event_show.php?id=<?= h($eventId) ?>" class="button btn-secondary">Return to Event /
+                    イベントに戻る</a>
             </div>
         </div>
     </div>

@@ -165,7 +165,7 @@ require_once 'layout/header.php';
 <div class="page-container">
     <header class="page-header">
         <h1>Register Bottle / ボトル登録</h1>
-        <a class="back-link" href="event_show.php?id=<?= h($event_id) ?>">
+        <a class="back-link btn-secondary" href="event_show.php?id=<?= h($event_id) ?>">
             ← Back to the event wine list / このイベントのワインリストに戻る
         </a>
         <div style="margin-top:5px; color:var(--text-muted);">

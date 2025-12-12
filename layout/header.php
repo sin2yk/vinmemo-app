@@ -63,9 +63,21 @@ require_once __DIR__ . '/../helpers.php';
 
             <!-- Navigation (Always visible for V1 usability, ignoring strict session check) -->
             <nav class="main-nav">
-                <a href="home.php">Home / ホーム</a>
-                <a href="events.php">Event List / イベント一覧</a>
-                <a href="mypage.php">My Page / マイページ</a>
+                <a href="home.php" class="main-nav-link">
+                    <span class="nav-label-en">Home</span>
+                    <span class="nav-label-sep"> / </span>
+                    <span class="nav-label-ja">ホーム</span>
+                </a>
+                <a href="events.php" class="main-nav-link">
+                    <span class="nav-label-en">Event List</span>
+                    <span class="nav-label-sep"> / </span>
+                    <span class="nav-label-ja">イベント一覧</span>
+                </a>
+                <a href="mypage.php" class="main-nav-link">
+                    <span class="nav-label-en">My Page</span>
+                    <span class="nav-label-sep"> / </span>
+                    <span class="nav-label-ja">マイページ</span>
+                </a>
             </nav>
 
             <!-- Login info suspended until Firebase/PHP session integration is complete -->

@@ -12,11 +12,11 @@ $page_title = 'VinMemo - Event List';
 require_once 'layout/header.php';
 ?>
 
-<header style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
-  <h1 style="margin:0;">Event List / イベント一覧</h1>
-  <a href="events_new.php" class="button">＋ New Event</a>
-</header>
-
+<div style="margin-bottom:20px; text-align:right;">
+  <?php if (isset($_SESSION['user_id'])): ?>
+    <a href="events_new.php" class="vm-btn vm-btn--primary">+ New Event</a>
+  <?php endif; ?>
+</div>
 <?php if (empty($events)): ?>
   <p>No events found.</p>
 <?php else: ?>

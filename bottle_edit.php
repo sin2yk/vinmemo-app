@@ -244,7 +244,8 @@ require_once 'layout/header.php';
 <div class="container bottle-page">
     <header class="page-header">
         <h1>Edit Bottle / ボトル編集</h1>
-        <a class="back-link" href="event_show.php?id=<?= h($event['id']) ?>">← Back to the event wine list /
+        <a class="back-link btn-secondary" href="event_show.php?id=<?= h($event['id']) ?>">← Back to the event wine list
+            /
             このイベントのワインリストに戻る</a>
         <div style="margin-top:5px; color:var(--text-muted);">
             Event / イベント: <?= h($event['title'] ?? 'Unknown Event') ?>

@@ -558,6 +558,189 @@ small {
   }
 }
 
+
+
+/* --- UI Polish v3: Final Header & Buttons --- */
+
+/* 1. Event Title Typography */
+.event-title {
+  font-size: 1.4rem;
+  line-height: 1.3;
+  margin: 0 0 0.2rem;
+  /* 上余白なし、下だけ少し */
+}
+
+/* PC では少し大きくしてもOK */
+@media (min-width: 1024px) {
+  .event-title {
+    font-size: 1.8rem;
+    margin: 0.3rem 0 0.3rem;
+  }
+}
+
+/* 2. Common Pill Button (VM Btn) */
+.vm-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.35rem 0.9rem;
+  border-radius: 9999px;
+  font-weight: 600;
+  font-size: 0.8rem;
+  text-decoration: none;
+  border: none;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.vm-btn--primary {
+  background-color: #ffcc33;
+  color: #3b0000;
+}
+
+.vm-btn--secondary {
+  background-color: #555555;
+  color: #ffffff;
+}
+
+/* Keep .btn-pill alias for backward comp if needed, or replace usage */
+.btn-pill {
+  /* Alias to vm-btn style for compatibility if any old code remains */
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.35rem 0.9rem;
+  border-radius: 9999px;
+  font-weight: 600;
+  font-size: 0.8rem;
+  text-decoration: none;
+  border: none;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+/* 3. Header Action Layout */
+.event-header-actions {
+  display: flex;
+  gap: 0.5rem;
+  margin: 0.4rem 0 0.6rem;
+}
+
+/* Flex item rules moved to media query block above for better grouping or here?
+   Better keep base styles here. */
+
+/* Base is Flex. */
+
+/* Back only aligns right */
+.event-header-actions--single {
+  justify-content: flex-end;
+}
+
+/* Specific PC/Mobile sizing handled in section 6 block */
+
+
+/* 4. Tighter Meta */
+.event-meta,
+.event-view-switch {
+  margin: 0 0 0.25rem;
+  line-height: 1.3;
+  font-size: 0.85rem;
+}
+
+/* 5. Section Header with View Switch */
+.section-header {
+  margin: 1.5rem 0 0.5rem;
+}
+
+.section-header--with-view {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+}
+
+.section-title {
+  font-size: 1.1rem;
+  margin: 0;
+}
+
+.section-view-switch {
+  font-size: 0.8rem;
+}
+
+@media (max-width: 640px) {
+  .section-header--with-view {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.15rem;
+  }
+
+  .section-view-switch {
+    font-size: 0.75rem;
+  }
+}
+
+/* 3. Mobile Nav (Vertical 2-line) */
+/* PC: 横並び */
+.main-nav {
+  display: flex;
+  gap: 2rem;
+  align-items: center;
+}
+
+.main-nav-link {
+  text-decoration: none;
+  font-size: 0.9rem;
+}
+
+.nav-label-en,
+.nav-label-sep,
+.nav-label-ja {
+  display: inline;
+}
+
+
+
+/* 7. Mobile Nav: Horizontal Row, Vertical Labels */
+@media (max-width: 640px) {
+
+  /* Stack Action Buttons */
+  .event-header-actions {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .main-nav {
+    gap: 0.2rem;
+    justify-content: space-around;
+  }
+
+  .main-nav-link {
+    display: block;
+    /* Use block to allow inline flow for En/Sep and block for Ja */
+    text-align: center;
+    line-height: 1.2;
+  }
+
+  /* Show separator inline with English label */
+  .nav-label-sep {
+    display: inline;
+    font-size: 0.9rem;
+  }
+
+  .nav-label-en {
+    font-size: 0.9rem;
+    font-weight: bold;
+    display: inline;
+  }
+
+  /* Force Japanese label to new line */
+  .nav-label-ja {
+    display: block;
+    font-size: 0.8rem;
+    margin-top: 2px;
+  }
+}
+
 @media (max-width: 900px) {
   .container.bottle-page {
     max-width: 100%;
