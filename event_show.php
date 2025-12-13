@@ -2,13 +2,9 @@
 // event_show.php : Event Details and Bottle List
 // Refactored to match BYO design concepts
 
-require_once 'db_connect.php';
-require_once 'helpers.php';
-// session_start() will be handled in layout/header.php if not already, 
-// but we might need session values for logic before header.
-if (session_status() === PHP_SESSION_NONE) {
-    session_start();
-}
+require_once __DIR__ . '/auth_required.php';
+require_once __DIR__ . '/db_connect.php';
+require_once __DIR__ . '/helpers.php';
 
 $id = filter_input(INPUT_GET, 'id', FILTER_VALIDATE_INT);
 $error = null;
@@ -497,9 +493,7 @@ require_once 'layout/header.php';
                 </div>
             </div>
         </section>
-    <?php endif; ?>
+        <?php endif; ?>
 
 
-<?php endif; ?>
-
-<?php require_once 'layout/footer.php'; ?>
+<?php endif; ?><?php require_once 'layout/footer.php'; ?>

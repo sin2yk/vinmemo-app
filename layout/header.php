@@ -58,39 +58,29 @@ require_once __DIR__ . '/../helpers.php';
     <header class="site-header">
         <div class="header-inner">
             <div class="site-title">
-                <h1><a href="index.html">VinMemo</a></h1>
+                <h1><a href="home.php">VinMemo</a></h1>
             </div>
 
-            <!-- Navigation (Always visible for V1 usability, ignoring strict session check) -->
-            <nav class="main-nav">
-                <a href="home.php" class="main-nav-link">
-                    <span class="nav-label-en">Home</span>
-                    <span class="nav-label-sep"> / </span>
-                    <span class="nav-label-ja">ホーム</span>
-                </a>
-                <a href="events.php" class="main-nav-link">
-                    <span class="nav-label-en">Event List</span>
-                    <span class="nav-label-sep"> / </span>
-                    <span class="nav-label-ja">イベント一覧</span>
-                </a>
-                <a href="mypage.php" class="main-nav-link">
-                    <span class="nav-label-en">My Page</span>
-                    <span class="nav-label-sep"> / </span>
-                    <span class="nav-label-ja">マイページ</span>
-                </a>
-            </nav>
-
-            <!-- Login info suspended until Firebase/PHP session integration is complete -->
-            <!-- 
-            <div class="login-info">
-                <?php if (isset($_SESSION['user_id'])): ?>
-                    Login: <?= isset($_SESSION['name']) ? h($_SESSION['name']) : 'User' ?>
-                    | <a href="logout.php">Logout</a>
-                <?php else: ?>
-                    <a href="index.html">Login</a>
-                <?php endif; ?>
-            </div>
-            -->
+            <!-- Navigation (Only visible if logged in) -->
+            <?php if (!empty($_SESSION['user_id'])): ?>
+                <nav class="main-nav">
+                    <a href="home.php" class="main-nav-link">
+                        <span class="nav-label-en">Home</span>
+                        <span class="nav-label-sep"> / </span>
+                        <span class="nav-label-ja">ホーム</span>
+                    </a>
+                    <a href="events.php" class="main-nav-link">
+                        <span class="nav-label-en">Event List</span>
+                        <span class="nav-label-sep"> / </span>
+                        <span class="nav-label-ja">イベント一覧</span>
+                    </a>
+                    <a href="mypage.php" class="main-nav-link">
+                        <span class="nav-label-en">My Page</span>
+                        <span class="nav-label-sep"> / </span>
+                        <span class="nav-label-ja">マイページ</span>
+                    </a>
+                </nav>
+            <?php endif; ?>
         </div>
     </header>
 

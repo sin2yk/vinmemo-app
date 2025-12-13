@@ -1,11 +1,8 @@
 <?php
 // events_new.php : ワイン会新規登録フォーム＆登録処理
-require_once 'db_connect.php';
-require_once 'helpers.php'; // Ensure h() is available
-
-if (session_status() === PHP_SESSION_NONE) {
-    session_start();
-}
+require_once __DIR__ . '/auth_required.php';
+require_once __DIR__ . '/db_connect.php';
+require_once __DIR__ . '/helpers.php'; // Ensure h() is available
 
 $error = null;
 // Initialize empty event array for partial

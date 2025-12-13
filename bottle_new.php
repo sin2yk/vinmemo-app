@@ -1,12 +1,9 @@
 <?php
 // bottle_new.php : Add new bottle (uses partials/bottle_form.php)
 
-require_once 'db_connect.php';
-require_once 'helpers.php';
-
-if (session_status() === PHP_SESSION_NONE) {
-    session_start();
-}
+require_once __DIR__ . '/auth_required.php';
+require_once __DIR__ . '/db_connect.php';
+require_once __DIR__ . '/helpers.php';
 
 // 1. イベントID取得（GET優先、POSTは再送信用）
 $event_id = filter_input(INPUT_GET, 'event_id', FILTER_VALIDATE_INT);
