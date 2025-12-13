@@ -156,15 +156,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
             $createdEditUrl = $baseUrl . '/bottle_edit.php?edt=' . urlencode($edit_token);
 
-            // Optional: Send Email (Simplistic)
+            // Send Email
             if (!empty($form['guest_email'])) {
-                // In a real app, use PHPMailer or similar.
-                // For now, we simulate success. 
-                // XAMPP usually can't send mail without sendmail config.
-                // We'll log it or just silently skip.
-                // $subject = "Bottle Registered: " . $form['wine_name'];
-                // $msg = "Edit URL: " . $createdEditUrl;
-                // @mail($form['guest_email'], $subject, $msg);
+                require_once __DIR__ . '/helpers_mail.php';
+
+                // Construct bottle data expected by helper
+                $bottleData = [
+                    'owner_label' => $form['owner_label'],
+                    'producer_name' => $form['producer_name'],
+                    'wine_name' => $form['wine_name']
+                ];
+
+                // Send registration email (isUpdate = false)
+                sendEditLinkEmail($form['guest_email'], $event, $bottleData, $createdEditUrl, false);
             }
 
         } catch (PDOException $e) {
