@@ -180,13 +180,14 @@ a:hover {
 
 /* Event List Cards (Mobile) */
 .event-list-cards {
-  display: none;
+  display: flex;
   /* Hidden by default on desktop */
   flex-direction: column;
   gap: 16px;
 }
 
-.event-card {
+.event-card,
+.card {
   background-color: var(--card-bg);
   padding: 16px;
   border-radius: 12px;
@@ -892,36 +893,38 @@ small {
 /* ---- Inline action buttons for bottle list ---- */
 /* TODO: button/.btn styles are duplicated; needs cleanup after v1 */
 
-.bottle-action-link {
-  background: none !important;
-  border: none !important;
-  padding: 0 6px !important;
+/* Bottle Action Links (Edit/Delete) - Unified Text Style */
+.bottle-action-link,
+button.bottle-action-link {
+  background: none;
+  border: none;
+  padding: 0;
+  margin: 0;
+  font-family: inherit;
   font-size: 0.9rem;
   font-weight: 600;
-  color: #ffc107;
+  line-height: inherit;
   cursor: pointer;
-  line-height: 1.2;
-  display: inline-block;
+  text-decoration: none;
+  transition: opacity 0.2s;
 }
 
-/* button要素として使う場合に、ブラウザ/共通ボタンのクセを消す */
-button.bottle-action-link {
-  -webkit-appearance: none;
-  appearance: none;
-  border-radius: 0 !important;
+/* Edit = Yellow */
+.bottle-action-link {
+  color: #ffc107;
 }
 
-/* Delete用だけ色変更 */
-.bottle-action-link--danger {
+/* Delete = Red */
+.bottle-action-link.bottle-action-link--danger {
   color: #ff5252;
 }
 
-/* hover 時も背景を絶対に出さない */
+/* Hover Effects */
 .bottle-action-link:hover,
-.bottle-action-link--danger:hover,
 button.bottle-action-link:hover {
-  background: none !important;
   text-decoration: underline;
+  opacity: 0.8;
+  background: none !important;
 }
 
 /* Info Icon for Tooltips */
@@ -991,4 +994,34 @@ button.bottle-action-link:hover {
   border: 1px solid #ffcc33;
   color: #ffcc33;
   cursor: help;
+}
+
+/* === New Event UI Polish === */
+.event-title-main {
+  font-size: 1.2rem;
+  font-weight: 600;
+  color: #ffd86b;
+  margin: 0 0 4px 0;
+}
+
+.event-meta-row {
+  margin: 0;
+  font-size: 0.9rem;
+  line-height: 1.4;
+  color: #f5e6d0;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.wine-list-actions {
+  margin-top: 16px;
+  text-align: center;
+}
+
+/* Event Details Grid */
+@media (max-width: 600px) {
+  .event-details-grid {
+    grid-template-columns: 1fr !important;
+  }
 }

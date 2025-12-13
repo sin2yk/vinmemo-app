@@ -56,15 +56,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     $place = trim($_POST['place'] ?? '');
     $area = trim($_POST['area'] ?? '');
+    $area_label = trim($_POST['area_label'] ?? '');
     $seats = filter_input(INPUT_POST, 'seats', FILTER_VALIDATE_INT);
+    $expected_guests = filter_input(INPUT_POST, 'expected_guests', FILTER_VALIDATE_INT);
     $event_type = $_POST['event_type'] ?? 'BYO';
 
     $event_style_detail = $_POST['event_style_detail'] ?? '';
-    $theme_desc = trim($_POST['theme_description'] ?? '');
-    $bottle_rules = trim($_POST['bottle_rules'] ?? '');
-    $blind_policy = $_POST['blind_policy'] ?? 'none';
-    $organizer_note = trim($_POST['memo'] ?? '');
-    $show_theme_fit = isset($_POST['show_theme_fit']) ? 1 : 0;
+    // ...
 
     if ($title === '' || $event_date === '') {
         $error = 'Title and Date are required.';
@@ -90,7 +88,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $sql = 'UPDATE events 
                     SET title = :title, 
                         event_date = :event_date, 
-                        place = :place, 
+                        place = :place,
+                        area_label = :area_label,
+                        expected_guests = :expected_guests,
                         memo = :memo, 
                         event_type = :event_type,
                         show_theme_fit = :show_theme_fit
@@ -100,6 +100,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $stmt->bindValue(':title', $title, PDO::PARAM_STR);
             $stmt->bindValue(':event_date', $event_date, PDO::PARAM_STR);
             $stmt->bindValue(':place', $place, PDO::PARAM_STR);
+            $stmt->bindValue(':area_label', $area_label, PDO::PARAM_STR);
+            $stmt->bindValue(':expected_guests', $expected_guests, PDO::PARAM_INT);
             $stmt->bindValue(':memo', $memo_to_save, PDO::PARAM_STR);
             $stmt->bindValue(':event_type', $event_type, PDO::PARAM_STR);
             $stmt->bindValue(':show_theme_fit', $show_theme_fit, PDO::PARAM_INT);
@@ -148,6 +150,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         'title' => $eventData['title'],
         'event_date' => $eventData['event_date'], // Y-m-d H:i:s -> Partial handles conversion
         'place' => $eventData['place'],
+        'area_label' => $eventData['area_label'] ?? '',
+        'expected_guests' => $eventData['expected_guests'] ?? '',
         'event_type' => $eventData['event_type'],
         'show_theme_fit' => $eventData['show_theme_fit'],
         'memo' => $note, // The text part

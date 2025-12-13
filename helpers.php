@@ -391,3 +391,29 @@ function getBlindPolicyLabel($code): string
     ];
     return $map[$code] ?? ucfirst($code);
 }
+
+/**
+ * Get standardized event date display.
+ * Format: YYYY-MM-DD (D) HH:MM
+ * 
+ * @param array $event
+ * @return string
+ */
+function getEventDateDisplay(array $event): string
+{
+    if (empty($event['event_date'])) {
+        return '';
+    }
+
+    $timestamp = strtotime($event['event_date']);
+    if (!$timestamp) {
+        return h($event['event_date']);
+    }
+
+    // Japanese day of week
+    $week = ['日', '月', '火', '水', '木', '金', '土'];
+    $w = $week[date('w', $timestamp)];
+
+    // Y-m-d (D) H:i
+    return date('Y-m-d', $timestamp) . " ($w) " . date('H:i', $timestamp);
+}

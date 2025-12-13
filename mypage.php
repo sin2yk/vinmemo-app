@@ -66,13 +66,41 @@ $myBottles = $stmt->fetchAll(PDO::FETCH_ASSOC);
         <?php else: ?>
             <div class="card-grid">
                 <?php foreach ($myEvents as $ev): ?>
+                    <?php
+                    $parsed = parseEventMemo($ev['memo']);
+                    $m = $parsed['meta'] ?? [];
+                    ?>
                     <a href="event_show.php?id=<?= h($ev['id']) ?>" class="event-card-link">
-                        <div class="card event-card">
-                            <h3><?= h($ev['title']) ?></h3>
-                            <div class="meta">
-                                <span>📅 <?= h($ev['event_date']) ?></span>
-                                📍 <?= h($ev['place']) ?>
-                            </div>
+                        <div class="card event-card" style="padding:15px; height:100%;">
+                            <h3 class="event-title-main"><?= h($ev['title']) ?></h3>
+                            <p class="event-meta-row">
+                                📅 <?= h(getEventDateDisplay($ev)) ?>
+                            </p>
+                            <p class="event-meta-row">
+                                📍 <?php
+                                if (!empty($ev['area_label'])) {
+                                    echo h($ev['area_label']) . ' · ' . h($ev['place']);
+                                } else {
+                                    echo h($ev['place']);
+                                }
+                                ?>
+                            </p>
+                            <?php if (!empty($ev['expected_guests'])): ?>
+                                <p class="event-meta-row">
+                                    👥 Expected Guests / 想定参加人数:
+                                    <?= (int) $ev['expected_guests'] ?> guests / <?= (int) $ev['expected_guests'] ?>名
+                                </p>
+                            <?php endif; ?>
+                            <p class="event-meta-row">
+                                🎯 Style:
+                                <?php
+                                if (!empty($m['event_style_detail'])) {
+                                    echo h(getEventStyleLabel($m['event_style_detail']));
+                                } else {
+                                    echo 'BYO';
+                                }
+                                ?>
+                            </p>
                         </div>
                     </a>
                 <?php endforeach; ?>
@@ -88,13 +116,41 @@ $myBottles = $stmt->fetchAll(PDO::FETCH_ASSOC);
         <?php else: ?>
             <div class="card-grid">
                 <?php foreach ($participatedEvents as $ev): ?>
+                    <?php
+                    $parsed = parseEventMemo($ev['memo']);
+                    $m = $parsed['meta'] ?? [];
+                    ?>
                     <a href="event_show.php?id=<?= h($ev['id']) ?>" class="event-card-link">
-                        <div class="card event-card">
-                            <h3><?= h($ev['title']) ?></h3>
-                            <div class="meta">
-                                <span>📅 <?= h($ev['event_date']) ?></span>
-                                📍 <?= h($ev['place']) ?>
-                            </div>
+                        <div class="card event-card" style="padding:15px; height:100%;">
+                            <h3 class="event-title-main"><?= h($ev['title']) ?></h3>
+                            <p class="event-meta-row">
+                                📅 <?= h(getEventDateDisplay($ev)) ?>
+                            </p>
+                            <p class="event-meta-row">
+                                📍 <?php
+                                if (!empty($ev['area_label'])) {
+                                    echo h($ev['area_label']) . ' · ' . h($ev['place']);
+                                } else {
+                                    echo h($ev['place']);
+                                }
+                                ?>
+                            </p>
+                            <?php if (!empty($ev['expected_guests'])): ?>
+                                <p class="event-meta-row">
+                                    👥 Expected Guests / 想定参加人数:
+                                    <?= (int) $ev['expected_guests'] ?> guests / <?= (int) $ev['expected_guests'] ?>名
+                                </p>
+                            <?php endif; ?>
+                            <p class="event-meta-row">
+                                🎯 Style:
+                                <?php
+                                if (!empty($m['event_style_detail'])) {
+                                    echo h(getEventStyleLabel($m['event_style_detail']));
+                                } else {
+                                    echo 'BYO';
+                                }
+                                ?>
+                            </p>
                         </div>
                     </a>
                 <?php endforeach; ?>

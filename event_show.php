@@ -93,20 +93,22 @@ require_once 'layout/header.php';
         <!-- 2. View Toggle -->
         <div class="event-view-toggle">
             <?php if ($view === 'guest'): ?>
-                <div class="view-toggle-item">
-                    <span>View as Guest / ゲストビューで見る</span>
+                <div class="view-toggle-item" style="color:var(--text-muted);">
+                    <span style="border-bottom: 2px solid var(--text-muted);">Displaying: Guest View / 表示中: ゲスト</span>
                 </div>
                 <?php if ($isOwner): ?>
                     <div class="view-toggle-item">
-                        <a href="event_show.php?id=<?= h($id) ?>&view=organizer">[Organizer View / 幹事ビュー]</a>
+                        <a href="event_show.php?id=<?= h($id) ?>&view=organizer"
+                            style="font-weight:bold; color:var(--accent);">[Switch to Organizer View / 幹事モードへ切替]</a>
                     </div>
                 <?php endif; ?>
             <?php else: ?>
                 <div class="view-toggle-item">
-                    <a href="event_show.php?id=<?= h($id) ?>">[Guest View / ゲストビュー]</a>
+                    <a href="event_show.php?id=<?= h($id) ?>" style="font-weight:bold; color:var(--accent);">[Switch to Guest
+                        View / ゲストモードへ切替]</a>
                 </div>
-                <div class="view-toggle-item">
-                    <span>Organizer View / 幹事ビューで見る</span>
+                <div class="view-toggle-item" style="color:var(--accent);">
+                    <span style="border-bottom: 2px solid var(--accent);">Displaying: Organizer View / 表示中: 幹事</span>
                 </div>
             <?php endif; ?>
         </div>
@@ -155,17 +157,38 @@ require_once 'layout/header.php';
 
     <!-- 6. Wine List (With Add Button) -->
     <!-- Add My Wine Button (Implicitly needed here) -->
-    <div style="margin:20px 0; text-align:right;">
-        <?php
-        $allow_byo = true;
-        if (isset($parsedMemo['meta']['event_style_detail']) && $parsedMemo['meta']['event_style_detail'] === 'no_byo') {
-            $allow_byo = false;
-        }
-        if ($allow_byo):
+
+
+    <!-- 5.5 Event Info Card -->
+    <section class="card event-info-card" style="margin-bottom:20px; padding:20px;">
+        <h2 class="section-title" style="margin-top:0;">Event Info / イベント情報</h2>
+
+        <p class="event-meta-row">
+            📅 <?= h(getEventDateDisplay($event)) ?>
+        </p>
+        <p class="event-meta-row">
+            📍 <?php
+            if (!empty($event['area_label'])) {
+                echo h($event['area_label']) . ' · ' . h($event['place']);
+            } else {
+                echo h($event['place']);
+            }
             ?>
-            <a href="bottle_new.php?event_id=<?= $id ?>" class="btn-pill btn-primary">＋ Add My Wine / 自分のワインを登録</a>
+        </p>
+        <?php if (!empty($event['expected_guests'])): ?>
+            <p class="event-meta-row">
+                👥 Expected Guests / 想定参加人数:
+                <?= (int) $event['expected_guests'] ?> guests / <?= (int) $event['expected_guests'] ?>名
+            </p>
         <?php endif; ?>
-    </div>
+
+        <?php if (!empty($parsedMemo['meta']['theme_description'])): ?>
+            <p class="event-meta-row">
+                🎯 Theme / テーマ:
+                <?= mb_strimwidth(h($parsedMemo['meta']['theme_description']), 0, 50, '...') ?>
+            </p>
+        <?php endif; ?>
+    </section>
 
     <section>
         <div class="section-header section-header--with-view">
@@ -192,7 +215,7 @@ require_once 'layout/header.php';
         </div>
 
         <?php if ($stats['total'] === 0): ?>
-            <p>No wines registered yet.</p>
+            <p>No wines registered yet. /ワインの登録がありません。</p>
         <?php else: ?>
             <div class="bottle-list-container">
                 <?php foreach ($bottles as $index => $b): ?>
@@ -287,11 +310,11 @@ require_once 'layout/header.php';
                                         </select>
                                     </form>
                                 <?php endif; ?>
-                                <div style="text-align:right; display:flex; justify-content:flex-end; gap:8px;">
+                                <div style="text-align:right; display:flex; justify-content:flex-end; align-items:baseline; gap:8px;">
                                     <a href="bottle_edit.php?id=<?= h($b['id']) ?>" class="bottle-action-link">
                                         Edit
                                     </a>
-                                    <form method="post" action="bottle_delete.php"
+                                    <form method="post" action="bottle_delete.php" style="display:inline;"
                                         onsubmit="return confirm('Are you sure you want to delete this bottle?');">
                                         <input type="hidden" name="id" value="<?= h($b['id']) ?>">
                                         <input type="hidden" name="event_id" value="<?= h($id) ?>">
@@ -308,19 +331,85 @@ require_once 'layout/header.php';
                     </div>
                 <?php endforeach; ?>
             </div>
+
+        <?php endif; ?>
+
+        <!-- Add My Wine Button (Moved to Bottom) -->
+        <?php
+        $is_no_byo = (isset($parsedMemo['meta']['event_style_detail']) && $parsedMemo['meta']['event_style_detail'] === 'no_byo');
+        // Allow if NOT no_byo, OR if user is owner
+        $can_add_wine = (!$is_no_byo || $isOwner);
+        if ($can_add_wine):
+            ?>
+            <div class="wine-list-actions">
+                <a href="bottle_new.php?event_id=<?= $id ?>" class="vm-btn vm-btn-primary btn-pill btn-primary">
+                    + Add My Wine / 自分のワインを登録
+                </a>
+            </div>
         <?php endif; ?>
     </section>
 
-    <!-- 7. Theme (Standalone Paragraph) -->
-    <?php if (!empty($m['theme_description'])): ?>
-        <p class="event-theme" style="margin-top:20px;">
-            Theme / テーマ: <?= nl2br(h($m['theme_description'])) ?>
-        </p>
+    <!-- 7 (New 4). Event Details -->
+    <?php if (
+        !empty($m) && (
+            !empty($m['event_style_detail']) ||
+            !empty($m['blind_policy']) ||
+            !empty($m['bottle_rules'])
+        )
+    ): ?>
+        <section class="card" style="margin-top:20px; padding:20px;">
+            <h3
+                style="margin-top:0; color:var(--text-main); border-bottom:1px solid var(--border); padding-bottom:10px; margin-bottom:15px;">
+                Event Details / イベント詳細情報
+            </h3>
+            <div style="display:grid; grid-template-columns: 1fr 1fr; gap:20px;">
+                <div>
+                    <?php if (!empty($m['event_style_detail'])): ?>
+                        <div style="margin-bottom:15px;">
+                            <div style="font-size:0.85rem; color:var(--text-muted);">Style / スタイル</div>
+                            <div style="font-size:1.1rem; font-weight:bold;">
+                                <?= h(getEventStyleLabel($m['event_style_detail'])) ?>
+                            </div>
+                        </div>
+                    <?php endif; ?>
+
+                    <?php if (!empty($m['blind_policy'])): ?>
+                        <div style="margin-bottom:15px;">
+                            <div style="font-size:0.85rem; color:var(--text-muted);">Blind Policy / ブラインド</div>
+                            <div><?= h(getBlindPolicyLabel($m['blind_policy'])) ?></div>
+                        </div>
+                    <?php endif; ?>
+                </div>
+                <div>
+                    <?php if (!empty($m['bottle_rules'])): ?>
+                        <div style="margin-bottom:15px;">
+                            <div style="font-size:0.85rem; color:var(--text-muted);">Bottle Rules / 持ち寄りルール</div>
+                            <div style="padding-top:4px;">
+                                <?= nl2br(h($m['bottle_rules'])) ?>
+                            </div>
+                        </div>
+                    <?php endif; ?>
+                </div>
+            </div>
+        </section>
     <?php endif; ?>
 
-    <!-- 8. Summary Panel -->
+    <!-- 8 (New 1). Theme -->
+    <?php if (!empty($m['theme_description'])): ?>
+        <section class="card" style="margin-top:20px; padding:20px;">
+            <h3
+                style="margin-top:0; color:var(--text-main); border-bottom:1px solid var(--border); padding-bottom:10px; margin-bottom:15px;">
+                Theme / テーマ
+            </h3>
+            <div>
+                <?= nl2br(h($m['theme_description'])) ?>
+            </div>
+        </section>
+    <?php endif; ?>
+
+    <!-- 9 (New 2). Summary Panel -->
     <section class="card" style="padding:20px; margin-top:20px;">
-        <h3 style="margin-top:0; border-bottom:1px solid var(--border); padding-bottom:10px;">
+        <h3 style="margin-top:0; border-bottom:1px solid var(--border); padding-bottom:10px; margin-bottom:15px;">
             Summary / サマリー
             <?php if ($view === 'organizer'): ?>
                 <span style="font-size:0.8em; color:var(--accent); margin-left:10px;">(Organizer View)</span>
@@ -344,55 +433,17 @@ require_once 'layout/header.php';
         </div>
     </section>
 
-    <!-- 9 (Extra). Organizer Note & Details (Below Summary) -->
-    <?php if ($parsedMemo['note']): ?>
-        <div style="margin-top:15px; padding:15px; background:rgba(255,255,255,0.05); border-radius:8px;">
-            <?= nl2br(h($parsedMemo['note'])) ?>
-        </div>
-    <?php endif; ?>
-
-    <?php if (
-        !empty($m) && (
-            !empty($m['event_style_detail']) ||
-            !empty($m['blind_policy']) ||
-            !empty($m['bottle_rules'])
-        )
-    ): ?>
-        <div class="card" style="margin-top:20px; padding:20px; border-left:4px solid var(--accent);">
-            <h4
-                style="margin-top:0; color:var(--text-main); border-bottom:1px solid #444; padding-bottom:10px; margin-bottom:15px;">
-                Event Details / イベント詳細情報
-            </h4>
-            <div style="display:grid; grid-template-columns: 1fr 1fr; gap:20px;">
-                <div>
-                    <?php if (!empty($m['event_style_detail'])): ?>
-                        <div style="margin-bottom:15px;">
-                            <div style="font-size:0.85rem; color:var(--text-muted);">Style / スタイル</div>
-                            <div style="font-size:1.1rem; font-weight:bold;">
-                                <?= h(getEventStyleLabel($m['event_style_detail'])) ?>
-                            </div>
-                        </div>
-                    <?php endif; ?>
-
-                    <?php if (!empty($m['blind_policy'])): ?>
-                        <div style="margin-bottom:15px;">
-                            <div style="font-size:0.85rem; color:var(--text-muted);">Blind Policy / ブラインド</div>
-                            <div><?= h(getBlindPolicyLabel($m['blind_policy'])) ?></div>
-                        </div>
-                    <?php endif; ?>
-                </div>
-                <div>
-                    <?php if (!empty($m['bottle_rules'])): ?>
-                        <div style="margin-bottom:15px;">
-                            <div style="font-size:0.85rem; color:var(--text-muted);">Bottle Rules / 持ち寄りルール</div>
-                            <div style="background:rgba(0,0,0,0.2); padding:10px; border-radius:4px;">
-                                <?= nl2br(h($m['bottle_rules'])) ?>
-                            </div>
-                        </div>
-                    <?php endif; ?>
-                </div>
+    <!-- 10 (New 3). Organizer Note (Organizer Only) -->
+    <?php if ($view === 'organizer' && $parsedMemo['note']): ?>
+        <section class="card" style="margin-top:20px; padding:20px;">
+            <h3
+                style="margin-top:0; color:var(--text-main); border-bottom:1px solid var(--border); padding-bottom:10px; margin-bottom:15px;">
+                Organizer Note / 幹事メモ
+            </h3>
+            <div>
+                <?= nl2br(h($parsedMemo['note'])) ?>
             </div>
-        </div>
+        </section>
     <?php endif; ?>
 
     <!-- Control Panel -->

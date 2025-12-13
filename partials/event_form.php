@@ -130,46 +130,46 @@ $blind_policy = $event['blind_policy'] ?? 'none';
     <div class="form-section">
         <h3>会場・スタイル / Venue & style</h3>
 
-        <div class="form-row">
-            <div class="form-group">
-                <label>会場名 / Venue name</label>
-                <input type="text" name="place" placeholder="例：Restaurant Vin" value="<?= h($place) ?>">
-            </div>
-            <div class="form-group">
-                <label>エリア / Area</label>
-                <input type="text" name="area" placeholder="例：六本木" value="<?= h($area) ?>">
-            </div>
+        <div class="form-group">
+            <label>会場名 / Venue name</label>
+            <input type="text" name="place" placeholder="例：Restaurant Vin" value="<?= h($place) ?>">
         </div>
+        <div class="form-group">
+            <label>エリア / Area Label</label>
+            <input type="text" name="area_label" placeholder="例：神宮前" value="<?= h($event['area_label'] ?? '') ?>">
+        </div>
+    </div>
 
-        <div class="form-row">
-            <div class="form-group">
-                <label>想定人数 / Seats</label>
-                <input type="number" name="seats" placeholder="例：8" value="<?= h($seats) ?>">
-            </div>
-
-            <div class="form-group">
-                <label>DB登録タイプ / DB Type</label>
-                <div class="radio-row">
-                    <label><input type="radio" name="event_type" value="BYO" <?= $event_type === 'BYO' ? 'checked' : '' ?>> BYO
-                        (持参)</label>
-                    <label><input type="radio" name="event_type" value="ORG" <?= $event_type === 'ORG' ? 'checked' : '' ?>> ORG
-                        (主催)</label>
-                    <label><input type="radio" name="event_type" value="VENUE" <?= $event_type === 'VENUE' ? 'checked' : '' ?>>
-                        VENUE (店舗)</label>
-                </div>
-            </div>
+    <div class="form-row">
+        <div class="form-group">
+            <label>想定人数 / Expected Guests</label>
+            <input type="number" name="expected_guests" placeholder="例：8"
+                value="<?= h($event['expected_guests'] ?? '') ?>">
         </div>
 
         <div class="form-group">
-            <label>イベントスタイル / Style Detail</label>
-            <select name="event_style_detail">
-                <option value="">選択してください</option>
-                <option value="full_byo" <?= $event_style_detail === 'full_byo' ? 'selected' : '' ?>>Full BYO（全員持ち寄り）</option>
-                <option value="half_byo" <?= $event_style_detail === 'half_byo' ? 'selected' : '' ?>>Half BYO（店ワイン＋持ち寄り）
-                </option>
-                <option value="no_byo" <?= $event_style_detail === 'no_byo' ? 'selected' : '' ?>>No BYO（主催者セレクト/ペアリング）</option>
-            </select>
+            <label>DB登録タイプ / DB Type</label>
+            <div class="radio-row">
+                <label><input type="radio" name="event_type" value="BYO" <?= $event_type === 'BYO' ? 'checked' : '' ?>> BYO
+                    (持参)</label>
+                <label><input type="radio" name="event_type" value="ORG" <?= $event_type === 'ORG' ? 'checked' : '' ?>> ORG
+                    (主催)</label>
+                <label><input type="radio" name="event_type" value="VENUE" <?= $event_type === 'VENUE' ? 'checked' : '' ?>>
+                    VENUE (店舗)</label>
+            </div>
         </div>
+    </div>
+
+    <div class="form-group">
+        <label>イベントスタイル / Style Detail</label>
+        <select name="event_style_detail">
+            <option value="">選択してください</option>
+            <option value="full_byo" <?= $event_style_detail === 'full_byo' ? 'selected' : '' ?>>Full BYO（全員持ち寄り）</option>
+            <option value="half_byo" <?= $event_style_detail === 'half_byo' ? 'selected' : '' ?>>Half BYO（店ワイン＋持ち寄り）
+            </option>
+            <option value="no_byo" <?= $event_style_detail === 'no_byo' ? 'selected' : '' ?>>No BYO（主催者セレクト/ペアリング）</option>
+        </select>
+    </div>
     </div>
 
     <!-- 3. テーマ・ルール / Theme & rules -->

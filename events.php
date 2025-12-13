@@ -20,96 +20,68 @@ require_once 'layout/header.php';
 <?php if (empty($events)): ?>
   <p>No events found.</p>
 <?php else: ?>
-  <div class="card">
-    <table class="event-table">
-      <thead>
-        <tr>
-          <th>Title / イベント名</th>
-          <th>Date / 日程</th>
-          <th>Place / 場所</th>
-          <th>Memo / メモ</th>
-        </tr>
-      </thead>
-      <tbody>
-        <?php foreach ($events as $event): ?>
-          <tr>
-            <td>
-              <a href="event_show.php?id=<?= h($event['id']) ?>">
-                <?= h($event['title']) ?>
-              </a>
-            </td>
-            <td><?= h($event['event_date']) ?></td>
-            <td><?= h($event['place']) ?></td>
-            <td>
-              <?php
-              $parsed = parseEventMemo($event['memo']);
-              echo nl2br(h($parsed['note']));
-              ?>
-              <?php if (!empty($parsed['meta'])): ?>
-                <div style="margin-top:5px; font-size:0.8rem;">
-                  <?php if (!empty($parsed['meta']['event_style_detail'])): ?>
-                    <span
-                      style="display:inline-block; padding:2px 6px; background:#444; color:#fff; border-radius:4px; margin-right:4px;">
-                      <?= h(getEventStyleLabel($parsed['meta']['event_style_detail'])) ?>
-                    </span>
-                  <?php endif; ?>
-                  <?php if (!empty($parsed['meta']['blind_policy'])): ?>
-                    <span style="display:inline-block; padding:2px 6px; background:#553333; color:#ffdddd; border-radius:4px;">
-                      <?= h(getBlindPolicyLabel($parsed['meta']['blind_policy'])) ?>
-                    </span>
-                  <?php endif; ?>
-                </div>
-              <?php endif; ?>
-            </td>
-          </tr>
-        <?php endforeach; ?>
-      </tbody>
-    </table>
+  <div class="event-list-cards">
+    <?php foreach ($events as $event): ?>
+      <?php
+      $parsed = parseEventMemo($event['memo']);
+      $m = $parsed['meta'] ?? [];
+      ?>
+      <div class="card event-card" style="margin-bottom:15px; padding:15px;">
+        <!-- 1. Title -->
+        <h3 class="event-title-main">
+          <a href="event_show.php?id=<?= h($event['id']) ?>" style="text-decoration:none; color:inherit;">
+            <?= h($event['title']) ?>
+          </a>
+        </h3>
 
-    <div class="event-list-cards">
-      <?php foreach ($events as $event): ?>
-        <div class="event-card">
-          <div class="event-card-title">
-            <a href="event_show.php?id=<?= h($event['id']) ?>">
-              <?= h($event['title']) ?>
-            </a>
-          </div>
-          <div class="event-card-meta">
-            <div class="event-card-row">
-              <span class="label">Date / 日程</span>
-              <span class="value"><?= h($event['event_date']) ?></span>
-            </div>
-            <div class="event-card-row">
-              <span class="label">Place / 場所</span>
-              <span class="value"><?= h($event['place']) ?></span>
-            </div>
-            <div class="event-card-row">
-              <span class="label">Memo / メモ</span>
-              <span class="value">
-                <?php
-                $parsed = parseEventMemo($event['memo']);
-                echo nl2br(h($parsed['note']));
-                ?>
-                <?php if (!empty($parsed['meta'])): ?>
-                  <div style="margin-top:8px; display:flex; gap:5px; flex-wrap:wrap;">
-                    <?php if (!empty($parsed['meta']['event_style_detail'])): ?>
-                      <span style="font-size:0.75rem; padding:2px 8px; border-radius:10px; background:#444; color:#fff;">
-                        <?= h(getEventStyleLabel($parsed['meta']['event_style_detail'])) ?>
-                      </span>
-                    <?php endif; ?>
-                    <?php if (!empty($parsed['meta']['blind_policy'])): ?>
-                      <span style="font-size:0.75rem; padding:2px 8px; border-radius:10px; background:#553333; color:#ffdddd;">
-                        <?= h(getBlindPolicyLabel($parsed['meta']['blind_policy'])) ?>
-                      </span>
-                    <?php endif; ?>
-                  </div>
-                <?php endif; ?>
-              </span>
-            </div>
-          </div>
-        </div>
-      <?php endforeach; ?>
-    </div>
+        <!-- 2. Date -->
+        <p class="event-meta-row">
+          📅 <?= h(getEventDateDisplay($event)) ?>
+        </p>
+
+        <!-- 3. Place -->
+        <p class="event-meta-row">
+          📍 <?php
+          if (!empty($event['area_label'])) {
+            echo h($event['area_label']) . ' · ' . h($event['place']);
+          } else {
+            echo h($event['place']);
+          }
+          ?>
+        </p>
+
+        <!-- 3b. Expected Guests -->
+        <?php if (!empty($event['expected_guests'])): ?>
+          <p class="event-meta-row">
+            👥 Expected Guests / 想定参加人数:
+            <?= (int) $event['expected_guests'] ?> guests / <?= (int) $event['expected_guests'] ?>名
+          </p>
+        <?php endif; ?>
+
+        <!-- 4. Style -->
+        <p class="event-meta-row">
+          🎯 Style / スタイル:
+          <?php
+          if (!empty($m['event_style_detail'])) {
+            echo h(getEventStyleLabel($m['event_style_detail']));
+          } elseif (!empty($event['event_type']) && $event['event_type'] === 'BYO') {
+            echo 'BYO';
+          } elseif (!empty($event['event_type']) && $event['event_type'] === 'no_byo') {
+            echo 'No BYO';
+          } else {
+            echo 'BYO'; // Default
+          }
+          ?>
+        </p>
+
+        <!-- 5. Theme (Optional) -->
+        <?php if (!empty($m['theme_description'])): ?>
+          <p class="event-meta-row">
+            Theme / テーマ: <?= mb_strimwidth(h($m['theme_description']), 0, 50, '...') ?>
+          </p>
+        <?php endif; ?>
+      </div>
+    <?php endforeach; ?>
   </div>
 <?php endif; ?>
 
