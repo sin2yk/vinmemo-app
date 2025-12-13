@@ -43,6 +43,16 @@ $stmt->bindValue(':event_id', $eventId, PDO::PARAM_INT);
 $stmt->execute();
 $bottles = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
+// 3. Fetch Media (if enabled)
+$mediaItems = [];
+if (!empty($event['media_enabled'])) {
+    $sql = "SELECT * FROM event_media WHERE event_id = :event_id AND visibility = 'public' ORDER BY created_at ASC";
+    $stmt = $pdo->prepare($sql);
+    $stmt->bindValue(':event_id', $eventId, PDO::PARAM_INT);
+    $stmt->execute();
+    $mediaItems = $stmt->fetchAll(PDO::FETCH_ASSOC);
+}
+
 // Check if registration is allowed
 // 1. Explicit style "no_byo"
 // 2. "持ちより不要" (No BYO required) in text
@@ -217,6 +227,65 @@ $allowRegistration = !$isNoByo;
             </div>
         <?php endif; ?>
     </section>
+
+    <!-- Media Gallery Section -->
+    <?php if (!empty($event['media_enabled'])): ?>
+        <section style="margin-top: 3rem;">
+            <div class="section-header">
+                <h2 class="section-title">Media Gallery / メディア</h2>
+            </div>
+
+            <?php if (empty($mediaItems)): ?>
+                <p style="color:var(--text-muted); text-align:center; padding:20px;">
+                    まだ写真やファイルは登録されていません。<br>
+                    No media uploaded yet.
+                </p>
+            <?php else: ?>
+                <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 1rem;">
+                    <?php foreach ($mediaItems as $media): ?>
+                        <?php
+                        $path = h($media['file_path']);
+                        $title = h($media['title']);
+                        $isImage = (strpos($media['mime_type'], 'image/') === 0);
+                        ?>
+                        <div
+                            style="border: 1px solid var(--border); border-radius: 8px; padding: 10px; background: rgba(0,0,0,0.2);">
+                            <?php if ($isImage): ?>
+                                <a href="<?= $path ?>" target="_blank" style="display:block; margin-bottom:8px;">
+                                    <img src="<?= $path ?>" alt="<?= $title ?>"
+                                        style="width: 100%; height: 120px; object-fit: cover; border-radius: 4px;">
+                                </a>
+                            <?php else: ?>
+                                <div
+                                    style="height:120px; display:flex; align-items:center; justify-content:center; background:rgba(255,255,255,0.05); border-radius:4px; margin-bottom:8px;">
+                                    <span style="font-family:monospace; font-weight:bold;">PDF</span>
+                                </div>
+                            <?php endif; ?>
+
+                            <div
+                                style="font-size: 0.85rem; font-weight: bold; margin-bottom: 4px; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;">
+                                <?= $title ?>
+                            </div>
+
+                            <?php if (!$isImage): ?>
+                                <a href="<?= $path ?>" target="_blank"
+                                    style="font-size: 0.8rem; text-decoration: underline; color: var(--text-secondary);">
+                                    View File
+                                </a>
+                            <?php endif; ?>
+                        </div>
+                    <?php endforeach; ?>
+                </div>
+            <?php endif; ?>
+
+            <div style="margin-top: 20px; text-align: center;">
+                <a href="event_media_upload.php?ET=<?= urlencode($eventToken) ?>" class="vm-btn"
+                    style="border:1px solid var(--accent); color:var(--accent);">
+                    📷 Upload Photos/Files
+                </a>
+            </div>
+        </section>
+    <?php endif; ?>
 
     <!-- Registration CTA Bottom -->
     <?php if ($allowRegistration): ?>
