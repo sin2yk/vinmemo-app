@@ -19,32 +19,43 @@
 </head>
 
 <body>
-  <div class="container text-center">
-    <header>
-      <h1>VinMemo v1</h1>
-    </header>
+  <header class="site-header">
+    <div class="header-inner">
+      <div class="site-title">
+        <h1>VinMemo v1</h1>
+      </div>
+    </div>
+  </header>
+
+  <div class="container main-container text-center">
 
     <p>ここにFirebase Authログインフォームを置く予定。</p>
 
     <div class="card" id="auth-section">
-      <h2>ログイン / 新規登録</h2>
+      <h2 class="section-title" style="margin-top:0;">ログイン / 新規登録</h2>
 
-      <label>
-        メールアドレス：
-        <input type="email" id="email" autocomplete="email" />
-      </label>
+      <div style="max-width: 400px; margin: 0 auto; text-align: left;">
+        <label>
+          メールアドレス：
+          <input type="email" id="email" autocomplete="email" />
+        </label>
 
-      <label>
-        パスワード：
-        <input type="password" id="password" autocomplete="current-password" />
-      </label>
-      <br /><br />
+        <label>
+          パスワード：
+          <input type="password" id="password" autocomplete="current-password" />
+        </label>
+      </div>
 
-      <button id="signup-btn">新規登録</button>
-      <button id="login-btn">ログイン</button>
-      <button id="logout-btn" disabled>ログアウト</button>
+      <div style="margin-top:20px; display:flex; gap:10px; justify-content:center; flex-wrap:wrap;">
+        <button id="signup-btn" class="vm-btn vm-btn--secondary">新規登録</button>
+        <button id="login-btn" class="vm-btn vm-btn--primary">ログイン</button>
+      </div>
 
-      <p id="auth-status"></p>
+      <div style="margin-top:20px;">
+        <button id="logout-btn" class="vm-btn" style="background:#444; color:#ccc;" disabled>ログアウト</button>
+      </div>
+
+      <p id="auth-status" style="margin-top:20px; min-height:1.5em;"></p>
     </div>
   </div>
 
@@ -167,5 +178,6 @@
     });
   </script>
 </body>
+
 
 </html>

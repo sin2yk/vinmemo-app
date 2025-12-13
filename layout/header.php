@@ -79,6 +79,13 @@ require_once __DIR__ . '/../helpers.php';
                         <span class="nav-label-sep"> / </span>
                         <span class="nav-label-ja">マイページ</span>
                     </a>
+                    <!-- ▼ここが重要：全ページ共通で home.php#logout -->
+                    <a href="home.php#logout" class="main-nav-link" id="nav-logout-link">
+                        <span class="nav-label-en">Logout</span>
+                        <span class="nav-label-sep"> / </span>
+                        <span class="nav-label-ja">ログアウト</span>
+                    </a>
+                    <!-- ▲ここまで -->
                 </nav>
             <?php endif; ?>
         </div>

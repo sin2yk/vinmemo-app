@@ -134,366 +134,365 @@ require_once 'layout/header.php';
         $m = $parsedMemo['meta'] ?? [];
         ?>
 
-        <!-- 4. Title -->
-        <h1 class="event-title"><?= h($event['title']) ?></h1>
 
-        <!-- 4b. Subtitle -->
-        <?php if (!empty($m['subtitle'])): ?>
-            <p class="event-subtitle"
-                style="font-size:1.1rem; color:var(--text-muted); margin-top:-0.5rem; margin-bottom:0.8rem;">
-                <?= h($m['subtitle']) ?>
-            </p>
-        <?php endif; ?>
+        <!-- 4. Title, Subtitle, Meta moved inside Event Info Card -->
 
-        <!-- 5. Meta -->
-        <p class="event-meta" style="color:var(--text-muted);">
-            <?= h($event['event_date']) ?> @ <?= h($event['place']) ?>
-        </p>
-    </header>
+        <!-- 5.5 Event Info Card -->
+        <section class="card event-info-card" style="margin-bottom:20px; padding:20px;">
+            <!-- Title & Subtitle moved here -->
+            <h1 class="event-title" style="margin-top:0; line-height:1.2; font-size:1.8rem;">
+                <?= h($event['title']) ?>
+            </h1>
 
-    <!-- 6. Wine List (With Add Button) -->
-    <!-- Add My Wine Button (Implicitly needed here) -->
+            <?php if (!empty($m['subtitle'])): ?>
+                <p class="event-subtitle" style="font-size:1.1rem; color:var(--text-muted); margin:0.2rem 0 0.8rem;">
+                    <?= h($m['subtitle']) ?>
+                </p>
+            <?php endif; ?>
 
+            <!-- Subtle Divider -->
+            <div style="border-bottom:1px solid var(--border); margin: 15px 0 15px 0;"></div>
 
-    <!-- 5.5 Event Info Card -->
-    <section class="card event-info-card" style="margin-bottom:20px; padding:20px;">
-        <h2 class="section-title" style="margin-top:0;">Event Info / イベント情報</h2>
-
-        <p class="event-meta-row">
-            📅 <?= h(getEventDateDisplay($event)) ?>
-        </p>
-        <p class="event-meta-row">
-            📍 <?php
-            if (!empty($event['area_label'])) {
-                echo h($event['area_label']) . ' · ' . h($event['place']);
-            } else {
-                echo h($event['place']);
-            }
-            ?>
-        </p>
-        <?php if (!empty($event['expected_guests'])): ?>
+            <!-- Meta Rows -->
             <p class="event-meta-row">
-                👥 Expected Guests / 想定参加人数:
-                <?= (int) $event['expected_guests'] ?> guests / <?= (int) $event['expected_guests'] ?>名
+                📅 <?= h(getEventDateDisplay($event)) ?>
             </p>
-        <?php endif; ?>
-
-        <?php if (!empty($parsedMemo['meta']['theme_description'])): ?>
             <p class="event-meta-row">
-                🎯 Theme / テーマ:
-                <?= mb_strimwidth(h($parsedMemo['meta']['theme_description']), 0, 50, '...') ?>
+                📍 <?php
+                if (!empty($event['area_label'])) {
+                    echo h($event['area_label']) . ' · ' . h($event['place']);
+                } else {
+                    echo h($event['place']);
+                }
+                ?>
             </p>
-        <?php endif; ?>
-    </section>
+            <?php if (!empty($event['expected_guests'])): ?>
+                <p class="event-meta-row">
+                    👥 Expected Guests / 想定参加人数:
+                    <?= (int) $event['expected_guests'] ?> guests / <?= (int) $event['expected_guests'] ?>名
+                </p>
+            <?php endif; ?>
 
-    <section>
-        <div class="section-header section-header--with-view">
-            <h2 class="section-title">
-                Wine List / ワインリスト
-            </h2>
-            <div class="section-view-switch">
-                <?php if ($view === 'guest'): ?>
-                    <?php $viewMode = $_GET['mode'] ?? 'standard'; ?>
-                    View:
-                    <a href="?id=<?= $id ?>&view=guest&mode=simple"
-                        style="<?= $viewMode === 'simple' ? 'font-weight:bold; color:var(--accent);' : 'color:#888;' ?>">Simple
-                        / 簡易</a>
-                    |
-                    <a href="?id=<?= $id ?>&view=guest&mode=standard"
-                        style="<?= $viewMode === 'standard' ? 'font-weight:bold; color:var(--accent);' : 'color:#888;' ?>">Standard
-                        / 標準</a>
-                    |
-                    <a href="?id=<?= $id ?>&view=guest&mode=full"
-                        style="<?= $viewMode === 'full' ? 'font-weight:bold; color:var(--accent);' : 'color:#888;' ?>">Full /
-                        詳細</a>
-                <?php endif; ?>
+            <?php if (!empty($parsedMemo['meta']['theme_description'])): ?>
+                <p class="event-meta-row">
+                    🎯 Theme / テーマ:
+                    <?= mb_strimwidth(h($parsedMemo['meta']['theme_description']), 0, 50, '...') ?>
+                </p>
+            <?php endif; ?>
+        </section>
+
+        <section>
+            <div class="section-header section-header--with-view">
+                <h2 class="section-title">
+                    Wine List / ワインリスト
+                </h2>
+                <div class="section-view-switch">
+                    <?php if ($view === 'guest'): ?>
+                        <?php $viewMode = $_GET['mode'] ?? 'standard'; ?>
+                        View:
+                        <a href="?id=<?= $id ?>&view=guest&mode=simple"
+                            style="<?= $viewMode === 'simple' ? 'font-weight:bold; color:var(--accent);' : 'color:#888;' ?>">Simple
+                            / 簡易</a>
+                        |
+                        <a href="?id=<?= $id ?>&view=guest&mode=standard"
+                            style="<?= $viewMode === 'standard' ? 'font-weight:bold; color:var(--accent);' : 'color:#888;' ?>">Standard
+                            / 標準</a>
+                        |
+                        <a href="?id=<?= $id ?>&view=guest&mode=full"
+                            style="<?= $viewMode === 'full' ? 'font-weight:bold; color:var(--accent);' : 'color:#888;' ?>">Full
+                            /
+                            詳細</a>
+                    <?php endif; ?>
+                </div>
             </div>
-        </div>
 
-        <?php if ($stats['total'] === 0): ?>
-            <p>No wines registered yet. /ワインの登録がありません。</p>
-        <?php else: ?>
-            <div class="bottle-list-container">
-                <?php foreach ($bottles as $index => $b): ?>
-                    <?php
-                    $visible = getVisibleFields($b, $event, $view);
-                    $displayName = getBottleDisplayName($visible, $b, $index);
-                    $currentMode = ($view === 'organizer') ? 'organizer_full' : ($viewMode ?? 'standard');
-                    $ownerStr = $visible['owner_label'] ? (' ' . h($visible['owner_label'])) : '';
-                    $line1 = '#' . ($index + 1) . $ownerStr;
-                    $mainTitle = h($displayName);
-                    ?>
+            <?php if ($stats['total'] === 0): ?>
+                <p>No wines registered yet. /ワインの登録がありません。</p>
+            <?php else: ?>
+                <div class="bottle-list-container">
+                    <?php foreach ($bottles as $index => $b): ?>
+                        <?php
+                        $visible = getVisibleFields($b, $event, $view);
+                        $displayName = getBottleDisplayName($visible, $b, $index);
+                        $currentMode = ($view === 'organizer') ? 'organizer_full' : ($viewMode ?? 'standard');
+                        $ownerStr = $visible['owner_label'] ? (' ' . h($visible['owner_label'])) : '';
+                        $line1 = '#' . ($index + 1) . $ownerStr;
+                        $mainTitle = h($displayName);
+                        ?>
 
-                    <div class="bottle-card bottle-card--<?= h($visible['color'] ?? 'red') ?>" style="margin-bottom:20px; padding:14px 16px; border-radius:12px;
+                        <div class="bottle-card bottle-card--<?= h($visible['color'] ?? 'red') ?>" style="margin-bottom:20px; padding:14px 16px; border-radius:12px;
                                 background:rgba(0,0,0,0.2); position:relative;">
-                        <div class="line-1-label"
-                            style="font-size:0.9em; color:var(--text-muted); display:flex; justify-content:space-between;">
-                            <span><?= $line1 ?></span>
-                            <?php if ($view === 'organizer' && $b['is_blind']): ?>
-                                <span style="font-size:0.8em; color:var(--accent-gold);">
-                                    BLIND (Level: <?= h($b['blind_reveal_level']) ?>)
-                                </span>
-                            <?php endif; ?>
-                        </div>
-                        <div class="line-main" style="font-size:1.2em; font-weight:600; margin-top:4px; color:var(--text-main);">
-                            <?= $mainTitle ?>
-                        </div>
-                        <?php if ($currentMode !== 'simple'): ?>
-                            <div class="line-specs"
-                                style="font-size:0.9rem; color:#ccc; display:flex; align-items:center; flex-wrap:wrap; gap:6px;">
-                                <?php if ($visible['color']): ?>
-                                    <?php
-                                    $cCode = $visible['color'];
-                                    $cLabel = getColorLabel($cCode);
-                                    ?>
-                                    <span class="wine-color-pill wine-color-<?= h($cCode) ?>">
-                                        <?= h($cLabel) ?>
+                            <div class="line-1-label"
+                                style="font-size:0.9em; color:var(--text-muted); display:flex; justify-content:space-between;">
+                                <span><?= $line1 ?></span>
+                                <?php if ($view === 'organizer' && $b['is_blind']): ?>
+                                    <span style="font-size:0.8em; color:var(--accent-gold);">
+                                        BLIND (Level: <?= h($b['blind_reveal_level']) ?>)
                                     </span>
                                 <?php endif; ?>
-                                <?php if ($visible['size'] != 750): ?>
-                                    <span><?= h(getBottleSizeLabel($visible['size'])) ?></span>
-                                <?php endif; ?>
                             </div>
-                            <?php
-                            $orgs = array_filter([$visible['country'], $visible['region'], $visible['appellation']]);
-                            if (!empty($orgs)):
-                                ?>
-                                <div class="line-origin" style="font-size:0.9rem; color:var(--text-muted);">
-                                    <?= implode(' / ', array_map('h', $orgs)) ?>
+                            <div class="line-main"
+                                style="font-size:1.2em; font-weight:600; margin-top:4px; color:var(--text-main);">
+                                <?= $mainTitle ?>
+                            </div>
+                            <?php if ($currentMode !== 'simple'): ?>
+                                <div class="line-specs"
+                                    style="font-size:0.9rem; color:#ccc; display:flex; align-items:center; flex-wrap:wrap; gap:6px;">
+                                    <?php if ($visible['color']): ?>
+                                        <?php
+                                        $cCode = $visible['color'];
+                                        $cLabel = getColorLabel($cCode);
+                                        ?>
+                                        <span class="wine-color-pill wine-color-<?= h($cCode) ?>">
+                                            <?= h($cLabel) ?>
+                                        </span>
+                                    <?php endif; ?>
+                                    <?php if ($visible['size'] != 750): ?>
+                                        <span><?= h(getBottleSizeLabel($visible['size'])) ?></span>
+                                    <?php endif; ?>
+                                </div>
+                                <?php
+                                $orgs = array_filter([$visible['country'], $visible['region'], $visible['appellation']]);
+                                if (!empty($orgs)):
+                                    ?>
+                                    <div class="line-origin" style="font-size:0.9rem; color:var(--text-muted);">
+                                        <?= implode(' / ', array_map('h', $orgs)) ?>
+                                    </div>
+                                <?php endif; ?>
+                                <?php
+                                $metas = [];
+                                if ($visible['price_band'])
+                                    $metas[] = '価格帯 / Price Band: ' . getPriceBandLabel($visible['price_band']);
+                                if ($visible['theme_fit'] && !empty($event['show_theme_fit']))
+                                    $metas[] = 'Theme Fit / テーマ適合度: ' . $visible['theme_fit'];
+                                if (!empty($metas)):
+                                    ?>
+                                    <div class="line-meta" style="font-size:0.85rem; color:var(--text-muted);">
+                                        <?= implode(' · ', array_map('h', $metas)) ?>
+                                    </div>
+                                <?php endif; ?>
+                                <?php if (($currentMode === 'full' || $currentMode === 'organizer_full') && !empty($visible['memo'])): ?>
+                                    <div class="line-memo"
+                                        style="margin-top:8px; font-size:0.9em; padding-top:4px; border-top:1px dashed #555; color:#ccc;">
+                                        <?= nl2br(h($visible['memo'])) ?>
+                                    </div>
+                                <?php endif; ?>
+                            <?php endif; ?>
+
+                            <?php if ($view === 'organizer'): ?>
+                                <div class="bottle-actions"
+                                    style="margin-top:12px; padding-top:8px; border-top:1px solid rgba(255,255,255,0.1);">
+                                    <?php if ($b['is_blind']): ?>
+                                        <form method="post" action="bottle_update_blind_level.php"
+                                            style="margin-bottom:10px; display:flex; align-items:center; gap:10px;">
+                                            <input type="hidden" name="event_id" value="<?= h($id) ?>">
+                                            <input type="hidden" name="bottle_id" value="<?= h($b['id']) ?>">
+                                            <?php if (isset($_GET['view']) && $_GET['view'] === 'organizer'): ?>
+                                                <input type="hidden" name="debug_bypass_role" value="organizer">
+                                            <?php endif; ?>
+                                            <label style="font-size:0.8rem; color:var(--accent-gold);">Reveal Level:</label>
+                                            <select name="blind_reveal_level" onchange="this.form.submit()"
+                                                style="padding:2px; font-size:0.8rem;">
+                                                <option value="none" <?= $b['blind_reveal_level'] === 'none' ? 'selected' : '' ?>>None (Blind)
+                                                </option>
+                                                <option value="country" <?= $b['blind_reveal_level'] === 'country' ? 'selected' : '' ?>>
+                                                    +Country
+                                                </option>
+                                                <option value="country_vintage" <?= $b['blind_reveal_level'] === 'country_vintage' ? 'selected' : '' ?>>+Country/Vint</option>
+                                                <option value="full" <?= $b['blind_reveal_level'] === 'full' ? 'selected' : '' ?>>Full Reveal
+                                                </option>
+                                            </select>
+                                        </form>
+                                    <?php endif; ?>
+                                    <div
+                                        style="text-align:right; display:flex; justify-content:flex-end; align-items:baseline; gap:8px;">
+                                        <a href="bottle_edit.php?id=<?= h($b['id']) ?>" class="bottle-action-link">
+                                            Edit
+                                        </a>
+                                        <form method="post" action="bottle_delete.php" style="display:inline;"
+                                            onsubmit="return confirm('Are you sure you want to delete this bottle?');">
+                                            <input type="hidden" name="id" value="<?= h($b['id']) ?>">
+                                            <input type="hidden" name="event_id" value="<?= h($id) ?>">
+                                            <?php if (isset($_GET['view']) && $_GET['view'] === 'organizer'): ?>
+                                                <input type="hidden" name="debug_bypass_role" value="organizer">
+                                            <?php endif; ?>
+                                            <button type="submit" class="bottle-action-link bottle-action-link--danger">
+                                                Delete
+                                            </button>
+                                        </form>
+                                    </div>
                                 </div>
                             <?php endif; ?>
-                            <?php
-                            $metas = [];
-                            if ($visible['price_band'])
-                                $metas[] = '価格帯 / Price Band: ' . getPriceBandLabel($visible['price_band']);
-                            if ($visible['theme_fit'] && !empty($event['show_theme_fit']))
-                                $metas[] = 'Theme Fit / テーマ適合度: ' . $visible['theme_fit'];
-                            if (!empty($metas)):
-                                ?>
-                                <div class="line-meta" style="font-size:0.85rem; color:var(--text-muted);">
-                                    <?= implode(' · ', array_map('h', $metas)) ?>
+                        </div>
+                    <?php endforeach; ?>
+                </div>
+
+            <?php endif; ?>
+
+            <!-- Add My Wine Button (Moved to Bottom) -->
+            <?php
+            $is_no_byo = (isset($parsedMemo['meta']['event_style_detail']) && $parsedMemo['meta']['event_style_detail'] === 'no_byo');
+            // Allow if NOT no_byo, OR if user is owner
+            $can_add_wine = (!$is_no_byo || $isOwner);
+            if ($can_add_wine):
+                ?>
+                <div class="wine-list-actions">
+                    <a href="bottle_new.php?event_id=<?= $id ?>" class="vm-btn vm-btn-primary btn-pill btn-primary">
+                        + Add My Wine / 自分のワインを登録
+                    </a>
+                </div>
+            <?php endif; ?>
+        </section>
+
+        <!-- 7 (New 4). Event Details -->
+        <?php if (
+            !empty($m) && (
+                !empty($m['event_style_detail']) ||
+                !empty($m['blind_policy']) ||
+                !empty($m['bottle_rules'])
+            )
+        ): ?>
+            <section class="card" style="margin-top:20px; padding:20px;">
+                <h3
+                    style="margin-top:0; color:var(--text-main); border-bottom:1px solid var(--border); padding-bottom:10px; margin-bottom:15px;">
+                    Event Details / イベント詳細
+                </h3>
+                <div style="display:grid; grid-template-columns: 1fr 1fr; gap:20px;">
+                    <div>
+                        <?php if (!empty($m['event_style_detail'])): ?>
+                            <div style="margin-bottom:15px;">
+                                <div style="font-size:0.85rem; color:var(--text-muted);">Style / スタイル</div>
+                                <div style="font-size:1.1rem; font-weight:bold;">
+                                    <?= h(getEventStyleLabel($m['event_style_detail'])) ?>
                                 </div>
-                            <?php endif; ?>
-                            <?php if (($currentMode === 'full' || $currentMode === 'organizer_full') && !empty($visible['memo'])): ?>
-                                <div class="line-memo"
-                                    style="margin-top:8px; font-size:0.9em; padding-top:4px; border-top:1px dashed #555; color:#ccc;">
-                                    <?= nl2br(h($visible['memo'])) ?>
-                                </div>
-                            <?php endif; ?>
+                            </div>
                         <?php endif; ?>
 
-                        <?php if ($view === 'organizer'): ?>
-                            <div class="bottle-actions"
-                                style="margin-top:12px; padding-top:8px; border-top:1px solid rgba(255,255,255,0.1);">
-                                <?php if ($b['is_blind']): ?>
-                                    <form method="post" action="bottle_update_blind_level.php"
-                                        style="margin-bottom:10px; display:flex; align-items:center; gap:10px;">
-                                        <input type="hidden" name="event_id" value="<?= h($id) ?>">
-                                        <input type="hidden" name="bottle_id" value="<?= h($b['id']) ?>">
-                                        <?php if (isset($_GET['view']) && $_GET['view'] === 'organizer'): ?>
-                                            <input type="hidden" name="debug_bypass_role" value="organizer">
-                                        <?php endif; ?>
-                                        <label style="font-size:0.8rem; color:var(--accent-gold);">Reveal Level:</label>
-                                        <select name="blind_reveal_level" onchange="this.form.submit()"
-                                            style="padding:2px; font-size:0.8rem;">
-                                            <option value="none" <?= $b['blind_reveal_level'] === 'none' ? 'selected' : '' ?>>None (Blind)
-                                            </option>
-                                            <option value="country" <?= $b['blind_reveal_level'] === 'country' ? 'selected' : '' ?>>+Country
-                                            </option>
-                                            <option value="country_vintage" <?= $b['blind_reveal_level'] === 'country_vintage' ? 'selected' : '' ?>>+Country/Vint</option>
-                                            <option value="full" <?= $b['blind_reveal_level'] === 'full' ? 'selected' : '' ?>>Full Reveal
-                                            </option>
-                                        </select>
-                                    </form>
-                                <?php endif; ?>
-                                <div style="text-align:right; display:flex; justify-content:flex-end; align-items:baseline; gap:8px;">
-                                    <a href="bottle_edit.php?id=<?= h($b['id']) ?>" class="bottle-action-link">
-                                        Edit
-                                    </a>
-                                    <form method="post" action="bottle_delete.php" style="display:inline;"
-                                        onsubmit="return confirm('Are you sure you want to delete this bottle?');">
-                                        <input type="hidden" name="id" value="<?= h($b['id']) ?>">
-                                        <input type="hidden" name="event_id" value="<?= h($id) ?>">
-                                        <?php if (isset($_GET['view']) && $_GET['view'] === 'organizer'): ?>
-                                            <input type="hidden" name="debug_bypass_role" value="organizer">
-                                        <?php endif; ?>
-                                        <button type="submit" class="bottle-action-link bottle-action-link--danger">
-                                            Delete
-                                        </button>
-                                    </form>
+                        <?php if (!empty($m['blind_policy'])): ?>
+                            <div style="margin-bottom:15px;">
+                                <div style="font-size:0.85rem; color:var(--text-muted);">Blind Policy / ブラインド</div>
+                                <div><?= h(getBlindPolicyLabel($m['blind_policy'])) ?></div>
+                            </div>
+                        <?php endif; ?>
+                    </div>
+                    <div>
+                        <?php if (!empty($m['bottle_rules'])): ?>
+                            <div style="margin-bottom:15px;">
+                                <div style="font-size:0.85rem; color:var(--text-muted);">Bottle Rules / 持ち寄りルール</div>
+                                <div style="padding-top:4px;">
+                                    <?= nl2br(h($m['bottle_rules'])) ?>
                                 </div>
                             </div>
                         <?php endif; ?>
                     </div>
-                <?php endforeach; ?>
-            </div>
-
+                </div>
+            </section>
         <?php endif; ?>
 
-        <!-- Add My Wine Button (Moved to Bottom) -->
-        <?php
-        $is_no_byo = (isset($parsedMemo['meta']['event_style_detail']) && $parsedMemo['meta']['event_style_detail'] === 'no_byo');
-        // Allow if NOT no_byo, OR if user is owner
-        $can_add_wine = (!$is_no_byo || $isOwner);
-        if ($can_add_wine):
+        <!-- 8 (New 1). Theme -->
+        <?php if (!empty($m['theme_description'])): ?>
+            <section class="card" style="margin-top:20px; padding:20px;">
+                <h3
+                    style="margin-top:0; color:var(--text-main); border-bottom:1px solid var(--border); padding-bottom:10px; margin-bottom:15px;">
+                    Theme / テーマ
+                </h3>
+                <div>
+                    <?= nl2br(h($m['theme_description'])) ?>
+                </div>
+            </section>
+        <?php endif; ?>
+
+        <!-- 9 (New 2). Summary Panel -->
+        <section class="card" style="padding:20px; margin-top:20px;">
+            <h3 style="margin-top:0; border-bottom:1px solid var(--border); padding-bottom:10px; margin-bottom:15px;">
+                Summary / サマリー
+                <?php if ($view === 'organizer'): ?>
+                    <span style="font-size:0.8em; color:var(--accent); margin-left:10px;">(Organizer View)</span>
+                <?php endif; ?>
+            </h3>
+            <div style="display:flex; flex-wrap:wrap; gap:20px;">
+                <div>
+                    <strong>Total Bottles / 登録ボトル数:</strong> <?= $stats['total'] ?>
+                </div>
+                <?php if (!empty($event['show_theme_fit'])): ?>
+                    <div>
+                        <strong>Avg Theme Fit / 平均テーマ適合度:</strong> <?= $stats['theme_fit_avg'] ?>
+                    </div>
+                <?php endif; ?>
+                <div>
+                    <strong>Breakdown / 内訳:</strong>
+                    <?php foreach ($stats['types'] as $type => $count): ?>
+                        <span style="margin-right:10px;"><?= ucfirst(h($type)) ?>: <?= $count ?></span>
+                    <?php endforeach; ?>
+                </div>
+            </div>
+        </section>
+
+        <!-- 10 (New 3). Organizer Note (Organizer Only) -->
+        <?php if ($view === 'organizer' && $parsedMemo['note']): ?>
+            <section class="card" style="margin-top:20px; padding:20px;">
+                <h3
+                    style="margin-top:0; color:var(--text-main); border-bottom:1px solid var(--border); padding-bottom:10px; margin-bottom:15px;">
+                    Organizer Note / 幹事メモ
+                </h3>
+                <div>
+                    <?= nl2br(h($parsedMemo['note'])) ?>
+                </div>
+            </section>
+        <?php endif; ?>
+
+        <!-- Control Panel -->
+        <?php if ($view === 'organizer'): ?>
+            <?php
+            $isRevealed = isEventRevealed($event);
+            $listConfig = json_decode($event['list_field_visibility'] ?? '[]', true);
+            function isChecked($conf, $key)
+            {
+                return !isset($conf[$key]) || $conf[$key] !== false;
+            }
             ?>
-            <div class="wine-list-actions">
-                <a href="bottle_new.php?event_id=<?= $id ?>" class="vm-btn vm-btn-primary btn-pill btn-primary">
-                    + Add My Wine / 自分のワインを登録
-                </a>
-            </div>
-        <?php endif; ?>
-    </section>
-
-    <!-- 7 (New 4). Event Details -->
-    <?php if (
-        !empty($m) && (
-            !empty($m['event_style_detail']) ||
-            !empty($m['blind_policy']) ||
-            !empty($m['bottle_rules'])
-        )
-    ): ?>
-        <section class="card" style="margin-top:20px; padding:20px;">
-            <h3
-                style="margin-top:0; color:var(--text-main); border-bottom:1px solid var(--border); padding-bottom:10px; margin-bottom:15px;">
-                Event Details / イベント詳細情報
-            </h3>
-            <div style="display:grid; grid-template-columns: 1fr 1fr; gap:20px;">
-                <div>
-                    <?php if (!empty($m['event_style_detail'])): ?>
-                        <div style="margin-bottom:15px;">
-                            <div style="font-size:0.85rem; color:var(--text-muted);">Style / スタイル</div>
-                            <div style="font-size:1.1rem; font-weight:bold;">
-                                <?= h(getEventStyleLabel($m['event_style_detail'])) ?>
-                            </div>
-                        </div>
-                    <?php endif; ?>
-
-                    <?php if (!empty($m['blind_policy'])): ?>
-                        <div style="margin-bottom:15px;">
-                            <div style="font-size:0.85rem; color:var(--text-muted);">Blind Policy / ブラインド</div>
-                            <div><?= h(getBlindPolicyLabel($m['blind_policy'])) ?></div>
-                        </div>
-                    <?php endif; ?>
-                </div>
-                <div>
-                    <?php if (!empty($m['bottle_rules'])): ?>
-                        <div style="margin-bottom:15px;">
-                            <div style="font-size:0.85rem; color:var(--text-muted);">Bottle Rules / 持ち寄りルール</div>
-                            <div style="padding-top:4px;">
-                                <?= nl2br(h($m['bottle_rules'])) ?>
-                            </div>
-                        </div>
-                    <?php endif; ?>
-                </div>
-            </div>
-        </section>
-    <?php endif; ?>
-
-    <!-- 8 (New 1). Theme -->
-    <?php if (!empty($m['theme_description'])): ?>
-        <section class="card" style="margin-top:20px; padding:20px;">
-            <h3
-                style="margin-top:0; color:var(--text-main); border-bottom:1px solid var(--border); padding-bottom:10px; margin-bottom:15px;">
-                Theme / テーマ
-            </h3>
-            <div>
-                <?= nl2br(h($m['theme_description'])) ?>
-            </div>
-        </section>
-    <?php endif; ?>
-
-    <!-- 9 (New 2). Summary Panel -->
-    <section class="card" style="padding:20px; margin-top:20px;">
-        <h3 style="margin-top:0; border-bottom:1px solid var(--border); padding-bottom:10px; margin-bottom:15px;">
-            Summary / サマリー
-            <?php if ($view === 'organizer'): ?>
-                <span style="font-size:0.8em; color:var(--accent); margin-left:10px;">(Organizer View)</span>
-            <?php endif; ?>
-        </h3>
-        <div style="display:flex; flex-wrap:wrap; gap:20px;">
-            <div>
-                <strong>Total Bottles / 登録ボトル数:</strong> <?= $stats['total'] ?>
-            </div>
-            <?php if (!empty($event['show_theme_fit'])): ?>
-                <div>
-                    <strong>Avg Theme Fit / 平均テーマ適合度:</strong> <?= $stats['theme_fit_avg'] ?>
-                </div>
-            <?php endif; ?>
-            <div>
-                <strong>Breakdown / 内訳:</strong>
-                <?php foreach ($stats['types'] as $type => $count): ?>
-                    <span style="margin-right:10px;"><?= ucfirst(h($type)) ?>: <?= $count ?></span>
-                <?php endforeach; ?>
-            </div>
-        </div>
-    </section>
-
-    <!-- 10 (New 3). Organizer Note (Organizer Only) -->
-    <?php if ($view === 'organizer' && $parsedMemo['note']): ?>
-        <section class="card" style="margin-top:20px; padding:20px;">
-            <h3
-                style="margin-top:0; color:var(--text-main); border-bottom:1px solid var(--border); padding-bottom:10px; margin-bottom:15px;">
-                Organizer Note / 幹事メモ
-            </h3>
-            <div>
-                <?= nl2br(h($parsedMemo['note'])) ?>
-            </div>
-        </section>
-    <?php endif; ?>
-
-    <!-- Control Panel -->
-    <?php if ($view === 'organizer'): ?>
-        <?php
-        $isRevealed = isEventRevealed($event);
-        $listConfig = json_decode($event['list_field_visibility'] ?? '[]', true);
-        function isChecked($conf, $key)
-        {
-            return !isset($conf[$key]) || $conf[$key] !== false;
-        }
-        ?>
-        <section class="card"
-            style="padding:20px; border:1px solid var(--accent); background:rgba(255,167,38,0.1); margin-top:20px;">
-            <h3 style="margin-top:0; color:var(--accent);">Organizer Controls</h3>
-            <div style="display:flex; flex-wrap:wrap; gap:30px;">
-                <div style="flex:1; min-width:300px;">
-                    <h4>Blind Reveal Status / ブラインド状況</h4>
-                    <p>Status: <?php if ($isRevealed): ?><strong style="color:#4caf50;">REVEALED
-                                (Open)</strong><?php else: ?><strong style="color:#ff9800;">BLIND</strong><?php endif; ?></p>
-                    <?php if (!$isRevealed): ?>
-                        <form method="post" action="event_update_visibility.php"
-                            onsubmit="return confirm('Reveal ALL bottles to guests?');">
+            <section class="card"
+                style="padding:20px; border:1px solid var(--accent); background:rgba(255,167,38,0.1); margin-top:20px;">
+                <h3 style="margin-top:0; color:var(--accent);">Organizer Controls</h3>
+                <div style="display:flex; flex-wrap:wrap; gap:30px;">
+                    <div style="flex:1; min-width:300px;">
+                        <h4>Blind Reveal Status / ブラインド状況</h4>
+                        <p>Status: <?php if ($isRevealed): ?><strong style="color:#4caf50;">REVEALED
+                                    (Open)</strong><?php else: ?><strong style="color:#ff9800;">BLIND</strong><?php endif; ?></p>
+                        <?php if (!$isRevealed): ?>
+                            <form method="post" action="event_update_visibility.php"
+                                onsubmit="return confirm('Reveal ALL bottles to guests?');">
+                                <input type="hidden" name="event_id" value="<?= h($id) ?>">
+                                <?php if (isset($_GET['view']) && $_GET['view'] === 'organizer'): ?><input type="hidden"
+                                        name="debug_bypass_role" value="organizer"><?php endif; ?>
+                                <button type="submit" name="action" value="reveal_all" class="button"
+                                    style="background:#ff9800; color:black;">⚡ Reveal All / 答え合わせ</button>
+                            </form>
+                        <?php else: ?>
+                            <p style="font-size:0.9em; color:#aaa;">Event is fully revealed.</p>
+                        <?php endif; ?>
+                    </div>
+                    <!-- List Rules Form (omitted for brevity, same as before) -->
+                    <div style="flex:1; min-width:300px;">
+                        <h4>Guest List Display Rules / ゲスト表示ルール</h4>
+                        <form method="post" action="event_update_visibility.php">
                             <input type="hidden" name="event_id" value="<?= h($id) ?>">
+                            <input type="hidden" name="action" value="update_list_constraints">
                             <?php if (isset($_GET['view']) && $_GET['view'] === 'organizer'): ?><input type="hidden"
                                     name="debug_bypass_role" value="organizer"><?php endif; ?>
-                            <button type="submit" name="action" value="reveal_all" class="button"
-                                style="background:#ff9800; color:black;">⚡ Reveal All / 答え合わせ</button>
+                            <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
+                                <label><input type="checkbox" name="field_theme_fit" <?= !empty($event['show_theme_fit']) ? 'checked' : '' ?>> Theme Fit / テーマ適合度</label>
+                                <label><input type="checkbox" name="field_price_band" <?= isChecked($listConfig, 'price_band') ? 'checked' : '' ?>> Price Band / 価格帯</label>
+                                <label><input type="checkbox" name="field_memo" <?= isChecked($listConfig, 'memo') ? 'checked' : '' ?>> Memo / メモ</label>
+                            </div>
+                            <div style="margin-top:10px;">
+                                <button type="submit" class="btn btn-primary">Update Rules</button>
+                            </div>
                         </form>
-                    <?php else: ?>
-                        <p style="font-size:0.9em; color:#aaa;">Event is fully revealed.</p>
-                    <?php endif; ?>
+                    </div>
                 </div>
-                <!-- List Rules Form (omitted for brevity, same as before) -->
-                <div style="flex:1; min-width:300px;">
-                    <h4>Guest List Display Rules / ゲスト表示ルール</h4>
-                    <form method="post" action="event_update_visibility.php">
-                        <input type="hidden" name="event_id" value="<?= h($id) ?>">
-                        <input type="hidden" name="action" value="update_list_constraints">
-                        <?php if (isset($_GET['view']) && $_GET['view'] === 'organizer'): ?><input type="hidden"
-                                name="debug_bypass_role" value="organizer"><?php endif; ?>
-                        <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
-                            <label><input type="checkbox" name="field_theme_fit" <?= !empty($event['show_theme_fit']) ? 'checked' : '' ?>> Theme Fit / テーマ適合度</label>
-                            <label><input type="checkbox" name="field_price_band" <?= isChecked($listConfig, 'price_band') ? 'checked' : '' ?>> Price Band / 価格帯</label>
-                            <label><input type="checkbox" name="field_memo" <?= isChecked($listConfig, 'memo') ? 'checked' : '' ?>> Memo / メモ</label>
-                        </div>
-                        <div style="margin-top:10px;">
-                            <button type="submit" class="btn btn-primary">Update Rules</button>
-                        </div>
-                    </form>
-                </div>
-            </div>
-        </section>
+            </section>
         <?php endif; ?>
 
 
-<?php endif; ?><?php require_once 'layout/footer.php'; ?>
+    <?php endif; ?><?php require_once 'layout/footer.php'; ?>
