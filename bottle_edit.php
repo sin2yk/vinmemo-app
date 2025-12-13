@@ -11,22 +11,23 @@ if (session_status() === PHP_SESSION_NONE) {
 
 // --- 1. Fetch Bottle & Event (Unified Access) ---
 
-// Determine ID and Token from GET or POST (to handle both display and submit)
+// determine ID and Token from GET or POST (to handle both display and submit)
+// Updated to prioritize 'edt' over generic 'token' or 'et' for Strict adherence to plan
 $id = filter_input(INPUT_POST, 'id', FILTER_VALIDATE_INT) ?? filter_input(INPUT_GET, 'id', FILTER_VALIDATE_INT);
-$token = $_POST['token'] ?? $_POST['et'] ?? $_GET['token'] ?? $_GET['et'] ?? '';
+$token = $_POST['edt'] ?? $_GET['edt'] ?? ''; // ONLY 'edt' for edit token as per rules
 
 $bottle = null;
 
-if ($id) {
-    // Priority: Fetch by ID
-    $stmt = $pdo->prepare("SELECT * FROM bottle_entries WHERE id = :id");
-    $stmt->bindValue(':id', $id, PDO::PARAM_INT);
-    $stmt->execute();
-    $bottle = $stmt->fetch(PDO::FETCH_ASSOC);
-} elseif ($token) {
-    // Fallback: Fetch by Token (if ID not provided, though ID should usually be there)
+if ($token) {
+    // Priority 1: Fetch by Token (Guest Mode)
     $stmt = $pdo->prepare("SELECT * FROM bottle_entries WHERE edit_token = :token");
     $stmt->bindValue(':token', $token, PDO::PARAM_STR);
+    $stmt->execute();
+    $bottle = $stmt->fetch(PDO::FETCH_ASSOC);
+} elseif ($id) {
+    // Priority 2: Fetch by ID (Organizer/Owner Mode)
+    $stmt = $pdo->prepare("SELECT * FROM bottle_entries WHERE id = :id");
+    $stmt->bindValue(':id', $id, PDO::PARAM_INT);
     $stmt->execute();
     $bottle = $stmt->fetch(PDO::FETCH_ASSOC);
 }

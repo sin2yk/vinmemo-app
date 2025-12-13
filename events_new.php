@@ -8,6 +8,18 @@ $error = null;
 // Initialize empty event array for partial
 $event = [];
 
+
+/**
+ * Generate a random event token (ET) for public guest access.
+ *
+ * @return string 32-characters hex string
+ */
+function generateEventToken(): string
+{
+    // 16 bytes → 32 chars hex
+    return bin2hex(random_bytes(16));
+}
+
 // フォーム送信後の処理
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     // Collect data (Same logic as before, just updated to match partial inputs)
@@ -66,9 +78,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         // ...
 
         try {
-            // INSERT with new columns
-            $sql = 'INSERT INTO events (title, event_date, place, area_label, expected_guests, memo, event_type, show_theme_fit, organizer_user_id, created_at)
-                    VALUES (:title, :event_date, :place, :area_label, :expected_guests, :memo, :event_type, :show_theme_fit, :uid, NOW())';
+            // Generate Event Token
+            $event_token = generateEventToken();
+
+            // INSERT with new columns including event_token
+            $sql = 'INSERT INTO events (title, event_date, place, area_label, expected_guests, memo, event_type, show_theme_fit, organizer_user_id, event_token, created_at)
+                    VALUES (:title, :event_date, :place, :area_label, :expected_guests, :memo, :event_type, :show_theme_fit, :uid, :event_token, NOW())';
 
             $stmt = $pdo->prepare($sql);
             $stmt->bindValue(':title', $title, PDO::PARAM_STR);
@@ -80,6 +95,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $stmt->bindValue(':event_type', $event_type, PDO::PARAM_STR);
             $stmt->bindValue(':show_theme_fit', $show_theme_fit, PDO::PARAM_INT);
             $stmt->bindValue(':uid', $_SESSION['user_id'] ?? 0, PDO::PARAM_INT);
+            $stmt->bindValue(':event_token', $event_token, PDO::PARAM_STR);
 
             $stmt->execute();
             $newId = $pdo->lastInsertId();

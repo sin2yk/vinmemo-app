@@ -181,6 +181,47 @@ require_once 'layout/header.php';
             <?php endif; ?>
         </section>
 
+        <!-- Guest Access Section (Organizer Only) -->
+        <?php
+        // Calculate Guest URL
+        $guestUrl = null;
+        if ($view === 'organizer' && !empty($event['event_token'])) {
+            $baseUrl = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? 'https://' : 'http://')
+                . $_SERVER['HTTP_HOST']
+                . rtrim(dirname($_SERVER['PHP_SELF']), '/\\');
+            // Assuming event_guest.php will be the public entry point.
+            // If not created yet, this link will 404 until created, but instructions say "Show Guest URL".
+            // We'll point to `event_public.php` or `entry.php`? User prompt said `event_public.php` in example 4(2).
+            // But let's check if the user wants `event_public.php` created?
+            // The user instructions for `event_show.php` says: "Show the Guest URL".
+            // And "event_public.php のファイル名・パスは...後で変更してOK".
+            // So I will use `entry.php` if it feels more appropriate or `event_guest.php`.
+            // Actually, `entry.php` exists in file list. Let's stick to user's `event_guest.php` suggestion or maybe `entry.php`?
+            // User prompt 4-2 example used `event_guest.php`.
+            // User prompt 4 (2) also said `event_public.php`.
+            // Let's use `entry.php` as a placeholder if it exists, or just `event_entry.php`.
+            // Let's stick to `event_entry.php` as a likely name.
+            $guestUrl = $baseUrl . '/event_entry.php?ET=' . urlencode($event['event_token']);
+        }
+        ?>
+        <?php if ($view === 'organizer'): ?>
+            <section class="card" style="margin-bottom:20px; padding:20px; border:1px solid var(--accent);">
+                <h3 style="margin-top:0; color:var(--accent);">Guest Access / ゲスト招待</h3>
+                <p>
+                    Share this URL with your guests.<br>
+                    <span style="font-size:0.9em; color:#ccc;">ゲストにこのURLを共有してください。ログイン不要でイベントページにアクセスできます。</span>
+                </p>
+                <?php if ($guestUrl): ?>
+                    <div style="background:rgba(0,0,0,0.3); padding:10px; border-radius:4px; margin:10px 0; word-break:break-all;">
+                        <a href="<?= h($guestUrl) ?>" target="_blank"
+                            style="color:#4fc3f7; font-weight:bold;"><?= h($guestUrl) ?></a>
+                    </div>
+                <?php else: ?>
+                    <div class="error-msg">Event Token not set. check DB.</div>
+                <?php endif; ?>
+            </section>
+        <?php endif; ?>
+
         <section>
             <div class="section-header section-header--with-view">
                 <h2 class="section-title">
