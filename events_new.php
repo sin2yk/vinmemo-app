@@ -52,7 +52,67 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $event_type = $_POST['event_type'] ?? 'BYO';
 
     $event_style_detail = $_POST['event_style_detail'] ?? '';
-    // ...
+
+    // MISSING INITIALIZATIONS ADDED HERE
+    $theme_desc = trim($_POST['theme_description'] ?? '');
+    $bottle_rules = trim($_POST['bottle_rules'] ?? '');
+    $blind_policy = $_POST['blind_policy'] ?? '';
+    $show_theme_fit = isset($_POST['show_theme_fit']) ? 1 : 0;
+
+    // Construct Memo
+    // If memo exists in POST, use it. $memo_to_save logic:
+    // We used to have separate $organizer_note. 
+    // Usually 'memo' input is the organizer note.
+    $organizer_note = trim($_POST['memo'] ?? '');
+
+    // If we want to stick to the old "parseEventMemo" compatibility, we might want to JSON encode metadata into memo?
+    // BUT we are moving to columns. 
+    // Ideally, 'memo' column should strictly store the text note, and columns store the rest.
+    // However, event_show.php (Step 72) uses parseEventMemo($event['memo']) to get meta.
+    // So for backward compatibility, we SHOULD encode these into the memo field as JSON frontmatter or similar?
+    // Wait, parseEventMemo in helpers.php usually parses YAML frontmatter or JSON.
+    // IF we are migrating to columns, event_show.php should prefer columns.
+    // checking event_show.php Step 72:
+    // Line 162: `if (!empty($event['area_label']))` -> uses column
+    // Line 176: `$parsedMemo['meta']['theme_description']` -> uses meta from memo!
+
+    // SO: We are in a transitional state. event_show.php reads theme_description from MEMO, but area_label from COLUMN.
+    // To support `event_show.php`, we MUST ALSO Write them to memo?
+    // Or we should update event_show.php to look at columns if available?
+    // Updating event_show.php is cleaner but risky. Writing to both is safer for now.
+    // Let's write to both (Meta in Memo) to fix the immediate "Undefined variable" errors and ensure display works.
+
+    // Construct Memo
+    // We must use the format compatible with helpers.php parseEventMemo:
+    // User Note + "\n\n---META---\n" + JSON
+
+    $organizer_note = trim($_POST['memo'] ?? '');
+
+    // Construct Meta Data Array
+    // We include fields that are NOT in columns or are needed for backward compat.
+    // event_show.php reads 'theme_description', 'bottle_rules', 'blind_policy', 'event_style_detail', 'subtitle' from Meta.
+    // 'area' and 'seats' are seemingly legacy but harmless to keep.
+    // 'start_time' is legacy.
+
+    $meta_data = [
+        'subtitle' => $subtitle,
+        'start_time' => $start_time, // derived from event_date
+        'area' => $area,
+        'seats' => $seats,
+        'event_style_detail' => $event_style_detail,
+        'theme_description' => $theme_desc,
+        'bottle_rules' => $bottle_rules,
+        'blind_policy' => $blind_policy,
+        // We can exclude 'memo' itself from meta to avoid recursion
+    ];
+
+    // Encode JSON
+    // standard VinMemo format per helpers.php (Step 229)
+    $memo_to_save = $organizer_note;
+    if (!empty($meta_data)) {
+        $memo_to_save .= "\n\n---META---\n" . json_encode($meta_data, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT);
+    }
+
 
     // Validation
     if ($title === '' || $event_date === '') {

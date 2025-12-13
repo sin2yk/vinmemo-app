@@ -88,21 +88,23 @@ $blind_policy = $event['blind_policy'] ?? 'none';
 <form method="post" class="bottle-form">
     <!-- 1. 基本情報 / Basic info -->
     <div class="form-section">
-        <h3>基本情報 / Basic info</h3>
+        <h3>Basic info / 基本情報</h3>
 
         <div class="form-group">
-            <label>イベント名 / Event title <span style="color:var(--danger)">*</span></label>
-            <input type="text" name="title" placeholder="例：第5回 ブルゴーニュ会" value="<?= h($title) ?>" required>
+            <label>Event title / イベント名 <span style="color:var(--danger)">*</span></label>
+            <input type="text" name="title" placeholder="Ex: 5th Bourgogne Meeting / 例：第5回 ブルゴーニュ会"
+                value="<?= h($title) ?>" required>
         </div>
 
         <div class="form-group">
-            <label>サブタイトル / Subtitle</label>
-            <input type="text" name="subtitle" placeholder="例：〜ジュヴレ・シャンベルタンの魅力〜" value="<?= h($subtitle) ?>">
+            <label>Subtitle / サブタイトル</label>
+            <input type="text" name="subtitle" placeholder="Ex: Charm of Gevrey-Chambertin / 例：〜ジュヴレ・シャンベルタンの魅力〜"
+                value="<?= h($subtitle) ?>">
         </div>
 
         <div class="form-row">
             <div class="form-group">
-                <label>開催日 / Date <span style="color:var(--danger)">*</span></label>
+                <label>Date / 開催日 <span style="color:var(--danger)">*</span></label>
                 <!-- events_new used date input, prompt section 1 mentions datetime-local. 
                      If we use datetime-local, we combine date and start_time? 
                      events_new has separate Date and Start Time. 
@@ -128,72 +130,78 @@ $blind_policy = $event['blind_policy'] ?? 'none';
 
     <!-- 2. 会場・スタイル / Venue & style -->
     <div class="form-section">
-        <h3>会場・スタイル / Venue & style</h3>
+        <h3>Venue & style / 会場・スタイル</h3>
 
         <div class="form-group">
-            <label>会場名 / Venue name</label>
-            <input type="text" name="place" placeholder="例：Restaurant Vin" value="<?= h($place) ?>">
+            <label>Venue name / 会場名</label>
+            <input type="text" name="place" placeholder="Ex: Restaurant Vin / 例：Restaurant Vin"
+                value="<?= h($place) ?>">
         </div>
         <div class="form-group">
-            <label>エリア / Area Label</label>
-            <input type="text" name="area_label" placeholder="例：神宮前" value="<?= h($event['area_label'] ?? '') ?>">
-        </div>
-    </div>
-
-    <div class="form-row">
-        <div class="form-group">
-            <label>想定人数 / Expected Guests</label>
-            <input type="number" name="expected_guests" placeholder="例：8"
-                value="<?= h($event['expected_guests'] ?? '') ?>">
+            <label>Area Label / エリア</label>
+            <input type="text" name="area_label" placeholder="Ex: Jingumae / 例：神宮前"
+                value="<?= h($event['area_label'] ?? '') ?>">
         </div>
 
-        <div class="form-group">
-            <label>DB登録タイプ / DB Type</label>
-            <div class="radio-row">
-                <label><input type="radio" name="event_type" value="BYO" <?= $event_type === 'BYO' ? 'checked' : '' ?>> BYO
-                    (持参)</label>
-                <label><input type="radio" name="event_type" value="ORG" <?= $event_type === 'ORG' ? 'checked' : '' ?>> ORG
-                    (主催)</label>
-                <label><input type="radio" name="event_type" value="VENUE" <?= $event_type === 'VENUE' ? 'checked' : '' ?>>
-                    VENUE (店舗)</label>
+
+        <div class="form-row">
+            <div class="form-group">
+                <label>Expected Guests / 想定人数</label>
+                <input type="number" name="expected_guests" placeholder="Ex: 8 / 例：8"
+                    value="<?= h($event['expected_guests'] ?? '') ?>">
+            </div>
+
+            <div class="form-group">
+                <label>DB Type / DB登録タイプ</label>
+                <div class="radio-row">
+                    <label><input type="radio" name="event_type" value="BYO" <?= $event_type === 'BYO' ? 'checked' : '' ?>>
+                        BYO
+                        (持参)</label>
+                    <label><input type="radio" name="event_type" value="ORG" <?= $event_type === 'ORG' ? 'checked' : '' ?>>
+                        ORG
+                        (主催)</label>
+                    <label><input type="radio" name="event_type" value="VENUE" <?= $event_type === 'VENUE' ? 'checked' : '' ?>>
+                        VENUE (店舗)</label>
+                </div>
             </div>
         </div>
-    </div>
 
-    <div class="form-group">
-        <label>イベントスタイル / Style Detail</label>
-        <select name="event_style_detail">
-            <option value="">選択してください</option>
-            <option value="full_byo" <?= $event_style_detail === 'full_byo' ? 'selected' : '' ?>>Full BYO（全員持ち寄り）</option>
-            <option value="half_byo" <?= $event_style_detail === 'half_byo' ? 'selected' : '' ?>>Half BYO（店ワイン＋持ち寄り）
-            </option>
-            <option value="no_byo" <?= $event_style_detail === 'no_byo' ? 'selected' : '' ?>>No BYO（主催者セレクト/ペアリング）</option>
-        </select>
-    </div>
+        <div class="form-group">
+            <label>Style Detail / イベントスタイル</label>
+            <select name="event_style_detail">
+                <option value="">Select / 選択してください</option>
+                <option value="full_byo" <?= $event_style_detail === 'full_byo' ? 'selected' : '' ?>>Full BYO / 全員持ち寄り
+                </option>
+                <option value="half_byo" <?= $event_style_detail === 'half_byo' ? 'selected' : '' ?>>Half BYO / 店ワイン＋持ち寄り
+                </option>
+                <option value="no_byo" <?= $event_style_detail === 'no_byo' ? 'selected' : '' ?>>No BYO / 主催者セレクト/ペアリング
+                </option>
+            </select>
+        </div>
     </div>
 
     <!-- 3. テーマ・ルール / Theme & rules -->
     <div class="form-section">
-        <h3>テーマ・ルール / Theme & rules</h3>
+        <h3>Theme & rules / テーマ・ルール</h3>
 
         <div class="form-group">
-            <label>テーマ詳細 / Theme description</label>
+            <label>Theme description / テーマ詳細</label>
             <textarea name="theme_description" rows="3"
-                placeholder="テーマについての詳しい説明"><?= h($theme_description) ?></textarea>
+                placeholder="Description of the theme / テーマについての詳しい説明"><?= h($theme_description) ?></textarea>
         </div>
 
         <div class="form-group">
-            <label>持ち寄りルール / Bottle rules</label>
+            <label>Bottle rules / 持ち寄りルール</label>
             <textarea name="bottle_rules" rows="3"
-                placeholder="例：1人1本、予算1万円以上、2015年以降など"><?= h($bottle_rules) ?></textarea>
+                placeholder="Ex: 1 bottle per person, over 10k yen / 例：1人1本、予算1万円以上、2015年以降など"><?= h($bottle_rules) ?></textarea>
         </div>
 
         <div class="form-group">
-            <label>ブラインド方針 / Blind policy</label>
+            <label>Blind policy / ブラインド方針</label>
             <select name="blind_policy">
-                <option value="none" <?= $blind_policy === 'none' ? 'selected' : '' ?>>Label Open（ラベル出し）</option>
-                <option value="semi" <?= $blind_policy === 'semi' ? 'selected' : '' ?>>Semi Blind（一部ブラインド）</option>
-                <option value="full" <?= $blind_policy === 'full' ? 'selected' : '' ?>>Full Blind（完全ブラインド）</option>
+                <option value="none" <?= $blind_policy === 'none' ? 'selected' : '' ?>>Label Open / ラベル出し</option>
+                <option value="semi" <?= $blind_policy === 'semi' ? 'selected' : '' ?>>Semi Blind / 一部ブラインド</option>
+                <option value="full" <?= $blind_policy === 'full' ? 'selected' : '' ?>>Full Blind / 完全ブラインド</option>
             </select>
         </div>
 
@@ -209,10 +217,11 @@ $blind_policy = $event['blind_policy'] ?? 'none';
 
     <!-- 4. 幹事メモ / Organizer note -->
     <div class="form-section">
-        <h3>幹事メモ / Organizer note</h3>
+        <h3>Organizer note / 幹事メモ</h3>
         <div class="form-group">
-            <label>管理者用メモ / Secret Note (Not visible to guests)</label>
-            <textarea name="memo" rows="4" placeholder="予算管理、連絡事項など。ここに入力した内容は参加者には表示されません。"><?= h($memo) ?></textarea>
+            <label>Secret Note (Not visible to guests) / 管理者用メモ</label>
+            <textarea name="memo" rows="4"
+                placeholder="Budget, notes, etc. Hidden from guests. / 予算管理、連絡事項など。ここに入力した内容は参加者には表示されません。"><?= h($memo) ?></textarea>
         </div>
     </div>
 

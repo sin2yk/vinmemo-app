@@ -62,6 +62,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $event_type = $_POST['event_type'] ?? 'BYO';
 
     $event_style_detail = $_POST['event_style_detail'] ?? '';
+
+    // MISSING INITIALIZATIONS ADDED HERE
+    $theme_desc = trim($_POST['theme_description'] ?? '');
+    $bottle_rules = trim($_POST['bottle_rules'] ?? '');
+    $blind_policy = $_POST['blind_policy'] ?? '';
+    $show_theme_fit = isset($_POST['show_theme_fit']) ? 1 : 0;
+
+    // Organizer Note from Input
+    $organizer_note = trim($_POST['memo'] ?? '');
+
     // ...
 
     if ($title === '' || $event_date === '') {

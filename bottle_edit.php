@@ -263,13 +263,13 @@ require_once 'layout/header.php';
         </div>
     <?php endif; ?>
 
-    <form method="post" action="bottle_edit.php?id=<?= h($bottle['id']) ?><?= $token ? '&token=' . h($token) : '' ?>"
+    <form method="post" action="bottle_edit.php?id=<?= h($bottle['id']) ?><?= $token ? '&edt=' . h($token) : '' ?>"
         class="card">
         <!-- Always POST ID -->
         <input type="hidden" name="id" value="<?= h($bottle['id']) ?>">
         <!-- Pass Token if Present -->
         <?php if ($token): ?>
-            <input type="hidden" name="token" value="<?= h($token) ?>">
+            <input type="hidden" name="edt" value="<?= h($token) ?>">
         <?php endif; ?>
 
         <?php
@@ -288,7 +288,7 @@ require_once 'layout/header.php';
             onsubmit="return confirm('Are you sure you want to delete this bottle? This cannot be undone.');">
             <input type="hidden" name="id" value="<?= h($bottle['id']) ?>">
             <?php if ($token): ?>
-                <input type="hidden" name="token" value="<?= h($token) ?>">
+                <input type="hidden" name="edt" value="<?= h($token) ?>">
             <?php endif; ?>
             <button type="submit" class="button btn-danger">Delete Bottle / ボトルを削除</button>
         </form>
